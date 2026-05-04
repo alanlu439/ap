@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="AP Exam Practice social preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e8fbf8"/>
+      <stop offset="0.48" stop-color="#f8fdff"/>
+      <stop offset="1" stop-color="#e8f1ff"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="120" y1="112" x2="1110" y2="552" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#075f64"/>
+      <stop offset="0.55" stop-color="#1e91d0"/>
+      <stop offset="1" stop-color="#416eed"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="900" y1="210" x2="1080" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe2a3"/>
+      <stop offset="1" stop-color="#f1a93e"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="34" flood-color="#064a52" flood-opacity="0.18"/>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#7ec7cf" stroke-opacity="0.22" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+  <circle cx="1040" cy="138" r="190" fill="#2f6fed" opacity="0.10"/>
+  <circle cx="167" cy="523" r="210" fill="#0b9296" opacity="0.12"/>
+  <rect x="72" y="70" width="1136" height="500" rx="38" fill="#ffffff" fill-opacity="0.88" stroke="#b8dce2" stroke-width="2" filter="url(#soft)"/>
+  <g transform="translate(126 126)">
+    <rect width="104" height="104" rx="26" fill="url(#brand)"/>
+    <path d="M30 20h42l14 14v52H30z" fill="#f8feff"/>
+    <path d="M72 20v14h14" fill="#d9f3f5"/>
+    <path d="M40 72V52M53 72V40M66 72V47" fill="none" stroke="#0a6970" stroke-width="6" stroke-linecap="round"/>
+    <path d="M38 55c9 6 18 4 26-3 7-7 13-9 22-4" fill="none" stroke="#2f6fed" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="83" cy="83" r="18" fill="url(#gold)" stroke="#fff" stroke-width="5"/>
+    <path d="M75 84l6 6 11-14" fill="none" stroke="#093f45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="256" y="178" fill="#122126" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="900" letter-spacing="0">AP Exam Practice</text>
+  <text x="260" y="236" fill="#3e555c" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">Subject-specific MCQ + FRQ practice for every AP course</text>
+  <g transform="translate(260 300)">
+    <rect width="190" height="68" rx="14" fill="#e0f7f4" stroke="#86cbd1" stroke-width="2"/>
+    <text x="28" y="43" fill="#075f64" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900">42 subjects</text>
+    <rect x="218" width="180" height="68" rx="14" fill="#eef4ff" stroke="#a8c0f6" stroke-width="2"/>
+    <text x="252" y="43" fill="#2457c6" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900">Auto grade</text>
+    <rect x="426" width="250" height="68" rx="14" fill="#fff5df" stroke="#efc672" stroke-width="2"/>
+    <text x="459" y="43" fill="#87590d" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900">Practice made by Alan</text>
+  </g>
+  <g transform="translate(936 352)">
+    <rect width="188" height="112" rx="16" fill="#ffffff" stroke="#b8dce2" stroke-width="2"/>
+    <path d="M30 80V58M66 80V38M102 80V52M138 80V28" fill="none" stroke="#0b9296" stroke-width="9" stroke-linecap="round"/>
+    <path d="M28 60c38 22 70 9 96-12 18-15 31-18 52-6" fill="none" stroke="#416eed" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="156" cy="36" r="18" fill="url(#gold)"/>
+    <path d="M148 37l6 6 12-16" fill="none" stroke="#093f45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="126" y="520" fill="#557077" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Original study questions. Independent and not endorsed by College Board.</text>
+</svg>

@@ -226,6 +226,18 @@ function initTestPicker() {
   });
 }
 
+function initBackButtons() {
+  document.querySelectorAll("[data-back-button]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+      window.location.href = "index.html";
+    });
+  });
+}
+
 function initMouseTracking() {
   const glow = document.createElement("div");
   const cursor = document.createElement("div");
@@ -276,4 +288,5 @@ updateChromeProgress();
 initFocusMode();
 initScrollTop();
 initTestPicker();
+initBackButtons();
 initMouseTracking();

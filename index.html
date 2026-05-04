@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AP Exam Practice</title>
     <meta name="description" content="Browser-based AP practice exam hub with subject-specific MCQ and FRQ practice, official structure timing, saved progress, and estimated grading.">
+    <meta property="og:title" content="AP Exam Practice">
+    <meta property="og:description" content="Browser-based AP practice exam hub with subject-specific MCQ and FRQ practice, official structure timing, saved progress, and estimated grading.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alanlu439.github.io/ap/">
+    <meta property="og:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
     <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -12,14 +19,14 @@
     <section class="start-screen home-page" id="startScreen">
       <div class="start-shell">
         <nav class="start-nav" aria-label="Home navigation">
-          <div class="brand-block">
+          <a class="brand-block brand-link" href="index.html" aria-label="AP Exam Practice home">
             <div class="brand-mark" aria-hidden="true">
               <img src="assets/ap-icon.svg" alt="">
             </div>
             <div>
               <h1>AP Exam Practice</h1>
-            </div>
           </div>
+          </a>
           <div class="subject-search" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg><input id="subjectSearch" type="search" autocomplete="off" placeholder="Search AP subjects" aria-label="Search AP subjects"></div>
         </nav>
 
@@ -30,28 +37,7 @@
             </div>
             <strong id="selectedSubjectStatus">Choose first</strong>
           </div>
-          <div class="subject-grid" id="subjectGrid" aria-label="AP subject options">
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Biology" data-short="Biology" data-available="true"><span>Science</span><strong>AP Biology</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Calculus AB" data-short="Calculus AB" data-available="true"><span>Math</span><strong>AP Calculus AB</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Calculus BC" data-short="Calculus BC" data-available="true"><span>Math</span><strong>AP Calculus BC</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Chemistry" data-short="Chemistry" data-available="true"><span>Science</span><strong>AP Chemistry</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Computer Science A" data-short="Computer Science A" data-available="true"><span>CS</span><strong>AP Computer Science A</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Computer Science Principles" data-short="CSP" data-available="true"><span>CS</span><strong>AP CSP</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP English Language and Composition" data-short="English Language" data-available="true"><span>English</span><strong>AP English Language</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP English Literature and Composition" data-short="English Literature" data-available="true"><span>English</span><strong>AP English Literature</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Environmental Science" data-short="Environmental Science" data-available="true"><span>Science</span><strong>AP Environmental Science</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Human Geography" data-short="Human Geography" data-available="true"><span>Social</span><strong>AP Human Geography</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Macroeconomics" data-short="Macroeconomics" data-available="true"><span>Social</span><strong>AP Macroeconomics</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Physics 1" data-short="Physics 1" data-available="true"><span>Science</span><strong>AP Physics 1</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Physics C: Mechanics" data-short="Physics C" data-available="true"><span>Science</span><strong>AP Physics C</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Precalculus" data-short="Precalculus" data-available="true"><span>Math</span><strong>AP Precalculus</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Psychology" data-short="Psychology" data-available="true"><span>Social</span><strong>AP Psychology</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Spanish Language and Culture" data-short="Spanish Language" data-available="true"><span>World Lang</span><strong>AP Spanish Language</strong><em>Available</em></button>
-            <button class="subject-card is-selected is-available" type="button" data-subject-card data-subject="AP Statistics" data-short="AP Statistics" data-available="true"><span>Math</span><strong>AP Statistics</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP United States Government and Politics" data-short="U.S. Government" data-available="true"><span>Social</span><strong>AP U.S. Government</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP United States History" data-short="U.S. History" data-available="true"><span>History</span><strong>AP U.S. History</strong><em>Available</em></button>
-            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP World History: Modern" data-short="World History" data-available="true"><span>History</span><strong>AP World History</strong><em>Available</em></button>
-          </div>
+          <div class="subject-grid" id="subjectGrid" aria-label="AP subject options"></div>
         </section>
 
         <section class="home-info-panel" aria-labelledby="homeInfoTitle">

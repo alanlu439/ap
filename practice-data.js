@@ -1125,140 +1125,448 @@
     return choices.slice(offset).concat(choices.slice(0, offset));
   }
 
-  const groupGuidance = {
-    Arts: {
-      evidence: "visual evidence, materials, composition, and written intent",
-      reasoning: "connects artistic choices to purpose and viewer effect",
-      misconception: "describes appearance without explaining design decisions"
-    },
-    Capstone: {
-      evidence: "source credibility, claims, limitations, and line of reasoning",
-      reasoning: "connects evidence to a defensible research argument",
-      misconception: "summarizes sources without evaluating or synthesizing them"
-    },
-    Career: {
-      evidence: "scenario details, risk tradeoffs, and practical constraints",
-      reasoning: "connects a decision to costs, benefits, ethics, and stakeholder impact",
-      misconception: "chooses an action without considering constraints or consequences"
-    },
-    CS: {
-      evidence: "code behavior, algorithms, data, and computing impacts",
-      reasoning: "traces logic accurately and explains why the program or system behaves that way",
-      misconception: "states an output or policy without tracing the process"
-    },
-    English: {
-      evidence: "textual evidence, rhetorical choices, structure, and commentary",
-      reasoning: "links language or literary choices to meaning, purpose, or effect",
-      misconception: "summarizes the passage instead of analyzing how it works"
-    },
-    History: {
-      evidence: "historical evidence, sourcing, chronology, and context",
-      reasoning: "builds a defensible claim using causation, comparison, continuity, or change",
-      misconception: "lists facts without connecting them to a historical argument"
-    },
+  const assessmentProfiles = {
     Math: {
+      focus: "mathematical modeling and justification",
       evidence: "definitions, representations, calculations, and conditions",
-      reasoning: "connects each step to the mathematical meaning of the problem",
-      misconception: "performs a procedure without checking assumptions or interpreting the result"
+      stimuli: [
+        "A problem gives a graph, table, or symbolic rule connected to {unit}. The answer must choose a valid method and interpret the result in context.",
+        "A student models a real situation using {unit}. Several solution paths are proposed, but only one keeps the needed conditions and units.",
+        "A calculator or algebraic result is shown for {unit}. The task is to decide which conclusion follows from the result."
+      ],
+      stems: [
+        "Which response best justifies the next step in the solution?",
+        "Which statement correctly interprets the result in context?",
+        "Which method is valid for the information given?",
+        "Which answer avoids the most common procedural error?"
+      ],
+      correct: [
+        "Use the representation to set up the correct relationship, check the required conditions, and interpret the answer with units.",
+        "Connect the calculation to the meaning of {unit} and explain why the result answers the question asked."
+      ],
+      distractors: [
+        "Use a familiar formula without checking that its conditions match the problem.",
+        "Give a numeric answer with no interpretation or units.",
+        "Use the correct vocabulary for {unit} but reverse the direction of the conclusion.",
+        "Ignore the graph or table and choose a method based only on a keyword."
+      ],
+      explanation: "AP math questions reward a valid setup, attention to conditions, and interpretation in context; the distractors reflect common formula-only or context-free errors.",
+      frqTypes: [
+        {
+          title: "Modeling and Interpretation",
+          stimulus: "A multi-part free-response problem presents a representation involving {unit}. Students must choose a method, carry out the work, and interpret the result.",
+          parts: [
+            { label: "(a) Identify the relevant representation, quantity, or condition.", criteria: [{ label: "Identifies the relevant quantity or condition", groups: [["condition", "given", "quantity", "representation", "{unitKey}"]] }] },
+            { label: "(b) Set up and carry out an appropriate calculation or symbolic step.", criteria: [{ label: "Shows a valid setup", groups: [["equation", "function", "derivative", "integral", "model", "setup", "calculate"]] }] },
+            { label: "(c) Justify why the method is valid.", criteria: [{ label: "Provides mathematical justification", groups: [["because", "therefore", "valid", "condition", "reason", "justifies"]] }] },
+            { label: "(d) Interpret the result in context.", criteria: [{ label: "Interprets in context", groups: [["context", "means", "represents", "units", "therefore", "conclude"]] }] }
+          ]
+        }
+      ]
     },
     Science: {
-      evidence: "data, models, variables, and experimental conditions",
-      reasoning: "connects evidence to a scientific claim or mechanism",
-      misconception: "names a concept but ignores the data or model in the prompt"
+      focus: "scientific modeling, data analysis, and experimental reasoning",
+      evidence: "data, models, variables, uncertainty, and experimental conditions",
+      stimuli: [
+        "An investigation about {unit} reports a data table and a proposed scientific explanation.",
+        "A diagram or model represents a process related to {unit}. Students must connect the model to evidence.",
+        "A lab group changes one variable in a system involving {unit} and compares the resulting trend."
+      ],
+      stems: [
+        "Which conclusion is best supported by the evidence?",
+        "Which claim-evidence-reasoning response would earn credit?",
+        "Which experimental change would most improve the investigation?",
+        "Which explanation best connects the model to the observed trend?"
+      ],
+      correct: [
+        "State a testable claim, cite the relevant data trend, and explain the mechanism connecting {unit} to the observation.",
+        "Use the model and data together, identify the variable relationship, and justify the conclusion scientifically."
+      ],
+      distractors: [
+        "Name the science concept but do not connect it to the data.",
+        "Describe the trend but give no mechanism or reasoning.",
+        "Change several variables at once, making the result hard to interpret.",
+        "Make a claim that goes beyond the evidence in the stimulus."
+      ],
+      explanation: "AP science items commonly ask for claim, evidence, and reasoning from a model or data display; unsupported claims and uncontrolled designs are weak.",
+      frqTypes: [
+        {
+          title: "Experimental Analysis",
+          stimulus: "A lab scenario involving {unit} includes variables, data, and a proposed explanation.",
+          parts: [
+            { label: "(a) State a scientific claim related to the scenario.", criteria: [{ label: "States a claim", groups: [["claim", "predict", "increase", "decrease", "relationship"]] }] },
+            { label: "(b) Use evidence from the data or model to support the claim.", criteria: [{ label: "Uses evidence", groups: [["data", "evidence", "trend", "table", "graph", "model"]] }] },
+            { label: "(c) Explain the biological, chemical, physical, or environmental mechanism.", criteria: [{ label: "Explains a mechanism", groups: [["because", "mechanism", "process", "causes", "therefore", "explains"]] }] },
+            { label: "(d) Propose a controlled improvement or follow-up investigation.", criteria: [{ label: "Controls variables or proposes a follow-up", groups: [["control", "variable", "repeat", "trial", "measure", "investigate"]] }] }
+          ]
+        }
+      ]
+    },
+    History: {
+      focus: "historical argumentation from documents and context",
+      evidence: "historical evidence, sourcing, chronology, and context",
+      stimuli: [
+        "A historical source about {unit} includes an author, audience, and point of view.",
+        "A set of events related to {unit} must be explained using causation, comparison, continuity, or change over time.",
+        "A document excerpt is paired with a broader historical development connected to {unit}."
+      ],
+      stems: [
+        "Which statement best uses the source as historical evidence?",
+        "Which claim would make the strongest historical argument?",
+        "Which contextualization would best support the analysis?",
+        "Which response best explains cause, comparison, continuity, or change?"
+      ],
+      correct: [
+        "Make a defensible claim, connect the source to broader context, and explain how the evidence supports the argument.",
+        "Use the document's point of view and historical situation to support a specific argument about {unit}."
+      ],
+      distractors: [
+        "Quote or summarize the source without explaining its historical significance.",
+        "Make a claim that is too broad to be defended with the evidence.",
+        "Ignore the time period and use an anachronistic explanation.",
+        "List facts about {unit} without connecting them to an argument."
+      ],
+      explanation: "AP history questions reward defensible claims, contextualization, sourcing, and evidence-based reasoning rather than simple summary.",
+      frqTypes: [
+        {
+          title: "Document-Based Historical Argument",
+          stimulus: "A document set addresses a historical development involving {unit}. Use source analysis and outside context to build an argument.",
+          parts: [
+            { label: "(a) Write a defensible thesis or claim.", criteria: [{ label: "States a defensible claim", groups: [["claim", "argue", "because", "although", "thesis"]] }] },
+            { label: "(b) Describe relevant historical context.", criteria: [{ label: "Provides context", groups: [["context", "period", "before", "during", "broader", "historical"]] }] },
+            { label: "(c) Use evidence from the source or course content.", criteria: [{ label: "Uses evidence", groups: [["evidence", "document", "source", "example", "shows"]] }] },
+            { label: "(d) Explain sourcing, causation, comparison, continuity, or change.", criteria: [{ label: "Explains historical reasoning", groups: [["cause", "change", "continuity", "comparison", "point of view", "purpose", "audience"]] }] }
+          ]
+        }
+      ]
+    },
+    English: {
+      focus: "close reading, rhetoric, evidence, and commentary",
+      evidence: "textual evidence, rhetorical choices, structure, and commentary",
+      stimuli: [
+        "A passage related to {unit} uses deliberate diction, structure, and detail to shape meaning.",
+        "A writer develops a claim about {unit} through evidence, organization, and style.",
+        "A literary or rhetorical excerpt invites analysis of how choices create an effect."
+      ],
+      stems: [
+        "Which commentary best explains how the evidence supports the claim?",
+        "Which revision would strengthen the line of reasoning?",
+        "Which statement best analyzes the author's choices?",
+        "Which answer moves beyond summary into analysis?"
+      ],
+      correct: [
+        "Identify the textual choice, connect it to the writer's purpose, and explain how it shapes meaning or effect.",
+        "Use specific evidence and commentary to develop a defensible interpretation of {unit}."
+      ],
+      distractors: [
+        "Summarize what happens in the passage without analyzing how it is written.",
+        "Use a quotation but leave the connection to the claim unstated.",
+        "Offer a personal reaction instead of commentary on the text.",
+        "Name a device from {unit} but misidentify its effect."
+      ],
+      explanation: "AP English responses earn credit for defensible interpretation, specific evidence, and commentary explaining how choices create meaning.",
+      frqTypes: [
+        {
+          title: "Evidence-Based Essay Response",
+          stimulus: "A passage or prompt connected to {unit} asks for a defensible interpretation supported by evidence.",
+          parts: [
+            { label: "(a) State a defensible thesis or claim.", criteria: [{ label: "States a defensible thesis", groups: [["claim", "argue", "thesis", "shows", "reveals"]] }] },
+            { label: "(b) Select specific textual or rhetorical evidence.", criteria: [{ label: "Uses textual evidence", groups: [["evidence", "quote", "detail", "diction", "imagery", "structure"]] }] },
+            { label: "(c) Explain how the evidence supports the line of reasoning.", criteria: [{ label: "Provides commentary", groups: [["because", "therefore", "suggests", "emphasizes", "conveys", "develops"]] }] },
+            { label: "(d) Address complexity, purpose, or broader significance.", criteria: [{ label: "Addresses complexity or significance", groups: [["complex", "although", "however", "purpose", "significance", "tension"]] }] }
+          ]
+        }
+      ]
+    },
+    WorldLang: {
+      focus: "interpretive, interpersonal, presentational, and cultural communication",
+      evidence: "cultural context, vocabulary, audience, register, and source details",
+      stimuli: [
+        "A message, article, chart, or audio summary about {unit} requires interpretation of purpose and audience.",
+        "A communication task about {unit} asks for an appropriate register and culturally aware response.",
+        "A cultural comparison prompt connects {unit} to practices, products, or perspectives."
+      ],
+      stems: [
+        "Which response best fits the audience and purpose?",
+        "Which interpretation is best supported by the source?",
+        "Which sentence uses the most appropriate register?",
+        "Which answer best connects culture and communication?"
+      ],
+      correct: [
+        "Use details from the source, choose an appropriate register, and connect the response to cultural context.",
+        "Interpret the message according to audience, purpose, and evidence from {unit}."
+      ],
+      distractors: [
+        "Translate words literally without considering context or register.",
+        "Respond to only part of the prompt and ignore the audience.",
+        "Use cultural information that is too vague to support the answer.",
+        "Make a claim about {unit} without source evidence."
+      ],
+      explanation: "AP world language tasks combine interpretation, audience awareness, register, and cultural evidence.",
+      frqTypes: [
+        {
+          title: "Communication Task",
+          stimulus: "A source or prompt about {unit} asks for an interpersonal or presentational response.",
+          parts: [
+            { label: "(a) Identify the source purpose, audience, or main idea.", criteria: [{ label: "Identifies purpose or main idea", groups: [["purpose", "audience", "main", "source", "message"]] }] },
+            { label: "(b) Use source details or cultural evidence.", criteria: [{ label: "Uses evidence", groups: [["evidence", "source", "detail", "example", "culture", "cultural"]] }] },
+            { label: "(c) Respond with appropriate register and organization.", criteria: [{ label: "Uses register and organization", groups: [["formal", "informal", "register", "greeting", "organized", "audience"]] }] },
+            { label: "(d) Make a cultural comparison or supported conclusion.", criteria: [{ label: "Connects culture to conclusion", groups: [["compare", "culture", "perspective", "practice", "product", "conclusion"]] }] }
+          ]
+        }
+      ]
+    },
+    Portfolio: {
+      focus: "portfolio development, visual evidence, and artistic intent",
+      evidence: "visual evidence, materials, process, composition, and written intent",
+      stimuli: [
+        "A portfolio statement describes work connected to {unit}, including process images and selected final pieces.",
+        "A critique compares how materials, composition, and experimentation communicate an idea in {unit}.",
+        "An artist revises a sustained investigation around {unit} after reviewing visual evidence."
+      ],
+      stems: [
+        "Which critique best connects form and intent?",
+        "Which revision would most strengthen the portfolio evidence?",
+        "Which statement best explains the relationship between process and outcome?",
+        "Which response would best support a sustained investigation?"
+      ],
+      correct: [
+        "Connect materials, composition, and process decisions to the stated inquiry and visual evidence.",
+        "Explain how the selected work demonstrates investigation, revision, and intentional decision-making."
+      ],
+      distractors: [
+        "Praise the work generally without citing visual evidence.",
+        "Describe materials but ignore the artist's intent or inquiry.",
+        "Choose a revision only because it is more decorative.",
+        "Discuss {unit} as a theme without linking it to specific portfolio evidence."
+      ],
+      explanation: "Portfolio scoring emphasizes sustained investigation, selected works, materials, process, and written evidence tied to intent.",
+      frqTypes: [
+        {
+          title: "Portfolio Reflection",
+          stimulus: "A portfolio prompt asks the artist to explain choices and evidence connected to {unit}.",
+          parts: [
+            { label: "(a) State the inquiry or artistic intent.", criteria: [{ label: "States intent or inquiry", groups: [["intent", "inquiry", "idea", "question", "investigation"]] }] },
+            { label: "(b) Describe specific visual evidence.", criteria: [{ label: "Uses visual evidence", groups: [["visual", "evidence", "composition", "material", "process", "form"]] }] },
+            { label: "(c) Explain how revision or experimentation strengthened the work.", criteria: [{ label: "Explains process or revision", groups: [["revise", "revision", "experiment", "process", "because", "develop"]] }] },
+            { label: "(d) Justify why the selected work belongs in the portfolio.", criteria: [{ label: "Justifies selection", groups: [["selected", "portfolio", "because", "demonstrates", "supports", "investigation"]] }] }
+          ]
+        }
+      ]
+    },
+    Capstone: {
+      focus: "research design, source evaluation, and argument synthesis",
+      evidence: "source credibility, claims, limitations, and line of reasoning",
+      stimuli: [
+        "A research team examines sources connected to {unit} and must evaluate credibility and relevance.",
+        "A student develops a line of reasoning about {unit} using multiple perspectives.",
+        "A presentation defense question asks the student to justify choices in research on {unit}."
+      ],
+      stems: [
+        "Which revision best strengthens the research question?",
+        "Which evaluation of the source is most useful?",
+        "Which evidence best supports the line of reasoning?",
+        "Which limitation should the researcher acknowledge?"
+      ],
+      correct: [
+        "Connect the source's credibility, relevance, and limitations to a focused research claim.",
+        "Synthesize evidence from multiple perspectives and explain how it supports the argument."
+      ],
+      distractors: [
+        "Use a source only because it agrees with the claim.",
+        "Summarize sources one by one without synthesis.",
+        "Ask a question that is too broad to investigate.",
+        "Ignore limitations in the evidence about {unit}."
+      ],
+      explanation: "AP Capstone work values focused inquiry, source credibility, synthesis, limitations, and defensible argumentation.",
+      frqTypes: [
+        {
+          title: "Research and Argument Response",
+          stimulus: "A research prompt about {unit} asks for evaluation, synthesis, and defense of a claim.",
+          parts: [
+            { label: "(a) Write or refine a focused research question.", criteria: [{ label: "Focuses a research question", groups: [["research", "question", "focused", "scope", "investigate"]] }] },
+            { label: "(b) Evaluate source credibility and relevance.", criteria: [{ label: "Evaluates credibility", groups: [["credibility", "relevant", "source", "bias", "reliable", "limitation"]] }] },
+            { label: "(c) Synthesize evidence into a line of reasoning.", criteria: [{ label: "Synthesizes evidence", groups: [["synthesize", "evidence", "perspective", "reasoning", "connects", "supports"]] }] },
+            { label: "(d) Defend the conclusion and acknowledge a limitation.", criteria: [{ label: "Defends with limitation", groups: [["defend", "conclusion", "limitation", "however", "because", "therefore"]] }] }
+          ]
+        }
+      ]
+    },
+    CS: {
+      focus: "program behavior, algorithms, data, and computing impacts",
+      evidence: "code behavior, algorithms, data, abstractions, and impacts",
+      stimuli: [
+        "A short algorithm processes data related to {unit}. Students must trace the output or identify an error.",
+        "A computing scenario involving {unit} asks about abstraction, data, security, or impact.",
+        "A program segment is described with inputs, conditions, and repeated steps."
+      ],
+      stems: [
+        "Which statement best describes the program behavior?",
+        "Which change would correctly fix or improve the algorithm?",
+        "Which explanation best traces the data through the process?",
+        "Which answer best accounts for impact, security, or abstraction?"
+      ],
+      correct: [
+        "Trace each step of the algorithm, connect the data to the condition being tested, and state the resulting behavior.",
+        "Use the abstraction correctly and explain how the program logic produces the outcome."
+      ],
+      distractors: [
+        "Assume the loop runs once without checking the condition.",
+        "Describe the purpose of the program but not its actual behavior.",
+        "Ignore the data representation used in {unit}.",
+        "Choose a fix that solves one case but fails a boundary case."
+      ],
+      explanation: "AP computer science questions reward accurate tracing, abstraction, data reasoning, and attention to edge cases or impacts.",
+      frqTypes: [
+        {
+          title: "Algorithm and Program Reasoning",
+          stimulus: "A program or computing scenario connected to {unit} includes inputs, processing, and expected behavior.",
+          parts: [
+            { label: "(a) Describe the purpose, input, or output of the program.", criteria: [{ label: "Describes purpose or I/O", groups: [["purpose", "input", "output", "program", "data"]] }] },
+            { label: "(b) Explain the algorithm or abstraction used.", criteria: [{ label: "Explains algorithm or abstraction", groups: [["algorithm", "abstraction", "loop", "condition", "list", "method"]] }] },
+            { label: "(c) Trace or justify the result for a test case.", criteria: [{ label: "Traces a test case", groups: [["test", "case", "trace", "because", "result", "returns"]] }] },
+            { label: "(d) Identify an improvement, limitation, or impact.", criteria: [{ label: "Identifies improvement or impact", groups: [["improve", "limitation", "impact", "security", "privacy", "efficiency"]] }] }
+          ]
+        }
+      ]
     },
     Social: {
+      focus: "models, institutions, behavior, data, and policy reasoning",
       evidence: "models, institutions, data, cases, and policy context",
-      reasoning: "explains how the concept affects behavior, incentives, or outcomes",
-      misconception: "gives a definition without applying it to the scenario"
-    },
-    "World Lang": {
-      evidence: "cultural context, vocabulary, audience, register, and source details",
-      reasoning: "selects language or interpretation that fits purpose, audience, and culture",
-      misconception: "translates words literally without considering context or register"
+      stimuli: [
+        "A scenario or data display about {unit} asks students to apply a course model.",
+        "A policy, institution, market, or behavior pattern connected to {unit} is described.",
+        "A chart or case study requires interpretation using course vocabulary."
+      ],
+      stems: [
+        "Which application of the course concept is most accurate?",
+        "Which conclusion is best supported by the data or scenario?",
+        "Which explanation best connects the model to the outcome?",
+        "Which response avoids a definition-only answer?"
+      ],
+      correct: [
+        "Apply the course concept to the scenario, use the relevant data or case evidence, and explain the effect on behavior or outcomes.",
+        "Connect {unit} to a specific model, institution, or decision and justify the conclusion."
+      ],
+      distractors: [
+        "Define the term but do not apply it to the scenario.",
+        "Choose a conclusion that is plausible but not supported by the data.",
+        "Ignore the institution, incentive, or context in {unit}.",
+        "Make a value judgment instead of a course-based explanation."
+      ],
+      explanation: "AP social science questions often require applying a model or institution to data and explaining behavior, incentives, or outcomes.",
+      frqTypes: [
+        {
+          title: "Applied Concept Response",
+          stimulus: "A scenario, model, or data source connected to {unit} asks for application and explanation.",
+          parts: [
+            { label: "(a) Define or identify the relevant course concept.", criteria: [{ label: "Identifies concept", groups: [["define", "concept", "model", "institution", "{unitKey}"]] }] },
+            { label: "(b) Apply the concept to the scenario or data.", criteria: [{ label: "Applies to scenario", groups: [["scenario", "data", "case", "example", "shows", "applies"]] }] },
+            { label: "(c) Explain the reasoning or causal mechanism.", criteria: [{ label: "Explains reasoning", groups: [["because", "therefore", "causes", "effect", "incentive", "explains"]] }] },
+            { label: "(d) State a supported implication, comparison, or limitation.", criteria: [{ label: "States implication or limitation", groups: [["implication", "compare", "limitation", "however", "conclusion", "policy"]] }] }
+          ]
+        }
+      ]
     }
   };
 
-  function guidanceFor(subject) {
-    return groupGuidance[subject.group] || groupGuidance.Social;
+  function profileKeyFor(subject) {
+    if (/Art and Design|Drawing/.test(subject.title)) return "Portfolio";
+    if (/Research|Seminar/.test(subject.title)) return "Capstone";
+    if (/Computer Science|Cybersecurity/.test(subject.title)) return "CS";
+    if (/Language and Culture|Latin|Spanish Literature/.test(subject.title)) return "WorldLang";
+    return assessmentProfiles[subject.group] ? subject.group : "Social";
+  }
+
+  function profileFor(subject) {
+    return assessmentProfiles[profileKeyFor(subject)] || assessmentProfiles.Social;
+  }
+
+  function keywordFrom(value) {
+    return String(value || "concept").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(" ")[0] || "concept";
+  }
+
+  function fillTemplate(template, values) {
+    return String(template)
+      .replaceAll("{unit}", values.unit)
+      .replaceAll("{unitLower}", values.unitLower)
+      .replaceAll("{unitKey}", values.unitKey)
+      .replaceAll("{subjectTitle}", values.subjectTitle)
+      .replaceAll("{subjectShort}", values.subjectShort)
+      .replaceAll("{subjectKey}", values.subjectKey)
+      .replaceAll("{evidence}", values.evidence)
+      .replaceAll("{focus}", values.focus);
+  }
+
+  function filledCriteria(criteria, values) {
+    return criteria.map((criterion) => ({
+      label: fillTemplate(criterion.label, values),
+      groups: criterion.groups.map((group) => group.map((term) => fillTemplate(term, values).toLowerCase()))
+    }));
   }
 
   function buildMcqQuestions(subject = getSelectedSubject()) {
-    const guidance = guidanceFor(subject);
-    const stems = [
-      "A student is working with {unit}. Which response would best meet AP-style scoring expectations?",
-      "Which revision would make an answer about {unit} strongest?",
-      "Which choice shows the best use of evidence for {unit}?",
-      "Which answer best avoids a common error when explaining {unit}?",
-      "A prompt asks students to reason about {unit}. Which response is most complete?"
-    ];
+    const profile = profileFor(subject);
+    const setLength = subject.format.mcqCount >= 40 ? 3 : 2;
 
     return Array.from({ length: subject.format.mcqCount }, (_, index) => {
       const unit = subject.units[index % subject.units.length];
-      const unitLower = unit.toLowerCase();
-      const stem = stems[index % stems.length].replace("{unit}", unitLower);
-      const correct = "Apply " + unitLower + " to the specific prompt, use " + guidance.evidence + ", and explain why that evidence supports the conclusion.";
-      const distractors = [
-        "Define " + unitLower + " accurately but do not apply it to the prompt.",
-        "Rely on a broad opinion instead of " + guidance.evidence + ".",
-        "Shift to an unrelated " + subject.short + " topic and ignore the task.",
-        "Make a claim about " + unitLower + " but skip the reasoning that earns credit."
-      ];
-      const choices = rotateChoices([correct, ...distractors], index + subject.slug.length);
+      const values = {
+        unit,
+        unitLower: unit.toLowerCase(),
+        unitKey: keywordFrom(unit),
+        subjectTitle: subject.title,
+        subjectShort: subject.short,
+        subjectKey: keywordFrom(subject.short),
+        evidence: profile.evidence,
+        focus: profile.focus
+      };
+      const correct = fillTemplate(profile.correct[index % profile.correct.length], values);
+      const distractors = profile.distractors.map((choice) => fillTemplate(choice, values));
+      const choices = rotateChoices([correct, ...distractors.slice(0, 4)], index + subject.slug.length);
+      const setStart = Math.floor(index / setLength) * setLength + 1;
+      const setEnd = Math.min(setStart + setLength - 1, subject.format.mcqCount);
 
       return {
         id: index + 1,
         unit: "Unit " + ((index % subject.units.length) + 1) + ": " + unit,
         skill: (index % 4) + 1,
-        set: index % 5 === 0 ? "Questions " + (index + 1) + "-" + Math.min(index + 3, subject.format.mcqCount) + " share a topic" : undefined,
-        stimulus: index % 5 === 0 ? "Topic focus: " + unit + ". Use course-specific reasoning for " + subject.title + "." : "",
-        prompt: stem,
+        set: setEnd > setStart ? "Questions " + setStart + "-" + setEnd + " share a stimulus" : undefined,
+        stimulus: fillTemplate(profile.stimuli[index % profile.stimuli.length], values),
+        prompt: fillTemplate(profile.stems[index % profile.stems.length], values),
         choices,
         correct: choices.indexOf(correct),
-        explanation: "The best AP-style response " + guidance.reasoning + ". The other choices are incomplete because one " + guidance.misconception + ", one is off task, and one lacks support."
+        explanation: fillTemplate(profile.explanation, values)
       };
     });
   }
 
   function buildFrqItems(subject = getSelectedSubject()) {
-    const guidance = guidanceFor(subject);
+    const profile = profileFor(subject);
+
     return Array.from({ length: subject.format.frqCount }, (_, index) => {
       const unit = subject.units[index % subject.units.length];
-      const unitLower = unit.toLowerCase();
-      const keyTerm = unit.split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
-      const subjectTerm = subject.short.toLowerCase().split(" ")[0].replace(/[^a-z0-9]/g, "");
+      const frqType = profile.frqTypes[index % profile.frqTypes.length];
+      const values = {
+        unit,
+        unitLower: unit.toLowerCase(),
+        unitKey: keywordFrom(unit),
+        subjectTitle: subject.title,
+        subjectShort: subject.short,
+        subjectKey: keywordFrom(subject.short),
+        evidence: profile.evidence,
+        focus: profile.focus
+      };
 
       return {
         id: index + 1,
-        title: unit + " Task",
-        maxPoints: 4,
-        stimulus: "Practice made by Alan for " + subject.title + ". Analyze a scenario involving " + unitLower + ", use course vocabulary, and justify a conclusion with evidence.",
-        parts: [
-          {
-            label: "(a) Identify the main course concept connected to " + unitLower + ".",
-            criteria: [
-              { label: "Identifies the relevant concept", groups: [[keyTerm, subjectTerm, "concept", "claim"]] }
-            ]
-          },
-          {
-            label: "(b) Use specific evidence from the scenario to support the claim.",
-            criteria: [
-              { label: "Uses evidence from the prompt", groups: [["evidence", "scenario", "source", "data", "example", "text"]] },
-              { label: "Connects evidence to the claim", groups: [["because", "therefore", "shows", "supports", "leads", "causes", "explains"]] }
-            ]
-          },
-          {
-            label: "(c) Explain the reasoning in " + subject.short + " terms.",
-            criteria: [
-              { label: "Explains reasoning with course vocabulary", groups: [[subjectTerm, keyTerm, "model", "process", "context", "method"]] }
-            ]
-          },
-          {
-            label: "(d) State a justified conclusion, limitation, or next step.",
-            criteria: [
-              { label: "States a justified conclusion or limitation", groups: [["conclude", "conclusion", "limitation", "however", "therefore", "next"]] }
-            ]
-          }
-        ]
+        title: fillTemplate(frqType.title, values),
+        maxPoints: frqType.parts.length,
+        stimulus: "Practice made by Alan for " + subject.title + ". " + fillTemplate(frqType.stimulus, values),
+        parts: frqType.parts.map((part) => ({
+          label: fillTemplate(part.label, values),
+          criteria: filledCriteria(part.criteria, values)
+        }))
       };
     });
   }

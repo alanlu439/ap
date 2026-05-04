@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AP Exam Practice | MCQ</title>
     <meta name="description" content="Practice AP multiple-choice questions with subject-specific timing, saved progress, and instant review.">
+    <meta property="og:title" content="AP Exam Practice | MCQ">
+    <meta property="og:description" content="Practice AP multiple-choice questions with subject-specific timing, saved progress, and instant review.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alanlu439.github.io/ap/mcq.html">
+    <meta property="og:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
     <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div class="brand-block">
+        <a class="brand-block brand-link" href="index.html" aria-label="AP Exam Practice home">
             <div class="brand-mark" aria-hidden="true">
               <img src="assets/ap-icon.svg" alt="">
             </div>
@@ -19,8 +26,9 @@
             <h1>MCQ</h1>
             <p>40 questions · 90 minutes · 50%</p>
           </div>
-        </div>
+          </a>
         <nav class="page-nav" aria-label="Practice pages">
+          <button class="text-button secondary compact back-button" type="button" data-back-button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6M10 12h10"/></svg><span>Back</span></button>
           <button class="text-button primary compact" type="button" data-start-test>Start Test</button>
         </nav>
         <div class="status-strip" aria-label="Practice status">
