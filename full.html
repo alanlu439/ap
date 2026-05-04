@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AP Exam Practice | Full Practice</title>
+    <meta name="description" content="Run a full AP practice path with MCQ and FRQ sections based on the selected subject structure.">
+    <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+            <div class="brand-mark" aria-hidden="true">
+              <img src="assets/ap-icon.svg" alt="">
+            </div>
+            <div>
+            <h1>Full Practice</h1>
+            <p>MCQ, then FRQ</p>
+          </div>
+        </div>
+        <nav class="page-nav" aria-label="Practice pages">
+          <button class="text-button primary compact" type="button" data-start-test>Start Test</button>
+        </nav>
+      </header>
+
+      <main class="path-page">
+        <section class="path-hero">
+          <div>
+            <h2>Full practice path.</h2>
+            <p>Start MCQ, then FRQ. Auto-saved.</p>
+          </div>
+          <div class="path-total">
+            <span>Total Time</span>
+            <strong>180 min</strong>
+          </div>
+        </section>
+
+        <section class="path-grid" aria-label="Full practice steps">
+          <a class="path-card" href="mcq.html" data-ready="mcq">
+            <span>Step 1</span>
+            <h3>MCQ</h3>
+            <p>40 questions. 90 minutes.</p>
+            <strong id="mcqPathStatus">Open MCQ</strong>
+          </a>
+          <a class="path-card" href="frq.html" data-ready="frq">
+            <span>Step 2</span>
+            <h3>FRQ</h3>
+            <p>6 questions. 90 minutes.</p>
+            <strong id="frqPathStatus">Open FRQ</strong>
+          </a>
+        </section>
+
+        <section class="docs-section compact-docs">
+          <h2>Sources</h2>
+          <div class="docs-grid">
+            <a href="https://apcentral.collegeboard.org/courses" target="_blank" rel="noreferrer">AP Central Courses</a>
+            <a href="https://apstudents.collegeboard.org/courses" target="_blank" rel="noreferrer">AP Students Courses</a>
+            <a href="legal.html">Disclaimer</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Practice made by Alan. AP® and Advanced Placement® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site.</span>
+        <a href="legal.html">Disclaimer</a>
+      </footer>
+    </div>
+
+    <dialog class="ready-dialog" id="readyDialog" aria-labelledby="readyTitle">
+      <form method="dialog">
+        <div class="ready-dialog-body">
+          <span class="home-greeting">Before you begin</span>
+          <h2 id="readyTitle">Ready?</h2>
+          <p id="readyDetail">Progress saves as you work.</p>
+          <div class="ready-actions">
+            <button class="text-button secondary" value="cancel" type="button" id="readyCancelBtn">Not yet</button>
+            <button class="text-button primary" value="confirm" type="button" id="readyConfirmBtn">I'm ready</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="practice-data.js"></script>
+    <script src="start.js"></script>
+    <script src="chrome.js"></script>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AP Exam Practice | FRQ</title>
+    <meta name="description" content="Practice AP free-response questions with subject-specific timing, saved progress, and estimated rubric grading.">
+    <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+            <div class="brand-mark" aria-hidden="true">
+              <img src="assets/ap-icon.svg" alt="">
+            </div>
+            <div>
+            <h1>FRQ</h1>
+            <p>6 questions · 90 minutes · 50%</p>
+          </div>
+        </div>
+        <nav class="page-nav" aria-label="Practice pages">
+          <button class="text-button primary compact" type="button" data-start-test>Start Test</button>
+        </nav>
+      </header>
+
+      <section class="frq-section standalone" id="frqSection">
+        <div class="frq-header">
+          <div>
+            <h2>Free Response</h2>
+            <p>6 prompts. Rubric estimate after submit.</p>
+          </div>
+          <div class="frq-status" aria-label="Free-response status">
+            <div>
+              <span>Timer</span>
+              <strong id="frqTimer">90:00</strong>
+            </div>
+            <div>
+              <span>Answered</span>
+              <strong id="frqAnswered">0 / 6</strong>
+            </div>
+            <div>
+              <span>Score</span>
+              <strong id="frqScore">--</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="frq-toolbar">
+          <button class="text-button primary" id="frqStartBtn" type="button">Start Timer</button>
+          <button class="text-button submit" id="frqSubmitBtn" type="button">Submit + Grade</button>
+          <a class="text-button secondary nav-link" href="mcq.html">MCQ</a>
+          <button class="text-button secondary" id="frqJumpBtn" type="button">Next Blank</button>
+          <button class="text-button secondary" id="frqResetBtn" type="button">Clear</button>
+        </div>
+        <div class="section-progress" aria-hidden="true"><span id="frqProgressBar"></span></div>
+        <p class="frq-caveat"><span>Auto grade is an estimate.</span><strong id="frqSaveStatus">Saved</strong></p>
+
+        <div class="frq-workspace">
+          <aside class="frq-rail" aria-label="FRQ navigator">
+            <div class="panel-title">
+              <h2>Questions</h2>
+              <span id="frqRailText">0 / 6</span>
+            </div>
+            <div class="frq-nav" id="frqNav"></div>
+          </aside>
+          <div class="frq-grid" id="frqList"></div>
+        </div>
+
+        <section class="frq-summary" id="frqSummary" hidden>
+          <div>
+            <span class="review-kicker">Rubric Review</span>
+            <h3 id="frqSummaryTitle">FRQ score estimate</h3>
+          </div>
+          <p id="frqSummaryText"></p>
+          <div class="frq-results" id="frqResults"></div>
+        </section>
+      </section>
+
+      <footer class="footer">
+        <span>Practice made by Alan. AP® and Advanced Placement® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site.</span>
+        <a href="legal.html">Disclaimer</a>
+      </footer>
+    </div>
+
+    <script src="practice-data.js"></script>
+    <script src="frq.js"></script>
+    <script src="chrome.js"></script>
+  </body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AP Exam Practice</title>
+    <meta name="description" content="Browser-based AP practice exam hub with subject-specific MCQ and FRQ practice, official structure timing, saved progress, and estimated grading.">
+    <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <section class="start-screen home-page" id="startScreen">
+      <div class="start-shell">
+        <nav class="start-nav" aria-label="Home navigation">
+          <div class="brand-block">
+            <div class="brand-mark" aria-hidden="true">
+              <img src="assets/ap-icon.svg" alt="">
+            </div>
+            <div>
+              <h1>AP Exam Practice</h1>
+            </div>
+          </div>
+          <button class="text-button primary compact nav-cta" type="button" data-start-test><span>Select Test</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </nav>
+
+        <section class="subject-panel" aria-labelledby="subjectTitle">
+          <div class="subject-heading">
+            <div>
+              <h2 id="subjectTitle">Select Your AP Test</h2>
+            </div>
+            <strong id="selectedSubjectStatus">Choose first</strong>
+          </div>
+          <div class="subject-grid" id="subjectGrid" aria-label="AP subject options">
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Biology" data-short="Biology" data-available="true"><span>Science</span><strong>AP Biology</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Calculus AB" data-short="Calculus AB" data-available="true"><span>Math</span><strong>AP Calculus AB</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Calculus BC" data-short="Calculus BC" data-available="true"><span>Math</span><strong>AP Calculus BC</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Chemistry" data-short="Chemistry" data-available="true"><span>Science</span><strong>AP Chemistry</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Computer Science A" data-short="Computer Science A" data-available="true"><span>CS</span><strong>AP Computer Science A</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Computer Science Principles" data-short="CSP" data-available="true"><span>CS</span><strong>AP CSP</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP English Language and Composition" data-short="English Language" data-available="true"><span>English</span><strong>AP English Language</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP English Literature and Composition" data-short="English Literature" data-available="true"><span>English</span><strong>AP English Literature</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Environmental Science" data-short="Environmental Science" data-available="true"><span>Science</span><strong>AP Environmental Science</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Human Geography" data-short="Human Geography" data-available="true"><span>Social</span><strong>AP Human Geography</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Macroeconomics" data-short="Macroeconomics" data-available="true"><span>Social</span><strong>AP Macroeconomics</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Physics 1" data-short="Physics 1" data-available="true"><span>Science</span><strong>AP Physics 1</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Physics C: Mechanics" data-short="Physics C" data-available="true"><span>Science</span><strong>AP Physics C</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Precalculus" data-short="Precalculus" data-available="true"><span>Math</span><strong>AP Precalculus</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Psychology" data-short="Psychology" data-available="true"><span>Social</span><strong>AP Psychology</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP Spanish Language and Culture" data-short="Spanish Language" data-available="true"><span>World Lang</span><strong>AP Spanish Language</strong><em>Available</em></button>
+            <button class="subject-card is-selected is-available" type="button" data-subject-card data-subject="AP Statistics" data-short="AP Statistics" data-available="true"><span>Math</span><strong>AP Statistics</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP United States Government and Politics" data-short="U.S. Government" data-available="true"><span>Social</span><strong>AP U.S. Government</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP United States History" data-short="U.S. History" data-available="true"><span>History</span><strong>AP U.S. History</strong><em>Available</em></button>
+            <button class="subject-card is-available" type="button" data-subject-card data-subject="AP World History: Modern" data-short="World History" data-available="true"><span>History</span><strong>AP World History</strong><em>Available</em></button>
+          </div>
+        </section>
+
+        <section class="home-info-panel" aria-labelledby="homeInfoTitle">
+          <div class="subject-heading">
+            <div>
+              <h2 id="homeInfoTitle">Before Test Day</h2>
+            </div>
+            <strong>Official Info</strong>
+          </div>
+          <div class="home-info-grid">
+            <a class="home-info-card" href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">
+              <span>Schedule</span>
+              <strong>Check Exam Dates</strong>
+              <em>2026 AP Exams run May 4-15. Morning exams begin 8-9 AM local; afternoon exams begin 12-1 PM local.</em>
+            </a>
+            <a class="home-info-card" href="https://apstudents.collegeboard.org/help-center/when-where-do-i-take-ap-exam" target="_blank" rel="noreferrer">
+              <span>Location</span>
+              <strong>Confirm Where To Report</strong>
+              <em>Your AP teacher or AP coordinator gives the exact room, arrival time, and school-specific instructions.</em>
+            </a>
+            <a class="home-info-card" href="https://apstudents.collegeboard.org/register-for-ap-exams" target="_blank" rel="noreferrer">
+              <span>My AP</span>
+              <strong>Verify Registration</strong>
+              <em>Sign in to My AP and make sure your class section and exam registration are correct.</em>
+            </a>
+          </div>
+        </section>
+
+        <div class="mode-popout" id="modePopout" role="dialog" aria-modal="true" aria-labelledby="modePopoutTitle" hidden>
+          <button class="mode-popout-backdrop" type="button" data-mode-close aria-label="Close exam choices"></button>
+          <section class="mode-popout-card" role="document">
+            <div class="mode-popout-head">
+              <div>
+                <span id="modePopoutSubject">Select a subject</span>
+                <h2 id="modePopoutTitle">Choose Exam Structure</h2>
+              </div>
+              <button class="mode-close" type="button" data-mode-close aria-label="Close exam choices">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+            <p id="modePopoutStatus">Choose one option to begin.</p>
+            <div class="mode-grid" id="modeGrid" aria-label="Practice modes">
+              <a class="mode-card is-selected" href="full.html" data-mode="full" data-ready="full">
+                <span class="mode-title">Full Exam</span>
+                <strong>180 min</strong>
+                <span>MCQ + FRQ</span>
+              </a>
+              <a class="mode-card" href="mcq.html" data-mode="mcq" data-ready="mcq">
+                <span class="mode-title">Section I</span>
+                <strong>40 MCQ</strong>
+                <span>90 minutes</span>
+              </a>
+              <a class="mode-card" href="frq.html" data-mode="frq" data-ready="frq">
+                <span class="mode-title">Section II</span>
+                <strong>6 FRQ</strong>
+                <span>90 minutes</span>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <footer class="legal-strip">
+          <span>Practice made by Alan. AP® and Advanced Placement® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site.</span>
+          <a href="legal.html">Disclaimer</a>
+        </footer>
+      </div>
+    </section>
+
+    <div class="ready-modal" id="readyDialog" role="dialog" aria-modal="true" aria-labelledby="readyTitle" hidden>
+      <div class="test-picker-backdrop" data-ready-close></div>
+      <div class="ready-dialog" role="document">
+        <div class="ready-dialog-body">
+          <span class="home-greeting">Before you begin</span>
+          <h2 id="readyTitle">Ready?</h2>
+          <p id="readyDetail">Progress saves as you work.</p>
+          <div class="ready-actions">
+            <button class="text-button secondary" value="cancel" type="button" id="readyCancelBtn" data-ready-close>Not yet</button>
+            <button class="text-button primary" value="confirm" type="button" id="readyConfirmBtn">I'm ready</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="practice-data.js"></script>
+    <script src="start.js"></script>
+    <script src="chrome.js"></script>
+  </body>
+</html>

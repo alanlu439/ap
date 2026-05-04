@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AP Exam Practice | MCQ</title>
+    <meta name="description" content="Practice AP multiple-choice questions with subject-specific timing, saved progress, and instant review.">
+    <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+            <div class="brand-mark" aria-hidden="true">
+              <img src="assets/ap-icon.svg" alt="">
+            </div>
+            <div>
+            <h1>MCQ</h1>
+            <p>40 questions · 90 minutes · 50%</p>
+          </div>
+        </div>
+        <nav class="page-nav" aria-label="Practice pages">
+          <button class="text-button primary compact" type="button" data-start-test>Start Test</button>
+        </nav>
+        <div class="status-strip" aria-label="Practice status">
+          <div class="status-item">
+            <span>Timer</span>
+            <strong id="timer">90:00</strong>
+          </div>
+          <div class="status-item">
+            <span>Progress</span>
+            <strong id="progressText">0 / 40</strong>
+          </div>
+          <div class="status-item">
+            <span>Score</span>
+            <strong id="scoreText">--</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="question-panel" aria-live="polite">
+          <div class="exam-note" id="examNote">
+            <strong>Section I:</strong> 40 MCQ · 90 min · 50%.
+          </div>
+          <div class="section-progress" aria-hidden="true"><span id="mcqProgressBar"></span></div>
+
+          <div class="question-card">
+            <div class="question-meta">
+              <span id="questionNumber">Question 1 of 40</span>
+              <span id="setLabel">Individual question</span>
+            </div>
+
+            <div class="stimulus" id="stimulus" hidden></div>
+
+            <h2 id="questionText"></h2>
+            <div class="choices" id="choices"></div>
+
+            <div class="actions">
+              <button class="icon-button secondary" id="prevBtn" type="button" aria-label="Previous question">
+                <span aria-hidden="true">‹</span>
+              </button>
+              <button class="text-button secondary" id="flagBtn" type="button">Flag</button>
+              <button class="text-button secondary" id="clearBtn" type="button">Clear</button>
+              <button class="text-button primary" id="startBtn" type="button">Start Timer</button>
+              <button class="icon-button secondary" id="nextBtn" type="button" aria-label="Next question">
+                <span aria-hidden="true">›</span>
+              </button>
+            </div>
+          </div>
+
+          <section class="review-panel" id="reviewPanel" hidden>
+            <div>
+              <span class="review-kicker" id="reviewStatus">Review</span>
+              <h3 id="reviewTitle">Answer explanation</h3>
+            </div>
+            <p id="reviewExplanation"></p>
+            <div class="tags" id="reviewTags"></div>
+          </section>
+        </section>
+
+        <aside class="sidebar">
+          <section class="control-panel">
+            <div class="panel-title">
+              <h2>Navigator</h2>
+              <span id="answeredText">0 answered</span>
+            </div>
+            <div class="navigator" id="navigator" aria-label="Question navigator"></div>
+            <button class="text-button submit" id="submitBtn" type="button">Submit</button>
+            <a class="text-button secondary full nav-link" href="frq.html">FRQ</a>
+            <button class="text-button secondary full" id="resetBtn" type="button">Restart</button>
+          </section>
+
+          <section class="structure-panel">
+            <h2>Structure</h2>
+            <dl>
+              <div>
+                <dt>Section</dt>
+                <dd>Multiple Choice</dd>
+              </div>
+              <div>
+                <dt>Questions</dt>
+                <dd>40</dd>
+              </div>
+              <div>
+                <dt>Time</dt>
+                <dd>90 minutes</dd>
+              </div>
+              <div>
+                <dt>Weight</dt>
+                <dd>50%</dd>
+              </div>
+              <div>
+                <dt>Choices</dt>
+                <dd>A-E</dd>
+              </div>
+            </dl>
+            <p class="source-note">No penalty for guessing.</p>
+          </section>
+
+          <section class="blueprint-panel">
+            <h2>Blueprint</h2>
+            <div id="blueprintList"></div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <span>Practice made by Alan. AP® and Advanced Placement® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site.</span>
+        <a href="legal.html">Disclaimer</a>
+      </footer>
+    </div>
+
+    <script src="practice-data.js"></script>
+    <script src="app.js"></script>
+    <script src="chrome.js"></script>
+  </body>
+</html>

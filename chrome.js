@@ -1,0 +1,279 @@
+const practiceData = window.APPracticeData;
+const CHROME_FOCUS_KEY = "ap-practice-focus-mode-v1";
+const fallbackChromeSubject = {
+  title: "AP Statistics",
+  short: "AP Statistics",
+  slug: "ap-statistics",
+  format: { mcqCount: 40, mcqMinutes: 90, frqCount: 6, frqMinutes: 90, mcqWeight: 50, frqWeight: 50, fullMinutes: 180 }
+};
+
+function getChromeSubject() {
+  return practiceData?.getSelectedSubject?.() || fallbackChromeSubject;
+}
+
+function chromeStorageKey(kind, subject = getChromeSubject()) {
+  return practiceData?.storageKey?.(kind, subject) || "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
+}
+
+function chromeWeight(value) {
+  return practiceData?.formatWeight?.(value) || (Number.isInteger(value) ? value + "%" : Number(value).toFixed(1) + "%");
+}
+
+function chromeTotalMinutes(format) {
+  return practiceData?.totalMinutes?.(format) || format.fullMinutes || format.mcqMinutes + format.frqMinutes;
+}
+
+function getTestOptions(subject = getChromeSubject()) {
+  const format = subject.format;
+  return [
+    {
+      href: "full.html",
+      mode: "full",
+      label: subject.title + " Full Practice",
+      meta: chromeTotalMinutes(format) + " minutes · MCQ, then FRQ"
+    },
+    {
+      href: "mcq.html",
+      mode: "mcq",
+      label: subject.title + " MCQ",
+      meta: format.mcqCount + " questions · " + format.mcqMinutes + " minutes · " + chromeWeight(format.mcqWeight)
+    },
+    {
+      href: "frq.html",
+      mode: "frq",
+      label: subject.title + " FRQ",
+      meta: format.frqCount + " prompts · " + format.frqMinutes + " minutes · " + chromeWeight(format.frqWeight)
+    }
+  ];
+}
+
+function readChromeJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function getChromeProgress(subject = getChromeSubject()) {
+  const mcq = readChromeJson(chromeStorageKey("mcq", subject));
+  const frq = readChromeJson(chromeStorageKey("frq", subject));
+  const mcqAnswered = Array.isArray(mcq.answers) ? mcq.answers.filter((answer) => answer !== null).length : 0;
+  const frqAnswered = Array.isArray(frq.answers)
+    ? frq.answers.filter((answers) =>
+        Array.isArray(answers) && answers.some((answer) => String(answer || "").trim().length > 0)
+      ).length
+    : 0;
+
+  return {
+    mcqAnswered,
+    frqAnswered,
+    mcqSubmitted: Boolean(mcq.submitted),
+    frqSubmitted: Boolean(frq.submitted)
+  };
+}
+
+function getResumeTarget(progress) {
+  if (progress.mcqSubmitted && !progress.frqSubmitted) return "frq.html";
+  if (progress.frqAnswered || progress.frqSubmitted) return "frq.html";
+  if (progress.mcqAnswered || progress.mcqSubmitted) return "mcq.html";
+  return "mcq.html";
+}
+
+function updateChromeProgress() {
+  const subject = getChromeSubject();
+  const progress = getChromeProgress(subject);
+  const resumeLinks = document.querySelectorAll("[data-resume-link]");
+  const progressLabels = document.querySelectorAll("[data-footer-progress]");
+  const resumeTarget = getResumeTarget(progress);
+  const label =
+    progress.mcqAnswered || progress.frqAnswered
+      ? `${progress.mcqAnswered}/${subject.format.mcqCount} MCQ · ${progress.frqAnswered}/${subject.format.frqCount} FRQ`
+      : "No saved work";
+
+  resumeLinks.forEach((link) => {
+    link.setAttribute("href", resumeTarget);
+    link.textContent = progress.mcqAnswered || progress.frqAnswered ? "Resume" : "Start";
+  });
+  progressLabels.forEach((item) => {
+    item.textContent = label;
+  });
+}
+
+function initFocusMode() {
+  const buttons = document.querySelectorAll("[data-focus-toggle]");
+  const apply = (enabled) => {
+    document.body.classList.toggle("focus-mode", enabled);
+    buttons.forEach((button) => {
+      button.textContent = enabled ? "Vibrant" : "Focus";
+      button.setAttribute("aria-pressed", String(enabled));
+    });
+  };
+
+  apply(localStorage.getItem(CHROME_FOCUS_KEY) === "true");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const enabled = !document.body.classList.contains("focus-mode");
+      localStorage.setItem(CHROME_FOCUS_KEY, String(enabled));
+      apply(enabled);
+    });
+  });
+}
+
+function initScrollTop() {
+  document.querySelectorAll("[data-scroll-top]").forEach((button) => {
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+}
+
+function openReadyConfirm(option) {
+  const proceed = window.confirm("Ready to begin " + option.label + "?\n" + option.meta);
+  if (proceed) window.location.href = option.href;
+}
+
+function renderTestPickerOptions(modal) {
+  const subject = getChromeSubject();
+  const title = modal.querySelector("#testPickerTitle");
+  const copy = modal.querySelector("[data-test-picker-copy]");
+  const grid = modal.querySelector(".test-picker-grid");
+
+  if (title) title.textContent = "Select " + subject.short + " practice";
+  if (copy) copy.textContent = subject.title + " is selected.";
+  if (grid) {
+    const options = getTestOptions(subject);
+    grid.innerHTML = options.map((option, index) =>
+      "<a class=\"test-picker-option\" href=\"" + option.href + "\" data-test-option=\"" + index + "\">" +
+      "<strong>" + option.label + "</strong>" +
+      "<span>" + option.meta + "</span>" +
+      "</a>"
+    ).join("");
+    grid.querySelectorAll("[data-test-option]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeTestPicker(modal);
+        openReadyConfirm(options[Number(link.dataset.testOption)]);
+      });
+    });
+  }
+}
+
+function ensureTestPicker() {
+  let modal = document.getElementById("testPickerDialog");
+  if (modal) {
+    renderTestPickerOptions(modal);
+    return modal;
+  }
+
+  modal = document.createElement("div");
+  modal.className = "test-picker-modal";
+  modal.id = "testPickerDialog";
+  modal.hidden = true;
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "testPickerTitle");
+  modal.innerHTML = `
+    <div class="test-picker-backdrop" data-test-picker-close></div>
+    <div class="test-picker ready-dialog" role="document">
+      <div class="ready-dialog-body">
+        <span class="home-greeting">Start test</span>
+        <h2 id="testPickerTitle">Select practice</h2>
+        <p data-test-picker-copy>Choose a section.</p>
+        <div class="test-picker-grid"></div>
+        <div class="ready-actions">
+          <button class="text-button secondary" value="cancel" type="button" data-test-picker-close>Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelectorAll("[data-test-picker-close]").forEach((control) => {
+    control.addEventListener("click", () => closeTestPicker(modal));
+  });
+  modal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeTestPicker(modal);
+  });
+  renderTestPickerOptions(modal);
+  return modal;
+}
+
+function openTestPicker(modal) {
+  renderTestPickerOptions(modal);
+  modal.hidden = false;
+  document.body.classList.add("test-picker-open");
+  const firstOption = modal.querySelector(".test-picker-option");
+  if (firstOption) firstOption.focus();
+}
+
+function closeTestPicker(modal) {
+  modal.hidden = true;
+  document.body.classList.remove("test-picker-open");
+}
+
+function initTestPicker() {
+  document.querySelectorAll("[data-start-test]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const subjectPanel = document.querySelector(".subject-panel");
+      if (subjectPanel) {
+        subjectPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        subjectPanel.classList.add("is-pulsing");
+        window.setTimeout(() => subjectPanel.classList.remove("is-pulsing"), 900);
+        return;
+      }
+      openTestPicker(ensureTestPicker());
+    });
+  });
+}
+
+function initMouseTracking() {
+  const glow = document.createElement("div");
+  const cursor = document.createElement("div");
+  glow.className = "mouse-glow";
+  cursor.className = "custom-cursor";
+  document.body.appendChild(glow);
+  document.body.appendChild(cursor);
+
+  let targetX = window.innerWidth / 2;
+  let targetY = window.innerHeight / 2;
+  let currentX = targetX;
+  let currentY = targetY;
+
+  const move = (event) => {
+    targetX = event.clientX;
+    targetY = event.clientY;
+    document.body.classList.add("has-mouse");
+    document.body.classList.add("custom-cursor-enabled");
+    cursor.classList.toggle(
+      "is-action",
+      Boolean(event.target.closest("a, button, input, textarea, select, [role=button]"))
+    );
+  };
+
+  const animate = () => {
+    currentX += (targetX - currentX) * 0.16;
+    currentY += (targetY - currentY) * 0.16;
+    glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+    cursor.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+    window.requestAnimationFrame(animate);
+  };
+
+  window.addEventListener("pointermove", move, { passive: true });
+  window.addEventListener("pointerdown", () => {
+    cursor.classList.add("is-down");
+  });
+  window.addEventListener("pointerup", () => {
+    cursor.classList.remove("is-down");
+  });
+  window.addEventListener("pointerleave", () => {
+    document.body.classList.remove("has-mouse");
+    document.body.classList.remove("custom-cursor-enabled");
+  });
+  animate();
+}
+
+updateChromeProgress();
+initFocusMode();
+initScrollTop();
+initTestPicker();
+initMouseTracking();
