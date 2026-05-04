@@ -8,7 +8,7 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 
 Website URL after GitHub Pages is enabled:
 
-[https://alanlu439.github.io/](https://alanlu439.github.io/)
+[https://alanlu439.github.io/ap/](https://alanlu439.github.io/ap/)
 
 If the page returns 404, enable GitHub Pages in repository settings:
 
@@ -83,7 +83,7 @@ http://localhost:8000
 
 The first public release is available here:
 
-[AP Exam Practice v1.0.0](https://github.com/alanlu439/alanlu.github.io/releases/tag/v1.0.0)
+[AP Exam Practice v1.0.0](https://github.com/alanlu439/ap/releases/tag/v1.0.0)
 
 ## Official Reference Links
 

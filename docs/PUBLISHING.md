@@ -2,9 +2,9 @@
 
 ## Website URL
 
-This repository is currently a user GitHub Pages repository, so the intended public URL is:
+This repository is currently a project GitHub Pages repository, so the public URL is:
 
-https://alanlu439.github.io/
+https://alanlu439.github.io/ap/
 
 ## Enable GitHub Pages
 
@@ -22,7 +22,7 @@ The `Publish Release` workflow creates a release package when a `v*` tag is push
 
 Current first release:
 
-https://github.com/alanlu439/alanlu.github.io/releases/tag/v1.0.0
+https://github.com/alanlu439/ap/releases/tag/v1.0.0
 
 ## Recommended Repository Metadata
 
