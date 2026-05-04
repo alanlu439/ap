@@ -30,8 +30,10 @@
     <rect width="104" height="104" rx="26" fill="url(#brand)"/>
     <path d="M30 20h42l14 14v52H30z" fill="#f8feff"/>
     <path d="M72 20v14h14" fill="#d9f3f5"/>
-    <path d="M40 72V52M53 72V40M66 72V47" fill="none" stroke="#0a6970" stroke-width="6" stroke-linecap="round"/>
-    <path d="M38 55c9 6 18 4 26-3 7-7 13-9 22-4" fill="none" stroke="#2f6fed" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M42 45h32M42 58h32M42 71h22" stroke="#0a6970" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="34" cy="45" r="4" fill="#2f6fed"/>
+    <circle cx="34" cy="58" r="4" fill="#2f6fed"/>
+    <circle cx="34" cy="71" r="4" fill="#2f6fed"/>
     <circle cx="83" cy="83" r="18" fill="url(#gold)" stroke="#fff" stroke-width="5"/>
     <path d="M75 84l6 6 11-14" fill="none" stroke="#093f45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
@@ -47,8 +49,10 @@
   </g>
   <g transform="translate(936 352)">
     <rect width="188" height="112" rx="16" fill="#ffffff" stroke="#b8dce2" stroke-width="2"/>
-    <path d="M30 80V58M66 80V38M102 80V52M138 80V28" fill="none" stroke="#0b9296" stroke-width="9" stroke-linecap="round"/>
-    <path d="M28 60c38 22 70 9 96-12 18-15 31-18 52-6" fill="none" stroke="#416eed" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M34 35h96M34 58h96M34 81h62" stroke="#0b9296" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="144" cy="35" r="9" fill="#416eed"/>
+    <circle cx="144" cy="58" r="9" fill="#416eed"/>
+    <circle cx="110" cy="81" r="9" fill="#416eed"/>
     <circle cx="156" cy="36" r="18" fill="url(#gold)"/>
     <path d="M148 37l6 6 12-16" fill="none" stroke="#093f45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>

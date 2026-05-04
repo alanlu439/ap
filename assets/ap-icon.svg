@@ -1,23 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AP Exam Practice icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AP Exam Practice test paper icon">
   <defs>
-    <linearGradient id="bg" x1="7" y1="8" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+    <linearGradient id="paperBg" x1="8" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
       <stop stop-color="#075f64"/>
       <stop offset="0.58" stop-color="#1f8bd8"/>
       <stop offset="1" stop-color="#416eed"/>
     </linearGradient>
-    <linearGradient id="gold" x1="38" y1="38" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+    <linearGradient id="accent" x1="40" y1="38" x2="57" y2="57" gradientUnits="userSpaceOnUse">
       <stop stop-color="#ffd88a"/>
       <stop offset="1" stop-color="#f2a93b"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
       <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#063d44" flood-opacity="0.24"/>
     </filter>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
-  <path d="M17 12h24l8 8v30H17z" fill="#f8feff" filter="url(#shadow)"/>
-  <path d="M41 12v8h8" fill="#d9f3f5"/>
-  <path d="M23 42V31M31 42V25M39 42V28" fill="none" stroke="#0a6970" stroke-width="3.2" stroke-linecap="round"/>
-  <path d="M22 32c5 3 9 2 13-2 4-4 7-5 11-2" fill="none" stroke="#2f6fed" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="48" cy="48" r="10" fill="url(#gold)" stroke="#fff" stroke-width="3"/>
+  <rect width="64" height="64" rx="16" fill="url(#paperBg)"/>
+  <path d="M16 10h26l8 8v35H16z" fill="#f8feff" filter="url(#softShadow)"/>
+  <path d="M42 10v8h8" fill="#d9f3f5"/>
+  <path d="M23 25h18M23 34h18M23 43h12" stroke="#0a6970" stroke-width="3.4" stroke-linecap="round"/>
+  <circle cx="19" cy="25" r="2.3" fill="#2f6fed"/>
+  <circle cx="19" cy="34" r="2.3" fill="#2f6fed"/>
+  <circle cx="19" cy="43" r="2.3" fill="#2f6fed"/>
+  <circle cx="48" cy="48" r="10" fill="url(#accent)" stroke="#fff" stroke-width="3"/>
   <path d="M43.5 48.5l3.1 3.1 6-7.1" fill="none" stroke="#093f45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

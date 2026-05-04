@@ -121,6 +121,64 @@ function readFrqProgress(subject = getSelectedSubject()) {
   }
 }
 
+function readSectionState(kind, subject = getSelectedSubject()) {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(kind, subject)) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function calculateSavedMcqScore(subject, saved) {
+  if (Number.isFinite(saved.score)) return saved.score;
+  if (!saved.submitted || !Array.isArray(saved.answers) || !practiceData?.buildMcqQuestions) return null;
+  const questions = practiceData.buildMcqQuestions(subject);
+  if (questions.length !== saved.answers.length) return null;
+  return questions.reduce((score, question, index) => score + (saved.answers[index] === question.correct ? 1 : 0), 0);
+}
+
+function calculateSavedFrqScore(saved) {
+  if (!saved.submitted || !Array.isArray(saved.results)) return null;
+  return saved.results.reduce((sum, result) => sum + (Number(result.score) || 0), 0);
+}
+
+function calculateSavedFrqMax(saved, subject) {
+  if (Array.isArray(saved.results) && saved.results.length) {
+    return saved.results.reduce((sum, result) => sum + (Number(result.maxPoints) || 0), 0);
+  }
+  const items = practiceData?.buildFrqItems?.(subject) || [];
+  return items.reduce((sum, item) => sum + (Number(item.maxPoints) || 0), 0);
+}
+
+function updateFullScoreCard(subject = getSelectedSubject()) {
+  const card = document.getElementById("fullScoreCard");
+  if (!card) return;
+
+  const title = document.getElementById("fullScoreTitle");
+  const text = document.getElementById("fullScoreText");
+  const mcqSaved = readSectionState("mcq", subject);
+  const frqSaved = readSectionState("frq", subject);
+  const mcqScore = calculateSavedMcqScore(subject, mcqSaved);
+  const frqScore = calculateSavedFrqScore(frqSaved);
+  const frqMax = calculateSavedFrqMax(frqSaved, subject);
+
+  if (!mcqSaved.submitted || !frqSaved.submitted || mcqScore === null || frqScore === null || !frqMax) {
+    card.hidden = true;
+    return;
+  }
+
+  const format = subject.format;
+  const mcqRatio = mcqScore / format.mcqCount;
+  const frqRatio = frqScore / frqMax;
+  const totalWeight = (Number(format.mcqWeight) || 0) + (Number(format.frqWeight) || 0) || 100;
+  const weighted = ((mcqRatio * format.mcqWeight) + (frqRatio * format.frqWeight)) / totalWeight;
+  card.hidden = false;
+  if (title) title.textContent = Math.round(weighted * 100) + "% estimated practice score";
+  if (text) {
+    text.textContent = "MCQ " + mcqScore + " / " + format.mcqCount + " and FRQ " + frqScore + " / " + frqMax + ". This is local auto grading for practice, not an official AP score.";
+  }
+}
+
 function updateHomeProgress() {
   const subject = getSelectedSubject();
   const format = subject.format;
@@ -221,6 +279,8 @@ function updateFullPracticePage(subject = getSelectedSubject()) {
   if (pathCards[1]) {
     pathCards[1].querySelector("p").textContent = `${format.frqCount} questions. ${format.frqMinutes} minutes. ${formatWeight(format.frqWeight)}.`;
   }
+
+  updateFullScoreCard(subject);
 }
 
 function closeModeSelection() {

@@ -703,7 +703,8 @@ function defaultState() {
     started: false,
     submitted: false,
     remaining: TOTAL_SECONDS,
-    lastTick: null
+    lastTick: null,
+    score: null
   };
 }
 
@@ -767,7 +768,11 @@ function applyMcqSubjectChrome() {
   if (structureValues[1]) structureValues[1].textContent = String(format.mcqCount);
   if (structureValues[2]) structureValues[2].textContent = format.mcqMinutes + " minutes";
   if (structureValues[3]) structureValues[3].textContent = weight;
-  if (sourceNote) sourceNote.textContent = "Practice made by Alan. No penalty for guessing.";
+  if (structureValues[4]) {
+    const maxChoices = Math.max(...questions.map((question) => question.choices.length));
+    structureValues[4].textContent = "A-" + String.fromCharCode(64 + maxChoices);
+  }
+  if (sourceNote) sourceNote.textContent = "Practice made by Alan. Auto graded after submit; no penalty for guessing.";
 }
 
 function currentQuestion() {
@@ -972,6 +977,7 @@ function reconcileLoadedTimer() {
   if (state.remaining <= 0) {
     state.remaining = 0;
     state.started = false;
+    state.score = calculateScore();
     state.submitted = true;
     state.lastTick = null;
     stopTimer();
@@ -989,6 +995,7 @@ function submitSection(auto = false) {
   }
   updateRemainingFromClock();
   state.started = false;
+  state.score = calculateScore();
   state.submitted = true;
   state.lastTick = null;
   stopTimer();

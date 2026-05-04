@@ -137,4 +137,4 @@ Suggested topics:
 
 ## Disclaimer
 
-AP(R) and Advanced Placement(R) are trademarks registered by the College Board. This site is independent and is not affiliated with, endorsed by, or reviewed by the College Board. Questions, explanations, scoring, and auto grading are original practice materials and are not official AP Exam content, scoring guidelines, official score reports, or score predictions.
+AP(R) and Advanced Placement(R) are trademarks registered by the College Board. This site is independent and is not affiliated with, endorsed by, or reviewed by the College Board. Questions, explanations, scoring, and auto grading are original practice materials and are not official AP Exam content, scoring guidelines, official score reports, or score predictions. Subjects with portfolios, performance tasks, or AP Career Kickstart assessments are mapped into MCQ and FRQ-style practice for local auto grading; users should verify current official rules, timing, and test-day instructions with College Board/AP sources.

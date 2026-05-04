@@ -1,4 +1,4 @@
-const practiceData = window.APPracticeData;
+const chromePracticeData = window.APPracticeData;
 const CHROME_FOCUS_KEY = "ap-practice-focus-mode-v1";
 const fallbackChromeSubject = {
   title: "AP Statistics",
@@ -8,19 +8,19 @@ const fallbackChromeSubject = {
 };
 
 function getChromeSubject() {
-  return practiceData?.getSelectedSubject?.() || fallbackChromeSubject;
+  return chromePracticeData?.getSelectedSubject?.() || fallbackChromeSubject;
 }
 
 function chromeStorageKey(kind, subject = getChromeSubject()) {
-  return practiceData?.storageKey?.(kind, subject) || "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
+  return chromePracticeData?.storageKey?.(kind, subject) || "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
 }
 
 function chromeWeight(value) {
-  return practiceData?.formatWeight?.(value) || (Number.isInteger(value) ? value + "%" : Number(value).toFixed(1) + "%");
+  return chromePracticeData?.formatWeight?.(value) || (Number.isInteger(value) ? value + "%" : Number(value).toFixed(1) + "%");
 }
 
 function chromeTotalMinutes(format) {
-  return practiceData?.totalMinutes?.(format) || format.fullMinutes || format.mcqMinutes + format.frqMinutes;
+  return chromePracticeData?.totalMinutes?.(format) || format.fullMinutes || format.mcqMinutes + format.frqMinutes;
 }
 
 function getTestOptions(subject = getChromeSubject()) {
@@ -238,6 +238,17 @@ function initBackButtons() {
   });
 }
 
+function applySubjectLogo() {
+  if (document.querySelector(".start-screen")) return;
+  const subject = getChromeSubject();
+  const icon = chromePracticeData?.getSubjectIcon?.(subject);
+  const mark = document.querySelector(".brand-mark img");
+  if (mark && icon) {
+    mark.src = icon;
+    mark.alt = subject.short + " topic icon";
+  }
+}
+
 function initMouseTracking() {
   const glow = document.createElement("div");
   const cursor = document.createElement("div");
@@ -284,6 +295,7 @@ function initMouseTracking() {
   animate();
 }
 
+applySubjectLogo();
 updateChromeProgress();
 initFocusMode();
 initScrollTop();
