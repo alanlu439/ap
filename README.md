@@ -16,7 +16,7 @@ If the page returns 404, enable GitHub Pages in repository settings:
 
 ## What Visitors Can Do
 
-- Choose from 20 major AP subjects
+- Choose from 42 AP subjects
 - Start Full Exam, MCQ, or FRQ practice from a pop-out structure selector
 - See per-subject section counts, minutes, and score weights
 - Answer MCQs with saved progress and review feedback
@@ -26,22 +26,44 @@ If the page returns 404, enable GitHub Pages in repository settings:
 
 ## Included Subjects
 
+- AP 2-D Art and Design
+- AP 3-D Art and Design
+- AP African American Studies
+- AP Art History
 - AP Biology
+- AP Business with Personal Finance
 - AP Calculus AB
 - AP Calculus BC
 - AP Chemistry
+- AP Chinese Language and Culture
+- AP Comparative Government and Politics
 - AP Computer Science A
 - AP Computer Science Principles
+- AP Cybersecurity
+- AP Drawing
 - AP English Language and Composition
 - AP English Literature and Composition
 - AP Environmental Science
+- AP European History
+- AP French Language and Culture
+- AP German Language and Culture
 - AP Human Geography
+- AP Italian Language and Culture
+- AP Japanese Language and Culture
+- AP Latin
 - AP Macroeconomics
-- AP Physics 1
+- AP Microeconomics
+- AP Music Theory
+- AP Physics 1: Algebra-Based
+- AP Physics 2: Algebra-Based
+- AP Physics C: Electricity and Magnetism
 - AP Physics C: Mechanics
 - AP Precalculus
 - AP Psychology
+- AP Research
+- AP Seminar
 - AP Spanish Language and Culture
+- AP Spanish Literature and Culture
 - AP Statistics
 - AP United States Government and Politics
 - AP United States History
@@ -87,7 +109,7 @@ The first public release is available here:
 
 ## Official Reference Links
 
-Exam structures were checked against official College Board/AP pages, including AP Central course exam pages and AP Students course resources. The app stores the structure data in `practice-data.js`.
+Exam structures were checked against official College Board/AP pages, including AP Central course exam pages and AP Students course resources. The app stores the structure data in `practice-data.js`. Portfolio, AP Capstone, and AP Career Kickstart courses use practice mappings so the site can still offer MCQ and FRQ-style study flows while noting their nontraditional official assessment formats.
 
 - [AP Central Courses](https://apcentral.collegeboard.org/courses)
 - [AP Students Courses](https://apstudents.collegeboard.org/courses)

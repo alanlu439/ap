@@ -35,6 +35,34 @@ function formatWeight(value) {
   return practiceData?.formatWeight?.(value) || (Number.isInteger(value) ? `${value}%` : `${Number(value).toFixed(1)}%`);
 }
 
+function normalizeSearch(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function escapeHomeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function renderSubjectCards() {
+  const grid = document.getElementById("subjectGrid");
+  if (!grid || !practiceData?.subjects?.length) return;
+
+  grid.innerHTML = practiceData.subjects.map((subject) => [
+    '<button class="subject-card is-available" type="button" data-subject-card data-subject="' + escapeHomeHtml(subject.title) + '" data-short="' + escapeHomeHtml(subject.short) + '" data-available="true">',
+    '<span>' + escapeHomeHtml(subject.group) + '</span>',
+    '<strong>' + escapeHomeHtml(subject.short || subject.title) + '</strong>',
+    '<em>Available</em>',
+    '</button>'
+  ].join("")).join("");
+}
+
 function formatReadyCopy(mode, subject = getSelectedSubject()) {
   const format = subject.format;
   const fullTime = totalMinutes(format);
@@ -221,16 +249,68 @@ function jumpToModeSelection() {
 }
 
 function initSubjectPicker() {
+  renderSubjectCards();
   const cards = document.querySelectorAll("[data-subject-card]");
+  const cardsArray = Array.from(cards);
+  const searchInput = document.getElementById("subjectSearch");
   const status = document.getElementById("selectedSubjectStatus");
   if (!cards.length) return;
 
-  const selectSubject = (card) => {
+  const subjectKeywords = (card) => normalizeSearch([
+    card.dataset.subject,
+    card.dataset.short,
+    card.querySelector("span")?.textContent,
+    card.querySelector("strong")?.textContent
+  ].join(" "));
+
+  const selectedStatusText = (subject, available) => available
+    ? subject.title + " selected"
+    : subject.title + " selected · coming soon";
+
+  const scrollToSubjects = () => {
+    const subjectPanel = document.querySelector(".subject-panel");
+    if (!subjectPanel) return;
+    subjectPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    subjectPanel.classList.add("is-pulsing");
+    window.setTimeout(() => subjectPanel.classList.remove("is-pulsing"), 900);
+  };
+
+  const updateSearchResults = () => {
+    const query = normalizeSearch(searchInput?.value);
+    const visibleCards = [];
+
+    cardsArray.forEach((card) => {
+      const matched = !query || subjectKeywords(card).includes(query);
+      card.hidden = !matched;
+      card.classList.remove("is-search-match");
+      if (matched) visibleCards.push(card);
+    });
+
+    if (query && visibleCards[0]) visibleCards[0].classList.add("is-search-match");
+
+    if (status && query) {
+      status.textContent = visibleCards.length
+        ? visibleCards.length + " subject" + (visibleCards.length === 1 ? "" : "s") + " found"
+        : "No AP subjects found";
+    }
+
+    if (status && !query) {
+      const selectedCard = cardsArray.find((card) => card.classList.contains("is-selected"));
+      if (selectedCard) {
+        const subject = getSubjectByTitle(selectedCard.dataset.subject) || fallbackSubject;
+        status.textContent = selectedStatusText(subject, selectedCard.dataset.available === "true");
+      }
+    }
+
+    return visibleCards;
+  };
+
+  const selectSubject = (card, options = {}) => {
     const subjectName = card.dataset.subject || fallbackSubject.title;
     const subject = getSubjectByTitle(subjectName) || fallbackSubject;
     const available = card.dataset.available === "true";
 
-    cards.forEach((item) => {
+    cardsArray.forEach((item) => {
       const selected = item === card;
       item.classList.toggle("is-selected", selected);
       item.setAttribute("aria-pressed", String(selected));
@@ -241,22 +321,42 @@ function initSubjectPicker() {
     updateModePopoutCopy(subject, available);
     updateHomeProgress();
 
-    if (status) {
-      status.textContent = available ? `${subject.title} selected` : `${subject.title} selected · coming soon`;
-    }
+    if (status) status.textContent = selectedStatusText(subject, available);
+    if (searchInput && options.openModes) searchInput.blur();
+    if (options.openModes) jumpToModeSelection();
   };
 
   const savedSubject = localStorage.getItem(SELECTED_AP_SUBJECT_KEY);
-  const availableCard = Array.from(cards).find((card) => card.dataset.available === "true");
-  const initialCard = Array.from(cards).find((card) => card.dataset.subject === savedSubject) || availableCard || cards[0];
+  const availableCard = cardsArray.find((card) => card.dataset.available === "true");
+  const initialCard = cardsArray.find((card) => card.dataset.subject === savedSubject) || availableCard || cards[0];
   selectSubject(initialCard);
 
-  cards.forEach((card) => {
+  cardsArray.forEach((card) => {
     card.addEventListener("click", () => {
-      selectSubject(card);
-      jumpToModeSelection();
+      selectSubject(card, { openModes: true });
     });
   });
+
+  if (searchInput) {
+    searchInput.addEventListener("focus", scrollToSubjects);
+    searchInput.addEventListener("input", updateSearchResults);
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const firstVisible = updateSearchResults().find((card) => !card.hidden);
+        if (firstVisible) {
+          event.preventDefault();
+          selectSubject(firstVisible, { openModes: true });
+        }
+      }
+
+      if (event.key === "Escape") {
+        searchInput.value = "";
+        updateSearchResults();
+      }
+    });
+  }
+
+  updateSearchResults();
 }
 
 function initModeCards() {
