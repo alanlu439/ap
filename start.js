@@ -152,7 +152,7 @@ function updateModePopoutCopy(subject, available = true) {
   if (subjectName) subjectName.textContent = subjectObject.title;
   if (status) {
     status.textContent = available
-      ? `${format.note || "Original practice."}`
+      ? `${format.note || "Practice made by Alan."}`
       : "Practice for this subject is coming soon.";
   }
 

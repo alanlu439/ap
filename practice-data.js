@@ -8,7 +8,7 @@
     mcqWeight: 50,
     frqWeight: 50,
     fullMinutes: 180,
-    note: "Original practice structure."
+    note: "Practice made by Alan."
   };
 
   const EXAM_FORMATS = {

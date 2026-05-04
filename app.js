@@ -767,7 +767,7 @@ function applyMcqSubjectChrome() {
   if (structureValues[1]) structureValues[1].textContent = String(format.mcqCount);
   if (structureValues[2]) structureValues[2].textContent = format.mcqMinutes + " minutes";
   if (structureValues[3]) structureValues[3].textContent = weight;
-  if (sourceNote) sourceNote.textContent = "Original practice questions. No penalty for guessing.";
+  if (sourceNote) sourceNote.textContent = "Practice made by Alan. No penalty for guessing.";
 }
 
 function currentQuestion() {
