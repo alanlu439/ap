@@ -1,0 +1,35 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Package static site
+        run: |
+          zip -r ap-exam-practice-site.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "codex_ap_publish_key*" \
+            -x ".DS_Store"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: AP Exam Practice ${{ github.ref_name }}
+          body: |
+            First public version of AP Exam Practice.
+
+            Try the website online: https://alanlu439.github.io/ap/
+
+            Includes subject selection, official AP-style section timing, MCQ practice, FRQ practice, estimated grading, saved progress, and official schedule/location links.
+          files: ap-exam-practice-site.zip

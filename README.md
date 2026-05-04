@@ -6,6 +6,12 @@ AP Exam Practice is an independent, browser-based AP practice site made by Alan.
 
 Browser-based AP practice exam hub with subject-specific MCQ and FRQ practice, official structure timing, saved progress, and estimated grading.
 
+## Try It Online
+
+After GitHub Pages finishes deploying, open:
+
+[https://alanlu439.github.io/ap/](https://alanlu439.github.io/ap/)
+
 ## Features
 
 - Home page subject picker with AP subjects sorted alphabetically
