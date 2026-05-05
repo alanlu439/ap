@@ -327,14 +327,6 @@ function initSubjectPicker() {
     ? subject.title + " selected"
     : subject.title + " selected · coming soon";
 
-  const scrollToSubjects = () => {
-    const subjectPanel = document.querySelector(".subject-panel");
-    if (!subjectPanel) return;
-    subjectPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-    subjectPanel.classList.add("is-pulsing");
-    window.setTimeout(() => subjectPanel.classList.remove("is-pulsing"), 900);
-  };
-
   const updateSearchResults = () => {
     const query = normalizeSearch(searchInput?.value);
     const visibleCards = [];
@@ -398,7 +390,6 @@ function initSubjectPicker() {
   });
 
   if (searchInput) {
-    searchInput.addEventListener("focus", scrollToSubjects);
     searchInput.addEventListener("input", updateSearchResults);
     searchInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {

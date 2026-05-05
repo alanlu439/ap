@@ -610,7 +610,11 @@ frqEls.reset.addEventListener("click", resetFrqs);
 
 reconcileLoadedFrqTimer();
 
-if (frqState.started && !frqState.submitted) runFrqTimer();
+if (!frqState.submitted && !frqState.started) {
+  startFrqTimer();
+} else if (frqState.started && !frqState.submitted) {
+  runFrqTimer();
+}
 
 applyFrqSubjectChrome();
 renderFrqs();

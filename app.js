@@ -1062,7 +1062,11 @@ document.addEventListener("keydown", (event) => {
 
 reconcileLoadedTimer();
 
-if (state.started && !state.submitted) runTimer();
+if (!state.submitted && !state.started) {
+  startTimer();
+} else if (state.started && !state.submitted) {
+  runTimer();
+}
 
 applyMcqSubjectChrome();
 render();

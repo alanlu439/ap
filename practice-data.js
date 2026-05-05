@@ -2148,17 +2148,46 @@
     "AP Music Theory": "MusicTheory"
   };
 
+  function subjectIconSvg(primary, secondary, accent, body) {
+    return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-hidden='true'>" +
+      "<defs><linearGradient id='g' x1='7' y1='5' x2='59' y2='61' gradientUnits='userSpaceOnUse'><stop stop-color='" + primary + "'/><stop offset='1' stop-color='" + secondary + "'/></linearGradient><radialGradient id='shine' cx='22%' cy='14%' r='70%'><stop stop-color='#ffffff' stop-opacity='.34'/><stop offset='.62' stop-color='#ffffff' stop-opacity='0'/></radialGradient><filter id='s' x='-20%' y='-20%' width='140%' height='150%'><feDropShadow dx='0' dy='4' stdDeviation='4' flood-color='#092d33' flood-opacity='.24'/></filter></defs>" +
+      "<rect width='64' height='64' rx='16' fill='url(#g)'/><rect width='64' height='64' rx='16' fill='url(#shine)'/>" +
+      body +
+      "<circle cx='49' cy='49' r='9' fill='" + accent + "' stroke='#fff' stroke-width='3' filter='url(#s)'/></svg>";
+  }
+
   const SUBJECT_ICON_SVGS = {
-    Math: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#075f64'/><path d='M16 44h32M20 34l8-16 8 16 8-16' fill='none' stroke='#fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='48' cy='47' r='7' fill='#ffd166'/></svg>",
-    Science: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#0f766e'/><path d='M25 13h14M32 13v16l13 20H19l13-20z' fill='#e7fffb' stroke='#fff' stroke-width='4' stroke-linejoin='round'/><path d='M23 43h18' stroke='#38bdf8' stroke-width='5' stroke-linecap='round'/></svg>",
-    History: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#7c3aed'/><path d='M14 24l18-10 18 10H14zm4 4h28v18H18z' fill='#fff'/><path d='M22 30v14M32 30v14M42 30v14' stroke='#7c3aed' stroke-width='4'/><path d='M16 50h32' stroke='#ffd166' stroke-width='5' stroke-linecap='round'/></svg>",
-    English: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#b45309'/><path d='M16 18h20a8 8 0 0 1 8 8v22H24a8 8 0 0 1-8-8z' fill='#fff7ed'/><path d='M25 28h18M25 36h14' stroke='#b45309' stroke-width='4' stroke-linecap='round'/><path d='M46 18l5 5-13 13-7 2 2-7z' fill='#38bdf8'/></svg>",
-    "World Lang": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#2563eb'/><path d='M17 18h30a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H34l-10 7v-7h-7a8 8 0 0 1-8-8V26a8 8 0 0 1 8-8z' fill='#eff6ff'/><path d='M20 32h24M32 22c-4 6-4 14 0 20M32 22c4 6 4 14 0 20' stroke='#2563eb' stroke-width='3' fill='none' stroke-linecap='round'/></svg>",
-    Arts: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#db2777'/><path d='M17 43c8-17 19-26 30-25 4 0 5 5 2 8C40 35 33 42 17 43z' fill='#fff'/><circle cx='24' cy='25' r='4' fill='#fde047'/><circle cx='34' cy='21' r='4' fill='#38bdf8'/><circle cx='43' cy='27' r='4' fill='#34d399'/></svg>",
-    CS: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#111827'/><path d='M25 22l-9 10 9 10M39 22l9 10-9 10' fill='none' stroke='#67e8f9' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><path d='M35 18l-6 28' stroke='#ffd166' stroke-width='5' stroke-linecap='round'/></svg>",
-    Social: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#0e7490'/><path d='M18 46V28l14-10 14 10v18' fill='none' stroke='#fff' stroke-width='5' stroke-linejoin='round'/><path d='M24 46V34h16v12' fill='#cffafe'/><path d='M17 50h30' stroke='#ffd166' stroke-width='5' stroke-linecap='round'/></svg>",
-    Capstone: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#4338ca'/><path d='M17 45l15-28 15 28H17z' fill='#fff'/><path d='M27 36h10M29 29h6' stroke='#4338ca' stroke-width='4' stroke-linecap='round'/><circle cx='32' cy='47' r='7' fill='#ffd166'/></svg>",
-    Career: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#047857'/><path d='M18 24h28a6 6 0 0 1 6 6v17H12V30a6 6 0 0 1 6-6z' fill='#ecfdf5'/><path d='M24 24v-5h16v5M12 35h40' stroke='#047857' stroke-width='4' stroke-linecap='round'/><path d='M22 46h20' stroke='#fbbf24' stroke-width='5' stroke-linecap='round'/></svg>"
+    "Math": subjectIconSvg("#075f64", "#2f6fed", "#ffd166", "<path d='M14 45h36M18 38c7-16 12-20 18-12 4 6 8 6 12-7' fill='none' stroke='#fff' stroke-width='4.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M20 18v30M15 43h34' stroke='#c9fbff' stroke-width='3' stroke-linecap='round'/><circle cx='36' cy='28' r='3.5' fill='#ffe3a2'/><circle cx='47' cy='19' r='3.5' fill='#9bdcff'/>"),
+    "Statistics": subjectIconSvg("#075f64", "#3498db", "#ffd166", "<path d='M16 45h34' stroke='#d7fbff' stroke-width='4' stroke-linecap='round'/><rect x='18' y='32' width='7' height='13' rx='2' fill='#ffffff'/><rect x='29' y='24' width='7' height='21' rx='2' fill='#fff7d7'/><rect x='40' y='17' width='7' height='28' rx='2' fill='#b9f4ff'/><path d='M18 20c9 7 18 8 30 1' fill='none' stroke='#ffd166' stroke-width='4' stroke-linecap='round'/>"),
+    "Calculus": subjectIconSvg("#123c7c", "#5b6df0", "#ffd166", "<path d='M23 47c8-2 10-18 9-27-.5-5 2-8 8-7' fill='none' stroke='#fff' stroke-width='5' stroke-linecap='round'/><path d='M17 24c9-8 20-8 31 0M18 40c9 5 20 5 31 0' fill='none' stroke='#c9fbff' stroke-width='3.5' stroke-linecap='round'/><circle cx='43' cy='16' r='3.5' fill='#ffd166'/>"),
+    "Precalculus": subjectIconSvg("#0b6b73", "#2f6fed", "#ffd166", "<path d='M17 44h31M20 44V17' stroke='#d7fbff' stroke-width='4' stroke-linecap='round'/><path d='M20 36c7-13 14-14 20-6 3 4 5 8 9 8' fill='none' stroke='#fff' stroke-width='4.5' stroke-linecap='round'/><path d='M27 22h14' stroke='#ffd166' stroke-width='4' stroke-linecap='round'/>"),
+    "Science": subjectIconSvg("#0f766e", "#1f8bd8", "#ffd166", "<path d='M25 12h14M32 13v16l13 20H19l13-20' fill='#f2fffd' stroke='#fff' stroke-width='3.6' stroke-linejoin='round'/><path d='M23 43h18' stroke='#2f6fed' stroke-width='4.4' stroke-linecap='round'/><circle cx='42' cy='25' r='3' fill='#ffd166'/>"),
+    "Biology": subjectIconSvg("#047857", "#22a06b", "#ffd166", "<path d='M18 39c12-20 26-24 32-20 0 15-13 28-32 20Z' fill='#f2fff8' stroke='#ffffff' stroke-width='3.4' stroke-linejoin='round'/><path d='M22 38c8-6 15-10 26-17M31 30c-1-5-4-9-8-12M37 26c3 2 7 3 12 2' fill='none' stroke='#0b7a62' stroke-width='3.2' stroke-linecap='round'/><circle cx='22' cy='47' r='4' fill='#9df2c9'/>"),
+    "Chemistry": subjectIconSvg("#0f766e", "#7c3aed", "#ffd166", "<path d='M25 13h14M32 13v13l14 22H18l14-22' fill='#fbffff' stroke='#ffffff' stroke-width='3.6' stroke-linejoin='round'/><path d='M23 42h18' stroke='#f59e0b' stroke-width='4.2' stroke-linecap='round'/><circle cx='24' cy='30' r='3' fill='#38bdf8'/><circle cx='40' cy='33' r='3.5' fill='#a78bfa'/>"),
+    "Physics": subjectIconSvg("#1d4ed8", "#111827", "#ffd166", "<circle cx='32' cy='32' r='4.5' fill='#ffffff'/><path d='M14 32c8-11 28-11 36 0-8 11-28 11-36 0ZM32 14c11 8 11 28 0 36-11-8-11-28 0-36Z' fill='none' stroke='#c9fbff' stroke-width='3.2'/><path d='M20 45l24-26' stroke='#ffd166' stroke-width='4' stroke-linecap='round'/>"),
+    "Environmental": subjectIconSvg("#047857", "#0ea5a5", "#ffd166", "<path d='M17 42c8-18 21-26 34-24-1 15-15 26-34 24Z' fill='#ecfdf5' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M21 40c7-5 15-10 27-19' stroke='#047857' stroke-width='3.4' stroke-linecap='round'/><path d='M18 21c3 6 8 9 15 9' fill='none' stroke='#b7ffdf' stroke-width='3.4' stroke-linecap='round'/>"),
+    "History": subjectIconSvg("#6d28d9", "#b45309", "#ffd166", "<path d='M14 24l18-11 18 11H14Z' fill='#fff7ed'/><path d='M18 28h28v17H18z' fill='#ffffff'/><path d='M23 30v13M32 30v13M41 30v13' stroke='#6d28d9' stroke-width='3.4' stroke-linecap='round'/><path d='M16 49h32' stroke='#ffd166' stroke-width='4.5' stroke-linecap='round'/>"),
+    "Government": subjectIconSvg("#0e7490", "#1d4ed8", "#ffd166", "<path d='M15 25l17-10 17 10H15Z' fill='#ffffff'/><path d='M20 28h24v16H20z' fill='#eefbff'/><path d='M25 30v12M32 30v12M39 30v12' stroke='#0e7490' stroke-width='3.3' stroke-linecap='round'/><path d='M17 48h30' stroke='#ffd166' stroke-width='4.5' stroke-linecap='round'/>"),
+    "Economics": subjectIconSvg("#065f46", "#0f8a8a", "#ffd166", "<path d='M17 43h31M20 43V18' stroke='#d7fbff' stroke-width='4' stroke-linecap='round'/><path d='M20 37c8-9 16-12 29-17' fill='none' stroke='#ffffff' stroke-width='4.4' stroke-linecap='round'/><path d='M39 20h10v10' fill='none' stroke='#ffd166' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><circle cx='26' cy='33' r='3.5' fill='#9df2c9'/>"),
+    "Psychology": subjectIconSvg("#7c3aed", "#db2777", "#ffd166", "<path d='M22 43c-4-4-6-9-5-15 2-11 13-16 23-10 6 4 8 12 5 20-2 5-6 8-11 9' fill='none' stroke='#ffffff' stroke-width='4.2' stroke-linecap='round'/><path d='M29 23c5 2 8 6 8 12M24 34h16' stroke='#fee2ff' stroke-width='3.4' stroke-linecap='round'/><circle cx='27' cy='27' r='3' fill='#ffd166'/>"),
+    "Geography": subjectIconSvg("#047857", "#2f6fed", "#ffd166", "<circle cx='32' cy='32' r='18' fill='#eff6ff' stroke='#fff' stroke-width='3.5'/><path d='M14 32h36M32 14c-7 8-7 28 0 36M32 14c7 8 7 28 0 36' fill='none' stroke='#0f766e' stroke-width='2.8' stroke-linecap='round'/><path d='M22 24c4-3 8-4 13-3M25 41c5 2 10 2 17-2' stroke='#2f6fed' stroke-width='3' stroke-linecap='round'/>"),
+    "English": subjectIconSvg("#9a3412", "#db2777", "#ffd166", "<path d='M16 18h19c6 0 10 4 10 10v20H26c-6 0-10-4-10-10Z' fill='#fff7ed' stroke='#fff' stroke-width='3'/><path d='M25 28h17M25 36h13' stroke='#9a3412' stroke-width='3.6' stroke-linecap='round'/><path d='M45 16l6 6-14 14-8 2 2-8Z' fill='#b9f4ff' stroke='#fff' stroke-width='2.2'/>"),
+    "World Lang": subjectIconSvg("#1d4ed8", "#0f8a8a", "#ffd166", "<path d='M16 18h31a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H35l-11 7v-7h-8a8 8 0 0 1-8-8V26a8 8 0 0 1 8-8Z' fill='#eff6ff'/><path d='M19 32h27M32 22c-4 6-4 14 0 20M32 22c4 6 4 14 0 20' stroke='#1d4ed8' stroke-width='3' fill='none' stroke-linecap='round'/>"),
+    "Latin": subjectIconSvg("#6d28d9", "#334155", "#ffd166", "<path d='M18 17h29' stroke='#fff' stroke-width='5' stroke-linecap='round'/><path d='M25 17v29h18' stroke='#fff7ed' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><path d='M24 31h14' stroke='#ffd166' stroke-width='4' stroke-linecap='round'/><path d='M44 19c4 5 5 10 2 17' fill='none' stroke='#c9fbff' stroke-width='3.4' stroke-linecap='round'/>"),
+    "SpanishLiterature": subjectIconSvg("#b91c1c", "#f59e0b", "#fff1a8", "<path d='M17 18h18c6 0 10 4 10 10v19H27c-6 0-10-4-10-10Z' fill='#fff7ed' stroke='#fff' stroke-width='3'/><path d='M24 29h18M24 37h13' stroke='#b91c1c' stroke-width='3.5' stroke-linecap='round'/><path d='M44 18l5 5' stroke='#ffd166' stroke-width='5' stroke-linecap='round'/>"),
+    "Arts": subjectIconSvg("#db2777", "#7c3aed", "#ffd166", "<path d='M17 43c8-18 20-27 32-25 4 1 4 6 1 9-9 8-17 15-33 16Z' fill='#fff' stroke='#fff' stroke-width='2'/><circle cx='24' cy='26' r='4' fill='#fde047'/><circle cx='34' cy='21' r='4' fill='#38bdf8'/><circle cx='43' cy='28' r='4' fill='#34d399'/>"),
+    "ArtPortfolio": subjectIconSvg("#be185d", "#f97316", "#fff1a8", "<rect x='17' y='16' width='30' height='33' rx='4' fill='#fff' stroke='#fff' stroke-width='3'/><path d='M21 39l8-9 6 6 4-5 6 8' fill='none' stroke='#be185d' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/><circle cx='26' cy='24' r='3.5' fill='#38bdf8'/>"),
+    "ArtHistory": subjectIconSvg("#7c2d12", "#db2777", "#ffd166", "<path d='M18 46V25l14-9 14 9v21' fill='#fff7ed' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M23 28h18M23 36h18' stroke='#7c2d12' stroke-width='3.3' stroke-linecap='round'/><path d='M16 50h32' stroke='#ffd166' stroke-width='4.5' stroke-linecap='round'/>"),
+    "MusicTheory": subjectIconSvg("#4c1d95", "#1d4ed8", "#ffd166", "<path d='M38 17v24a7 7 0 1 1-5-7V22l15-4v18a7 7 0 1 1-5-7V16Z' fill='#fff7ed'/><path d='M20 22h15M20 30h15M20 38h15' stroke='#a7f3d0' stroke-width='2.8' stroke-linecap='round'/>"),
+    "CS": subjectIconSvg("#111827", "#2563eb", "#ffd166", "<path d='M25 22l-9 10 9 10M39 22l9 10-9 10' fill='none' stroke='#67e8f9' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><path d='M35 18l-6 28' stroke='#ffd166' stroke-width='4.8' stroke-linecap='round'/><rect x='18' y='15' width='28' height='34' rx='5' fill='none' stroke='#ffffff' stroke-opacity='.32' stroke-width='2'/>"),
+    "Cybersecurity": subjectIconSvg("#111827", "#0f766e", "#ffd166", "<path d='M32 14l16 6v12c0 10-6 17-16 20-10-3-16-10-16-20V20Z' fill='#ecfdf5' stroke='#fff' stroke-width='3.3' stroke-linejoin='round'/><path d='M25 33l5 5 10-12' fill='none' stroke='#0f766e' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M23 23h18' stroke='#111827' stroke-width='3' stroke-linecap='round'/>"),
+    "Social": subjectIconSvg("#0e7490", "#2f6fed", "#ffd166", "<path d='M18 46V28l14-10 14 10v18' fill='none' stroke='#fff' stroke-width='4.5' stroke-linejoin='round'/><path d='M24 46V34h16v12' fill='#cffafe'/><path d='M17 50h30' stroke='#ffd166' stroke-width='4.5' stroke-linecap='round'/>"),
+    "Capstone": subjectIconSvg("#4338ca", "#0f8a8a", "#ffd166", "<path d='M18 45l14-28 14 28H18Z' fill='#fff' stroke='#fff' stroke-width='2.5' stroke-linejoin='round'/><circle cx='34' cy='32' r='8' fill='none' stroke='#4338ca' stroke-width='3.4'/><path d='M40 38l7 7' stroke='#4338ca' stroke-width='4' stroke-linecap='round'/><path d='M27 45h17' stroke='#ffd166' stroke-width='4' stroke-linecap='round'/>"),
+    "Career": subjectIconSvg("#047857", "#0f8a8a", "#ffd166", "<path d='M18 24h28a6 6 0 0 1 6 6v17H12V30a6 6 0 0 1 6-6Z' fill='#ecfdf5'/><path d='M24 24v-5h16v5M12 35h40' stroke='#047857' stroke-width='3.8' stroke-linecap='round'/><path d='M22 46h20' stroke='#fbbf24' stroke-width='4.5' stroke-linecap='round'/>"),
+    "Business": subjectIconSvg("#065f46", "#1f8bd8", "#ffd166", "<path d='M18 24h28a6 6 0 0 1 6 6v17H12V30a6 6 0 0 1 6-6Z' fill='#ecfdf5'/><path d='M20 42l7-7 6 5 10-12' fill='none' stroke='#047857' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M24 24v-5h16v5' stroke='#fff' stroke-width='3.5' stroke-linecap='round'/>"),
+    "AfricanAmericanStudies": subjectIconSvg("#111827", "#b45309", "#ffd166", "<path d='M18 45V20h28v25' fill='#fff7ed' stroke='#fff' stroke-width='3.4'/><path d='M24 27h16M24 35h13' stroke='#111827' stroke-width='3.5' stroke-linecap='round'/><path d='M18 49h28' stroke='#ffd166' stroke-width='4.5' stroke-linecap='round'/><circle cx='43' cy='23' r='4' fill='#38bdf8'/>"),
+    "Research": subjectIconSvg("#4338ca", "#0e7490", "#ffd166", "<path d='M17 44h30' stroke='#fff' stroke-width='4.5' stroke-linecap='round'/><path d='M22 39V18h20v21' fill='#f8feff' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M27 26h10M27 33h8' stroke='#4338ca' stroke-width='3.2' stroke-linecap='round'/><circle cx='44' cy='42' r='7' fill='none' stroke='#ffd166' stroke-width='3.5'/>"),
+    "Seminar": subjectIconSvg("#0e7490", "#4338ca", "#ffd166", "<path d='M16 23h31a7 7 0 0 1 7 7v13H23l-9 7v-7h-1V30a7 7 0 0 1 7-7Z' fill='#eff6ff'/><path d='M23 32h22M23 39h16' stroke='#0e7490' stroke-width='3.4' stroke-linecap='round'/><circle cx='20' cy='20' r='4' fill='#ffd166'/>")
   };
 
   function profileKeyFor(subject) {
@@ -2185,12 +2214,31 @@
   }
 
   function subjectIconKey(subject) {
-    if (/Computer Science|Cybersecurity/.test(subject.title)) return "CS";
-    if (/Business/.test(subject.title)) return "Career";
-    if (/Language and Culture|Latin|Spanish Literature/.test(subject.title)) return "World Lang";
-    if (/Art and Design|Drawing|Art History|Music Theory/.test(subject.title)) return "Arts";
-    if (/Research|Seminar/.test(subject.title)) return "Capstone";
-    if (/Government|Economics|Psychology|Geography/.test(subject.title)) return "Social";
+    if (/African American Studies/.test(subject.title)) return "AfricanAmericanStudies";
+    if (/Statistics/.test(subject.title)) return "Statistics";
+    if (/Calculus/.test(subject.title)) return "Calculus";
+    if (/Precalculus/.test(subject.title)) return "Precalculus";
+    if (/Environmental Science/.test(subject.title)) return "Environmental";
+    if (/Biology/.test(subject.title)) return "Biology";
+    if (/Chemistry/.test(subject.title)) return "Chemistry";
+    if (/Physics/.test(subject.title)) return "Physics";
+    if (/Computer Science/.test(subject.title)) return "CS";
+    if (/Cybersecurity/.test(subject.title)) return "Cybersecurity";
+    if (/Business/.test(subject.title)) return "Business";
+    if (/Research/.test(subject.title)) return "Research";
+    if (/Seminar/.test(subject.title)) return "Seminar";
+    if (/Spanish Literature/.test(subject.title)) return "SpanishLiterature";
+    if (/Latin/.test(subject.title)) return "Latin";
+    if (/Language and Culture/.test(subject.title)) return "World Lang";
+    if (/Art History/.test(subject.title)) return "ArtHistory";
+    if (/Music Theory/.test(subject.title)) return "MusicTheory";
+    if (/Art and Design|Drawing/.test(subject.title)) return "ArtPortfolio";
+    if (/Government/.test(subject.title)) return "Government";
+    if (/Economics/.test(subject.title)) return "Economics";
+    if (/Psychology/.test(subject.title)) return "Psychology";
+    if (/Geography/.test(subject.title)) return "Geography";
+    if (/English/.test(subject.title)) return "English";
+    if (/United States History|European History|World History/.test(subject.title)) return "History";
     return subject.group || "Social";
   }
 
@@ -2249,14 +2297,17 @@
       const choices = rotateChoices([correct, ...distractors.slice(0, choiceCount - 1)], index + subject.slug.length);
       const setStart = Math.floor(index / setLength) * setLength + 1;
       const setEnd = Math.min(setStart + setLength - 1, subject.format.mcqCount);
+      const stimulus = fillTemplate(profile.stimuli[index % profile.stimuli.length], values).replace(/\.$/, "");
+      const stem = fillTemplate(profile.stems[index % profile.stems.length], values);
+      const prompt = stimulus ? stimulus + ". " + stem : stem;
 
       return {
         id: index + 1,
         unit: "Unit " + ((index % subject.units.length) + 1) + ": " + unit,
         skill: (index % 4) + 1,
-        set: setEnd > setStart ? "Questions " + setStart + "-" + setEnd + " share a stimulus" : undefined,
-        stimulus: fillTemplate(profile.stimuli[index % profile.stimuli.length], values),
-        prompt: fillTemplate(profile.stems[index % profile.stems.length], values),
+        set: setEnd > setStart ? "Questions " + setStart + "-" + setEnd + " share a topic" : undefined,
+        stimulus: "",
+        prompt,
         choices,
         correct: choices.indexOf(correct),
         explanation: fillTemplate(profile.explanation, values)

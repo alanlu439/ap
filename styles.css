@@ -235,6 +235,45 @@ a {
   line-height: 1;
 }
 
+.start-nav .home-wordmark {
+  flex: 1 1 360px;
+  align-self: stretch;
+  padding: 2px 0;
+}
+
+.start-nav .home-wordmark h1 {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  padding: 4px 0 14px;
+  color: #071a1f;
+  font-family: Avenir Next, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+  font-size: clamp(34px, 5.5vw, 56px);
+  font-weight: 950;
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-wrap: balance;
+  text-shadow: none;
+}
+
+.start-nav .home-wordmark h1 span {
+  color: #075f64;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.start-nav .home-wordmark h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(220px, 72%);
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #075f64, #2f6fed 72%, #f2a93b);
+  box-shadow: 0 10px 24px rgba(47, 111, 237, 0.24);
+}
+
 .start-nav .subject-search {
   flex: 1 1 320px;
   max-width: 520px;
@@ -2491,6 +2530,10 @@ h1 {
     font-size: 22px;
   }
 
+  .start-nav .home-wordmark h1 {
+    font-size: clamp(30px, 10vw, 42px);
+  }
+
   .start-nav .subject-search {
     flex-basis: 100%;
     max-width: none;
@@ -2891,4 +2934,385 @@ h1 {
   to {
     background-position: 0 0, 0 0, 0 0, 56px 56px, 56px 56px;
   }
+}
+
+/* Apple-clean visual refinement */
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface-soft: #f9f9fb;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d9d9de;
+  --teal: #0071e3;
+  --teal-dark: #005bb5;
+  --teal-soft: #eaf4ff;
+  --amber: #ff9f0a;
+  --amber-soft: #fff8ed;
+  --blue: #0071e3;
+  --green: #34c759;
+  --green-soft: #edf9f0;
+  --red: #ff3b30;
+  --red-soft: #fff0ef;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.055);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.start-screen::before,
+.start-nav::before {
+  display: none;
+}
+
+.mouse-glow {
+  display: none;
+}
+
+.custom-cursor {
+  width: 18px;
+  height: 18px;
+  border-color: rgba(0, 113, 227, 0.42);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 6px rgba(0, 113, 227, 0.06);
+}
+
+.custom-cursor.is-action {
+  width: 30px;
+  height: 30px;
+  border-color: rgba(0, 113, 227, 0.65);
+  background: rgba(0, 113, 227, 0.08);
+  box-shadow: 0 0 0 8px rgba(0, 113, 227, 0.06);
+}
+
+.start-shell,
+.app-shell {
+  width: min(1320px, 100%);
+}
+
+.start-nav,
+.subject-panel,
+.home-info-panel,
+.ready-dialog,
+.test-picker,
+.legal-card,
+.topbar,
+.question-card,
+.review-panel,
+.control-panel,
+.structure-panel,
+.blueprint-panel,
+.frq-section,
+.docs-section,
+.frq-rail,
+.frq-card,
+.path-hero,
+.path-card,
+.full-score-card {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: saturate(180%) blur(18px);
+}
+
+.start-nav {
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.start-nav .home-wordmark {
+  flex: 0 1 auto;
+}
+
+.start-nav .home-wordmark h1 {
+  padding: 0;
+  color: #1d1d1f !important;
+  font-family: var(--font);
+  font-size: clamp(34px, 4.6vw, 52px);
+  font-weight: 760;
+  line-height: 1.02;
+  text-shadow: none;
+}
+
+.start-nav .home-wordmark h1 span {
+  color: #0071e3;
+}
+
+.start-nav .home-wordmark h1::after {
+  display: none;
+}
+
+.start-nav .subject-search {
+  max-width: 560px;
+  min-height: 48px;
+  border-color: transparent;
+  border-radius: 999px;
+  background: rgba(245, 245, 247, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.start-nav .subject-search:focus-within {
+  border-color: transparent;
+  background: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 113, 227, 0.28),
+    0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+.start-nav .subject-search svg {
+  stroke: #86868b;
+}
+
+.start-nav .subject-search input {
+  font-size: 15px;
+  font-weight: 560;
+}
+
+.subject-panel,
+.home-info-panel {
+  padding: 22px;
+}
+
+.subject-heading h2,
+.panel-title h2,
+.structure-panel h2,
+.blueprint-panel h2,
+.frq-header h2,
+.docs-section h2 {
+  font-weight: 720;
+}
+
+.subject-heading strong {
+  border-color: rgba(0, 113, 227, 0.22);
+  background: #f5faff;
+  color: #0066cc;
+  font-weight: 650;
+}
+
+.subject-grid {
+  gap: 12px;
+}
+
+.subject-card,
+.home-info-card,
+.test-picker-option,
+.mode-card,
+.choice,
+.status-item,
+.frq-status div,
+.nav-dot,
+.frq-nav-dot {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.subject-card {
+  min-height: 112px;
+  padding: 16px;
+}
+
+.subject-card:hover,
+.subject-card.is-selected,
+.subject-card.is-search-match:not(.is-selected),
+.home-info-card:hover,
+.test-picker-option:hover,
+.mode-card:hover,
+.mode-card.is-selected,
+.path-card:hover {
+  border-color: rgba(0, 113, 227, 0.38);
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.075);
+  transform: translateY(-1px);
+}
+
+.subject-card.is-selected {
+  background: #f5faff;
+}
+
+.subject-card strong,
+.home-info-card strong,
+.test-picker-option strong,
+.mode-card strong,
+.blueprint-row strong,
+.path-card strong,
+.path-total strong,
+.full-score-card h2,
+.frq-caveat strong {
+  color: #0066cc;
+}
+
+.subject-card span,
+.subject-card em,
+.home-info-card span,
+.mode-title,
+.start-meta span,
+.status-item span,
+.review-kicker,
+.path-total span,
+.path-card span,
+.full-score-card span,
+.frq-status span {
+  color: #86868b;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.home-info-card {
+  background: #ffffff;
+}
+
+.topbar {
+  top: 10px;
+  min-height: 78px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.brand-block h1 {
+  font-weight: 740;
+}
+
+.brand-block p,
+.source-note,
+.frq-header p,
+.path-card p,
+.full-score-card p,
+.legal-card p,
+#reviewExplanation {
+  color: #6e6e73;
+}
+
+.exam-note,
+.frq-summary,
+.frq-status div,
+.frq-rail,
+.frq-card,
+.path-total {
+  background: #ffffff;
+}
+
+.section-progress {
+  height: 6px;
+  border-color: transparent;
+  background: #e8e8ed;
+}
+
+.section-progress span,
+.bar > span {
+  background: #0071e3;
+}
+
+.question-card {
+  background: #ffffff;
+}
+
+.stimulus,
+.frq-stimulus {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-left-color: #0071e3;
+  background: #fbfbfd;
+}
+
+#questionText {
+  font-weight: 720;
+  color: #1d1d1f;
+}
+
+.choice-letter {
+  background: #f5f5f7;
+  color: #0066cc;
+}
+
+.choice:hover {
+  border-color: rgba(0, 113, 227, 0.34);
+  box-shadow: none;
+}
+
+.choice.selected {
+  border-color: #0071e3;
+  background: #f5faff;
+  box-shadow: inset 0 0 0 1px rgba(0, 113, 227, 0.34);
+}
+
+.primary,
+.submit,
+.nav-dot.current,
+.frq-nav-dot.current {
+  background: #0071e3;
+  color: #ffffff;
+}
+
+.primary:hover,
+.submit:hover {
+  background: #0066cc;
+}
+
+.secondary,
+.page-nav a {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #1d1d1f;
+}
+
+.secondary:hover,
+.page-nav a:hover {
+  border-color: rgba(0, 113, 227, 0.24);
+  background: #f5faff;
+}
+
+.tag {
+  background: #f5f5f7;
+  color: #424245;
+}
+
+.nav-dot.current,
+.frq-nav-dot.current {
+  border-color: #0071e3;
+}
+
+.nav-dot.answered:not(.current),
+.frq-nav-dot.answered {
+  border-color: rgba(0, 113, 227, 0.18);
+  background: #f5faff;
+  color: #0066cc;
+}
+
+.bar,
+.section-progress {
+  background: #e8e8ed;
+}
+
+.frq-part textarea {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+}
+
+.frq-part textarea:focus {
+  outline: 4px solid rgba(0, 113, 227, 0.12);
+  border-color: rgba(0, 113, 227, 0.45);
+}
+
+@media (max-width: 760px) {
+  .start-nav .home-wordmark h1 {
+    font-size: clamp(30px, 9vw, 40px);
+  }
+}
+
+.start-nav {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.start-nav .home-wordmark,
+.start-nav .home-wordmark h1,
+.start-nav .subject-search {
+  opacity: 1 !important;
+  transform: none !important;
 }
