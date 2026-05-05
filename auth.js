@@ -4,9 +4,19 @@
   const USER_PREFIX = "ap-practice-user-";
   const AUTH_PREFIX = "ap-practice-auth-";
   const SELECTED_SUBJECT_KEY = "ap-practice-selected-subject-v1";
+  const FIREBASE_SDK_VERSION = "12.7.0";
+  const GOOGLE_PROVIDER = "google";
+  const APPLE_PROVIDER = "apple";
+  const PASSWORD_HASH = {
+    algorithm: "PBKDF2-SHA-256",
+    iterations: 210000,
+    length: 256
+  };
 
   const listeners = new Set();
   let authMode = "login";
+  let firebaseModulesPromise = null;
+  let firebaseRedirectChecked = false;
 
   function safeJsonParse(value, fallback) {
     try {
@@ -66,7 +76,10 @@
       id: user.id,
       name: user.name,
       email: user.email,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      authType: user.authType || "local",
+      provider: user.provider || "password",
+      photoURL: user.photoURL || ""
     };
   }
 
@@ -105,23 +118,55 @@
     window.dispatchEvent(new CustomEvent("ap-auth-change", { detail: { user } }));
   }
 
-  function randomToken(length = 16) {
-    const bytes = new Uint8Array(length);
-    if (window.crypto?.getRandomValues) {
-      window.crypto.getRandomValues(bytes);
-      return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-    }
-    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  function hasPasswordCrypto() {
+    return Boolean(window.crypto?.subtle && window.crypto?.getRandomValues && window.TextEncoder && window.btoa && window.atob);
   }
 
-  async function hashPassword(password, salt) {
-    const text = salt + ":" + password;
-    if (window.crypto?.subtle && window.TextEncoder) {
-      const data = new TextEncoder().encode(text);
-      const digest = await window.crypto.subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  function bytesToBase64(bytes) {
+    let binary = "";
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    return window.btoa(binary);
+  }
+
+  function base64ToBytes(value) {
+    const binary = window.atob(value);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) {
+      bytes[index] = binary.charCodeAt(index);
     }
-    return simpleHash(text);
+    return bytes;
+  }
+
+  function randomSalt(length = 16) {
+    if (!hasPasswordCrypto()) throw new Error("Secure password hashing is not available in this browser.");
+    const bytes = new Uint8Array(length);
+    window.crypto.getRandomValues(bytes);
+    return bytesToBase64(bytes);
+  }
+
+  async function hashPassword(password, salt, iterations = PASSWORD_HASH.iterations) {
+    if (!hasPasswordCrypto()) throw new Error("Secure password hashing is not available in this browser.");
+    const encoder = new TextEncoder();
+    const key = await window.crypto.subtle.importKey(
+      "raw",
+      encoder.encode(String(password || "")),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const bits = await window.crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: base64ToBytes(salt),
+        iterations,
+        hash: "SHA-256"
+      },
+      key,
+      PASSWORD_HASH.length
+    );
+    return bytesToBase64(new Uint8Array(bits));
   }
 
   function validEmail(email) {
@@ -156,7 +201,7 @@
     if (String(password || "").length < 6) throw new Error("Use at least 6 characters.");
     if (users[normalizedEmail]) throw new Error("That email already has a local account.");
 
-    const passwordSalt = randomToken(12);
+    const passwordSalt = randomSalt();
     const passwordHash = await hashPassword(password, passwordSalt);
     const user = {
       id: makeUserId(normalizedEmail),
@@ -164,7 +209,9 @@
       email: normalizedEmail,
       createdAt: new Date().toISOString(),
       passwordSalt,
-      passwordHash
+      passwordHash,
+      passwordAlgorithm: PASSWORD_HASH.algorithm,
+      passwordIterations: PASSWORD_HASH.iterations
     };
 
     users[normalizedEmail] = user;
@@ -181,7 +228,8 @@
     const user = users[normalizedEmail];
 
     if (!user) throw new Error("No local account found for that email.");
-    const passwordHash = await hashPassword(password, user.passwordSalt);
+    if (!user.passwordSalt || !user.passwordHash) throw new Error("Use the provider you used to create this account.");
+    const passwordHash = await hashPassword(password, user.passwordSalt, user.passwordIterations || PASSWORD_HASH.iterations);
     if (passwordHash !== user.passwordHash) throw new Error("Password does not match.");
 
     localStorage.setItem(SESSION_KEY, JSON.stringify({ email: normalizedEmail, signedInAt: new Date().toISOString() }));
@@ -204,6 +252,130 @@
     writeUsers(users);
     emitAuthChange();
     return safeUser(updated);
+  }
+
+
+  function getFirebaseConfig() {
+    const config = window.AP_FIREBASE_CONFIG;
+    if (!config || typeof config !== "object") return null;
+    const required = ["apiKey", "authDomain", "projectId", "appId"];
+    const missing = required.some((key) => {
+      const value = String(config[key] || "").trim();
+      return !value || value.includes("YOUR_");
+    });
+    return missing ? null : config;
+  }
+
+  function firebaseSetupMessage() {
+    return "Google and Apple sign-in need Firebase config in firebase-config.js first.";
+  }
+
+  async function loadFirebaseModules() {
+    const config = getFirebaseConfig();
+    if (!config) throw new Error(firebaseSetupMessage());
+
+    if (!firebaseModulesPromise) {
+      firebaseModulesPromise = Promise.all([
+        import("https://www.gstatic.com/firebasejs/" + FIREBASE_SDK_VERSION + "/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/" + FIREBASE_SDK_VERSION + "/firebase-auth.js")
+      ]).then(([appModule, authModule]) => {
+        const firebaseApp = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
+        const firebaseAuth = authModule.getAuth(firebaseApp);
+        firebaseAuth.useDeviceLanguage();
+        return { appModule, authModule, firebaseApp, firebaseAuth };
+      });
+    }
+
+    return firebaseModulesPromise;
+  }
+
+  function providerLabel(providerName) {
+    return providerName === APPLE_PROVIDER ? "Apple" : "Google";
+  }
+
+  function makeFirebaseProvider(authModule, providerName) {
+    if (providerName === APPLE_PROVIDER) {
+      const provider = new authModule.OAuthProvider("apple.com");
+      provider.addScope("email");
+      provider.addScope("name");
+      return provider;
+    }
+    const provider = new authModule.GoogleAuthProvider();
+    provider.addScope("profile");
+    provider.addScope("email");
+    return provider;
+  }
+
+  function providerFromFirebaseUser(firebaseUser, fallbackProvider) {
+    const providerId = firebaseUser?.providerData?.[0]?.providerId || "";
+    if (providerId.includes("apple")) return APPLE_PROVIDER;
+    if (providerId.includes("google")) return GOOGLE_PROVIDER;
+    return fallbackProvider || "firebase";
+  }
+
+  function cloudEmail(firebaseUser, providerName) {
+    const email = normalizeEmail(firebaseUser?.email);
+    if (email) return email;
+    return providerName + "-" + simpleHash(firebaseUser?.uid || Date.now()) + "@ap-practice.local";
+  }
+
+  function activateFirebaseUser(firebaseUser, fallbackProvider) {
+    if (!firebaseUser?.uid) throw new Error("Provider sign-in did not return a user.");
+    const provider = providerFromFirebaseUser(firebaseUser, fallbackProvider);
+    const email = cloudEmail(firebaseUser, provider);
+    const users = readUsers();
+    const existing = users[email] || {};
+    const now = new Date().toISOString();
+    const user = {
+      ...existing,
+      id: existing.id || makeUserId(email),
+      name: firebaseUser.displayName || existing.name || providerLabel(provider) + " User",
+      email,
+      createdAt: existing.createdAt || now,
+      updatedAt: now,
+      authType: "firebase",
+      provider,
+      firebaseUid: firebaseUser.uid,
+      photoURL: firebaseUser.photoURL || existing.photoURL || ""
+    };
+
+    users[email] = user;
+    writeUsers(users);
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ email, provider, firebaseUid: firebaseUser.uid, signedInAt: now }));
+    migrateGuestProgressToUser(user);
+    emitAuthChange();
+    return safeUser(user);
+  }
+
+  async function signInWithProvider(providerName) {
+    const modules = await loadFirebaseModules();
+    const provider = makeFirebaseProvider(modules.authModule, providerName);
+
+    try {
+      const result = await modules.authModule.signInWithPopup(modules.firebaseAuth, provider);
+      return activateFirebaseUser(result.user, providerName);
+    } catch (error) {
+      if (["auth/popup-blocked", "auth/cancelled-popup-request", "auth/operation-not-supported-in-this-environment"].includes(error.code)) {
+        await modules.authModule.signInWithRedirect(modules.firebaseAuth, provider);
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  async function checkFirebaseRedirectResult() {
+    if (firebaseRedirectChecked || !getFirebaseConfig()) return;
+    firebaseRedirectChecked = true;
+    try {
+      const modules = await loadFirebaseModules();
+      const result = await modules.authModule.getRedirectResult(modules.firebaseAuth);
+      if (result?.user) {
+        activateFirebaseUser(result.user);
+        window.location.reload();
+      }
+    } catch (error) {
+      window.console?.warn?.("Provider sign-in redirect check failed", error);
+    }
   }
 
   function onChange(listener) {
@@ -305,7 +477,7 @@
           '<span class="account-avatar large" aria-hidden="true">' + escapeAuthHtml(getInitials(user)) + '</span>',
           '<div><strong>' + escapeAuthHtml(user.name || firstName(user)) + '</strong><span>' + escapeAuthHtml(user.email) + '</span></div>',
           '</div>',
-          '<p>Your answers, timers, scores, and selected subject save to this local profile on this browser.</p>',
+          '<p>Your answers, timers, scores, and selected subject save to this profile on this browser.</p>',
           '<div class="auth-actions">',
           '<button class="text-button secondary" type="button" data-auth-close>Close</button>',
           '<button class="text-button primary" type="button" data-auth-logout>Sign Out</button>',
@@ -322,7 +494,7 @@
 
     if (user) {
       if (title) title.textContent = "Progress is saving";
-      if (copy) copy.textContent = "This is a local browser account, not a College Board or cloud account.";
+      if (copy) copy.textContent = "This account is for AP Exam Practice only. Provider sign-in uses Firebase when configured.";
     } else {
       setAuthMode(modal, authMode);
     }
@@ -349,6 +521,11 @@
       '<p class="auth-copy" data-auth-copy>Sign in on this browser to continue saved AP practice progress.</p>',
       '<div class="auth-signed-in" data-auth-signed-in hidden></div>',
       '<div data-auth-form-area>',
+      '<div class="auth-provider-grid" aria-label="Provider sign-in options">',
+      '<button class="auth-provider-button" type="button" data-auth-provider="google"><span aria-hidden="true">G</span><strong>Continue with Google</strong></button>',
+      '<button class="auth-provider-button" type="button" data-auth-provider="apple"><span aria-hidden="true">Apple</span><strong>Continue with Apple</strong></button>',
+      '</div>',
+      '<div class="auth-divider"><span>or</span></div>',
       '<div class="auth-tabs" role="tablist" aria-label="Account mode">',
       '<button type="button" data-auth-mode="login" role="tab" aria-selected="true">Login</button>',
       '<button type="button" data-auth-mode="register" role="tab" aria-selected="false">Register</button>',
@@ -358,7 +535,7 @@
       '<label class="auth-field"><span>Email</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>',
       '<label class="auth-field"><span>Password</span><input name="password" type="password" minlength="6" autocomplete="current-password" placeholder="6+ characters" required></label>',
       '<p class="auth-message" data-auth-message aria-live="polite"></p>',
-      '<p class="auth-note">Local only: this browser stores your profile and progress. Do not use a sensitive password.</p>',
+      '<p class="auth-note">Social sign-in uses Firebase when configured. Local accounts and progress still save in this browser.</p>',
       '<button class="text-button primary full" type="submit" data-auth-submit>Sign In</button>',
       '</form>',
       '</div>',
@@ -372,6 +549,30 @@
     });
     modal.querySelectorAll("[data-auth-mode]").forEach((control) => {
       control.addEventListener("click", () => setAuthMode(modal, control.dataset.authMode));
+    });
+    modal.querySelectorAll("[data-auth-provider]").forEach((control) => {
+      control.addEventListener("click", async () => {
+        const provider = control.dataset.authProvider;
+        modal.querySelectorAll("[data-auth-provider]").forEach((button) => {
+          button.disabled = true;
+        });
+        setAuthMessage(modal, "Opening " + providerLabel(provider) + " sign-in...");
+        try {
+          const user = await signInWithProvider(provider);
+          if (user) {
+            setAuthMessage(modal, "Signed in with " + providerLabel(provider) + ". Loading your saved workspace...", "success");
+            updateAccountButtons();
+            window.setTimeout(() => window.location.reload(), 550);
+          } else {
+            setAuthMessage(modal, "Continue in the provider window to finish sign-in.", "success");
+          }
+        } catch (error) {
+          setAuthMessage(modal, error.message || providerLabel(provider) + " sign-in failed.", "error");
+          modal.querySelectorAll("[data-auth-provider]").forEach((button) => {
+            button.disabled = false;
+          });
+        }
+      });
     });
     modal.querySelector("[data-auth-form]")?.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -427,6 +628,7 @@
   function initAuthUi() {
     mountAccountButtons();
     window.addEventListener("storage", updateAccountButtons);
+    checkFirebaseRedirectResult();
   }
 
   window.APPracticeAuth = {
@@ -437,6 +639,8 @@
     logout,
     register,
     updateProfile,
+    signInWithProvider,
+    hasCloudAuthConfig: () => Boolean(getFirebaseConfig()),
     onChange,
     scopeKey,
     open: openAuthModal
