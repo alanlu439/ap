@@ -17,6 +17,7 @@ If the page returns 404, enable GitHub Pages in repository settings:
 ## What Visitors Can Do
 
 - Choose from 42 AP subjects
+- Register or sign in to a local browser account for per-user saved progress
 - Start Full Exam, MCQ, or FRQ practice from a pop-out structure selector
 - See per-subject section counts, minutes, and score weights
 - Answer MCQs with saved progress and review feedback
@@ -79,6 +80,7 @@ If the page returns 404, enable GitHub Pages in repository settings:
 ├── frq.html            # Free-response section UI
 ├── legal.html          # Disclaimer and legal notice
 ├── practice-data.js    # Subject list, exam structures, generated practice data
+├── auth.js             # Local browser login, registration, and per-user storage scoping
 ├── app.js              # MCQ logic and grading
 ├── frq.js              # FRQ writing flow and estimated rubric grading
 ├── start.js            # Home page, subject selection, ready dialogs
@@ -134,6 +136,10 @@ Use this for the GitHub repository description:
 Suggested topics:
 
 `ap`, `ap-exams`, `practice-exam`, `education`, `static-site`, `mcq`, `frq`, `github-pages`
+
+## Local Accounts
+
+Registration and login are local to the current browser. The static GitHub Pages site stores a name, email, password hash, selected subject, and practice progress in `localStorage`; it does not provide secure cloud accounts or cross-device sync. Visitors should not reuse a sensitive password.
 
 ## Disclaimer
 

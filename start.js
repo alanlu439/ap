@@ -1,5 +1,9 @@
 const practiceData = window.APPracticeData;
 const SELECTED_AP_SUBJECT_KEY = practiceData?.SELECTED_AP_SUBJECT_KEY || "ap-practice-selected-subject-v1";
+
+function selectedSubjectStorageKey() {
+  return practiceData?.selectedSubjectStorageKey?.() || practiceData?.scopedStorageKey?.(SELECTED_AP_SUBJECT_KEY) || SELECTED_AP_SUBJECT_KEY;
+}
 const fallbackSubject = {
   title: "AP Statistics",
   short: "AP Statistics",
@@ -368,7 +372,7 @@ function initSubjectPicker() {
       item.setAttribute("aria-pressed", String(selected));
     });
 
-    localStorage.setItem(SELECTED_AP_SUBJECT_KEY, subject.title);
+    localStorage.setItem(selectedSubjectStorageKey(), subject.title);
     setPracticeLinksAvailable(available);
     updateModePopoutCopy(subject, available);
     updateHomeProgress();
@@ -378,7 +382,7 @@ function initSubjectPicker() {
     if (options.openModes) jumpToModeSelection();
   };
 
-  const savedSubject = localStorage.getItem(SELECTED_AP_SUBJECT_KEY);
+  const savedSubject = localStorage.getItem(selectedSubjectStorageKey());
   const availableCard = cardsArray.find((card) => card.dataset.available === "true");
   const initialCard = cardsArray.find((card) => card.dataset.subject === savedSubject) || availableCard || cards[0];
   selectSubject(initialCard);
