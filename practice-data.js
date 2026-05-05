@@ -2305,7 +2305,7 @@
         id: index + 1,
         unit: "Unit " + ((index % subject.units.length) + 1) + ": " + unit,
         skill: (index % 4) + 1,
-        set: setEnd > setStart ? "Questions " + setStart + "-" + setEnd + " share a topic" : undefined,
+        set: undefined,
         stimulus: "",
         prompt,
         choices,
@@ -2327,7 +2327,7 @@
         id: index + 1,
         title: fillTemplate(frqType.title, values),
         maxPoints: frqType.parts.length,
-        stimulus: "Practice made by Alan for " + subject.title + ". " + fillTemplate(frqType.stimulus, values),
+        stimulus: fillTemplate(frqType.stimulus, values),
         parts: frqType.parts.map((item) => ({
           label: fillTemplate(item.label, values),
           criteria: filledCriteria(item.criteria, values)

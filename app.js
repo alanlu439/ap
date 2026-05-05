@@ -21,7 +21,6 @@ const statsQuestions = [
     id: 1,
     unit: "Unit 1: Exploring One-Variable Data",
     skill: 2,
-    set: "Questions 1-3 share a prompt",
     stimulus: "A random sample of 12 commute times, in minutes, for students at a large high school is shown.\n18, 21, 24, 25, 26, 28, 31, 33, 36, 39, 42, 69",
     prompt: "Which description best summarizes the shape and unusual features of the distribution?",
     choices: [
@@ -38,7 +37,6 @@ const statsQuestions = [
     id: 2,
     unit: "Unit 1: Exploring One-Variable Data",
     skill: 2,
-    set: "Questions 1-3 share a prompt",
     stimulus: "A random sample of 12 commute times, in minutes, for students at a large high school is shown.\n18, 21, 24, 25, 26, 28, 31, 33, 36, 39, 42, 69",
     prompt: "Using the median-of-halves method, what is the interquartile range of the commute times?",
     choices: [
@@ -55,7 +53,6 @@ const statsQuestions = [
     id: 3,
     unit: "Unit 1: Exploring One-Variable Data",
     skill: 4,
-    set: "Questions 1-3 share a prompt",
     stimulus: "A random sample of 12 commute times, in minutes, for students at a large high school is shown.\n18, 21, 24, 25, 26, 28, 31, 33, 36, 39, 42, 69",
     prompt: "Which pair of summary statistics is most appropriate for describing the center and variability of these commute times?",
     choices: [
@@ -147,7 +144,6 @@ const statsQuestions = [
     id: 9,
     unit: "Unit 2: Exploring Two-Variable Data",
     skill: 2,
-    set: "Questions 9-10 share a prompt",
     stimulus: "A least-squares regression line for predicting exam score from hours studied is y-hat = 62 + 4.3x, where x is hours studied.",
     prompt: "Which is the best interpretation of the slope?",
     choices: [
@@ -164,7 +160,6 @@ const statsQuestions = [
     id: 10,
     unit: "Unit 2: Exploring Two-Variable Data",
     skill: 2,
-    set: "Questions 9-10 share a prompt",
     stimulus: "A least-squares regression line for predicting exam score from hours studied is y-hat = 62 + 4.3x, where x is hours studied.",
     prompt: "A student who studied 5 hours scored 80. What is the residual for this student?",
     choices: [
@@ -196,7 +191,6 @@ const statsQuestions = [
     id: 12,
     unit: "Unit 3: Collecting Data",
     skill: 1,
-    set: "Questions 12-13 share a prompt",
     stimulus: "A sleep app company wants to compare the effect of a caffeinated drink with a placebo drink on reaction time. Sixty volunteers agree to participate.",
     prompt: "Which design gives the strongest evidence that any difference in reaction time is caused by the drink?",
     choices: [
@@ -213,7 +207,6 @@ const statsQuestions = [
     id: 13,
     unit: "Unit 3: Collecting Data",
     skill: 4,
-    set: "Questions 12-13 share a prompt",
     stimulus: "A sleep app company wants to compare the effect of a caffeinated drink with a placebo drink on reaction time. Sixty volunteers agree to participate.",
     prompt: "What is the main purpose of random assignment in this experiment?",
     choices: [
@@ -426,7 +419,6 @@ const statsQuestions = [
     id: 27,
     unit: "Unit 6: Inference for Categorical Data: Proportions",
     skill: 1,
-    set: "Questions 27-29 share a prompt",
     stimulus: "A random sample of 500 adults finds that 295 support a proposed policy. A researcher tests H0: p = 0.55 versus Ha: p > 0.55, where p is the true proportion of adults who support the policy.",
     prompt: "Which statement correctly checks the large-counts condition for the test?",
     choices: [
@@ -443,7 +435,6 @@ const statsQuestions = [
     id: 28,
     unit: "Unit 6: Inference for Categorical Data: Proportions",
     skill: 3,
-    set: "Questions 27-29 share a prompt",
     stimulus: "A random sample of 500 adults finds that 295 support a proposed policy. A researcher tests H0: p = 0.55 versus Ha: p > 0.55, where p is the true proportion of adults who support the policy.",
     prompt: "The sample proportion is 0.59. What is the approximate test statistic and p-value?",
     choices: [
@@ -460,7 +451,6 @@ const statsQuestions = [
     id: 29,
     unit: "Unit 6: Inference for Categorical Data: Proportions",
     skill: 3,
-    set: "Questions 27-29 share a prompt",
     stimulus: "A random sample of 500 adults finds that 295 support a proposed policy. A researcher tests H0: p = 0.55 versus Ha: p > 0.55, where p is the true proportion of adults who support the policy.",
     prompt: "Which interpretation of the p-value is correct?",
     choices: [
@@ -537,7 +527,6 @@ const statsQuestions = [
     id: 34,
     unit: "Unit 7: Inference for Quantitative Data: Means",
     skill: 1,
-    set: "Questions 34-35 share a prompt",
     stimulus: "A district compares mean SAT math scores for students in two independent tutoring programs. Program A has 35 randomly selected students. Program B has 40 randomly selected students. The population standard deviations are unknown.",
     prompt: "Which procedure is most appropriate for estimating the difference in mean scores, mu_A - mu_B?",
     choices: [
@@ -554,7 +543,6 @@ const statsQuestions = [
     id: 35,
     unit: "Unit 7: Inference for Quantitative Data: Means",
     skill: 3,
-    set: "Questions 34-35 share a prompt",
     stimulus: "A district compares mean SAT math scores for students in two independent tutoring programs. Program A has 35 randomly selected students. Program B has 40 randomly selected students. The population standard deviations are unknown.",
     prompt: "Why is a t procedure used instead of a z procedure?",
     choices: [
@@ -617,7 +605,6 @@ const statsQuestions = [
     id: 39,
     unit: "Unit 9: Inference for Quantitative Data: Slopes",
     skill: 4,
-    set: "Questions 39-40 share a prompt",
     stimulus: "A least-squares regression is used to predict plant growth from hours of light. Computer output for the slope gives estimate = 2.80, standard error = 0.90, and df = 18.",
     prompt: "For testing H0: beta = 0 versus Ha: beta > 0, which conclusion is best at alpha = 0.05?",
     choices: [
@@ -634,7 +621,6 @@ const statsQuestions = [
     id: 40,
     unit: "Unit 9: Inference for Quantitative Data: Slopes",
     skill: 4,
-    set: "Questions 39-40 share a prompt",
     stimulus: "A least-squares regression is used to predict plant growth from hours of light. Computer output for the slope gives estimate = 2.80, standard error = 0.90, and df = 18.",
     prompt: "A 95% confidence interval for the true slope is (0.7, 4.9). Which interpretation is correct?",
     choices: [
@@ -750,6 +736,20 @@ function formatText(value) {
   return escapeHtml(value).replaceAll("\n", "<br>");
 }
 
+function oneParagraph(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function questionPrompt(question) {
+  const stimulus = oneParagraph(question.stimulus);
+  const prompt = oneParagraph(question.prompt);
+  if (stimulus && prompt) {
+    const separator = /[.!?]$/.test(stimulus) ? " " : ". ";
+    return stimulus + separator + prompt;
+  }
+  return prompt || stimulus;
+}
+
 function applyMcqSubjectChrome() {
   const format = selectedPracticeSubject.format;
   const weight = practiceData?.formatWeight?.(format.mcqWeight) || format.mcqWeight + "%";
@@ -792,16 +792,11 @@ function render() {
   els.answeredText.textContent = `${answeredCount} answered`;
   els.scoreText.textContent = state.submitted ? `${score} / ${questions.length}` : "--";
   els.questionNumber.textContent = `Question ${q.id} of ${questions.length}`;
-  els.setLabel.textContent = q.set || "Single";
-  els.questionText.textContent = q.prompt;
-
-  if (q.stimulus) {
-    els.stimulus.hidden = false;
-    els.stimulus.innerHTML = formatText(q.stimulus);
-  } else {
-    els.stimulus.hidden = true;
-    els.stimulus.innerHTML = "";
-  }
+  els.setLabel.hidden = true;
+  els.setLabel.textContent = "";
+  els.questionText.textContent = questionPrompt(q);
+  els.stimulus.hidden = true;
+  els.stimulus.innerHTML = "";
 
   els.choices.innerHTML = "";
   q.choices.forEach((choice, index) => {
