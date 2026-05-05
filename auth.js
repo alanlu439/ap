@@ -4,9 +4,6 @@
   const USER_PREFIX = "ap-practice-user-";
   const AUTH_PREFIX = "ap-practice-auth-";
   const SELECTED_SUBJECT_KEY = "ap-practice-selected-subject-v1";
-  const FIREBASE_SDK_VERSION = "12.7.0";
-  const GOOGLE_PROVIDER = "google";
-  const APPLE_PROVIDER = "apple";
   const PASSWORD_HASH = {
     algorithm: "PBKDF2-SHA-256",
     iterations: 210000,
@@ -15,8 +12,6 @@
 
   const listeners = new Set();
   let authMode = "login";
-  let firebaseModulesPromise = null;
-  let firebaseRedirectChecked = false;
 
   function safeJsonParse(value, fallback) {
     try {
@@ -76,10 +71,7 @@
       id: user.id,
       name: user.name,
       email: user.email,
-      createdAt: user.createdAt,
-      authType: user.authType || "local",
-      provider: user.provider || "password",
-      photoURL: user.photoURL || ""
+      createdAt: user.createdAt
     };
   }
 
@@ -228,7 +220,7 @@
     const user = users[normalizedEmail];
 
     if (!user) throw new Error("No local account found for that email.");
-    if (!user.passwordSalt || !user.passwordHash) throw new Error("Use the provider you used to create this account.");
+    if (!user.passwordSalt || !user.passwordHash) throw new Error("This local account cannot use password sign-in.");
     const passwordHash = await hashPassword(password, user.passwordSalt, user.passwordIterations || PASSWORD_HASH.iterations);
     if (passwordHash !== user.passwordHash) throw new Error("Password does not match.");
 
@@ -254,133 +246,6 @@
     return safeUser(updated);
   }
 
-
-  function getFirebaseConfig() {
-    const config = window.AP_FIREBASE_CONFIG;
-    if (!config || typeof config !== "object") return null;
-    const required = ["apiKey", "authDomain", "projectId", "appId"];
-    const missing = required.some((key) => {
-      const value = String(config[key] || "").trim();
-      return !value || value.includes("YOUR_");
-    });
-    return missing ? null : config;
-  }
-
-  function firebaseSetupMessage() {
-    return "Google and Apple sign-in need Firebase setup first. Add your Firebase web config in firebase-config.js and enable both providers.";
-  }
-
-  function cloudAuthReady() {
-    return Boolean(getFirebaseConfig());
-  }
-
-  async function loadFirebaseModules() {
-    const config = getFirebaseConfig();
-    if (!config) throw new Error(firebaseSetupMessage());
-
-    if (!firebaseModulesPromise) {
-      firebaseModulesPromise = Promise.all([
-        import("https://www.gstatic.com/firebasejs/" + FIREBASE_SDK_VERSION + "/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/" + FIREBASE_SDK_VERSION + "/firebase-auth.js")
-      ]).then(([appModule, authModule]) => {
-        const firebaseApp = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
-        const firebaseAuth = authModule.getAuth(firebaseApp);
-        firebaseAuth.useDeviceLanguage();
-        return { appModule, authModule, firebaseApp, firebaseAuth };
-      });
-    }
-
-    return firebaseModulesPromise;
-  }
-
-  function providerLabel(providerName) {
-    return providerName === APPLE_PROVIDER ? "Apple" : "Google";
-  }
-
-  function makeFirebaseProvider(authModule, providerName) {
-    if (providerName === APPLE_PROVIDER) {
-      const provider = new authModule.OAuthProvider("apple.com");
-      provider.addScope("email");
-      provider.addScope("name");
-      return provider;
-    }
-    const provider = new authModule.GoogleAuthProvider();
-    provider.addScope("profile");
-    provider.addScope("email");
-    return provider;
-  }
-
-  function providerFromFirebaseUser(firebaseUser, fallbackProvider) {
-    const providerId = firebaseUser?.providerData?.[0]?.providerId || "";
-    if (providerId.includes("apple")) return APPLE_PROVIDER;
-    if (providerId.includes("google")) return GOOGLE_PROVIDER;
-    return fallbackProvider || "firebase";
-  }
-
-  function cloudEmail(firebaseUser, providerName) {
-    const email = normalizeEmail(firebaseUser?.email);
-    if (email) return email;
-    return providerName + "-" + simpleHash(firebaseUser?.uid || Date.now()) + "@ap-practice.local";
-  }
-
-  function activateFirebaseUser(firebaseUser, fallbackProvider) {
-    if (!firebaseUser?.uid) throw new Error("Provider sign-in did not return a user.");
-    const provider = providerFromFirebaseUser(firebaseUser, fallbackProvider);
-    const email = cloudEmail(firebaseUser, provider);
-    const users = readUsers();
-    const existing = users[email] || {};
-    const now = new Date().toISOString();
-    const user = {
-      ...existing,
-      id: existing.id || makeUserId(email),
-      name: firebaseUser.displayName || existing.name || providerLabel(provider) + " User",
-      email,
-      createdAt: existing.createdAt || now,
-      updatedAt: now,
-      authType: "firebase",
-      provider,
-      firebaseUid: firebaseUser.uid,
-      photoURL: firebaseUser.photoURL || existing.photoURL || ""
-    };
-
-    users[email] = user;
-    writeUsers(users);
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ email, provider, firebaseUid: firebaseUser.uid, signedInAt: now }));
-    migrateGuestProgressToUser(user);
-    emitAuthChange();
-    return safeUser(user);
-  }
-
-  async function signInWithProvider(providerName) {
-    const modules = await loadFirebaseModules();
-    const provider = makeFirebaseProvider(modules.authModule, providerName);
-
-    try {
-      const result = await modules.authModule.signInWithPopup(modules.firebaseAuth, provider);
-      return activateFirebaseUser(result.user, providerName);
-    } catch (error) {
-      if (["auth/popup-blocked", "auth/cancelled-popup-request", "auth/operation-not-supported-in-this-environment"].includes(error.code)) {
-        await modules.authModule.signInWithRedirect(modules.firebaseAuth, provider);
-        return null;
-      }
-      throw error;
-    }
-  }
-
-  async function checkFirebaseRedirectResult() {
-    if (firebaseRedirectChecked || !getFirebaseConfig()) return;
-    firebaseRedirectChecked = true;
-    try {
-      const modules = await loadFirebaseModules();
-      const result = await modules.authModule.getRedirectResult(modules.firebaseAuth);
-      if (result?.user) {
-        activateFirebaseUser(result.user);
-        window.location.reload();
-      }
-    } catch (error) {
-      window.console?.warn?.("Provider sign-in redirect check failed", error);
-    }
-  }
 
   function onChange(listener) {
     listeners.add(listener);
@@ -462,11 +327,7 @@
         ? "Create a local browser profile so progress can save under your name."
         : "Sign in on this browser to continue saved AP practice progress.";
     }
-    if (!cloudAuthReady()) {
-      setAuthMessage(modal, firebaseSetupMessage());
-    } else {
-      setAuthMessage(modal, "");
-    }
+    setAuthMessage(modal, "");
   }
 
   function renderSignedInPanel(modal) {
@@ -502,7 +363,7 @@
 
     if (user) {
       if (title) title.textContent = "Progress is saving";
-      if (copy) copy.textContent = "This account is for AP Exam Practice only. Provider sign-in uses Firebase when configured.";
+      if (copy) copy.textContent = "This local browser account saves progress for AP Exam Practice.";
     } else {
       setAuthMode(modal, authMode);
     }
@@ -529,11 +390,6 @@
       '<p class="auth-copy" data-auth-copy>Sign in on this browser to continue saved AP practice progress.</p>',
       '<div class="auth-signed-in" data-auth-signed-in hidden></div>',
       '<div data-auth-form-area>',
-      '<div class="auth-provider-grid" aria-label="Provider sign-in options">',
-      '<button class="auth-provider-button" type="button" data-auth-provider="google"><span aria-hidden="true">G</span><strong>Continue with Google</strong><em data-provider-state>Setup required</em></button>',
-      '<button class="auth-provider-button" type="button" data-auth-provider="apple"><span aria-hidden="true">Apple</span><strong>Continue with Apple</strong><em data-provider-state>Setup required</em></button>',
-      '</div>',
-      '<div class="auth-divider"><span>or</span></div>',
       '<div class="auth-tabs" role="tablist" aria-label="Account mode">',
       '<button type="button" data-auth-mode="login" role="tab" aria-selected="true">Login</button>',
       '<button type="button" data-auth-mode="register" role="tab" aria-selected="false">Register</button>',
@@ -543,7 +399,7 @@
       '<label class="auth-field"><span>Email</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>',
       '<label class="auth-field"><span>Password</span><input name="password" type="password" minlength="6" autocomplete="current-password" placeholder="6+ characters" required></label>',
       '<p class="auth-message" data-auth-message aria-live="polite"></p>',
-      '<p class="auth-note">Social sign-in uses Firebase when configured. Local accounts and progress still save in this browser.</p>',
+      '<p class="auth-note">Local only: this browser stores your profile and progress. Do not use a sensitive password.</p>',
       '<button class="text-button primary full" type="submit" data-auth-submit>Sign In</button>',
       '</form>',
       '</div>',
@@ -557,38 +413,6 @@
     });
     modal.querySelectorAll("[data-auth-mode]").forEach((control) => {
       control.addEventListener("click", () => setAuthMode(modal, control.dataset.authMode));
-    });
-    const providerReady = cloudAuthReady();
-    modal.querySelectorAll("[data-auth-provider]").forEach((control) => {
-      control.classList.toggle("is-unconfigured", !providerReady);
-      control.querySelector("[data-provider-state]").textContent = providerReady ? "Ready" : "Setup required";
-      control.title = providerReady ? "" : firebaseSetupMessage();
-      control.addEventListener("click", async () => {
-        const provider = control.dataset.authProvider;
-        if (!cloudAuthReady()) {
-          setAuthMessage(modal, firebaseSetupMessage(), "error");
-          return;
-        }
-        modal.querySelectorAll("[data-auth-provider]").forEach((button) => {
-          button.disabled = true;
-        });
-        setAuthMessage(modal, "Opening " + providerLabel(provider) + " sign-in...");
-        try {
-          const user = await signInWithProvider(provider);
-          if (user) {
-            setAuthMessage(modal, "Signed in with " + providerLabel(provider) + ". Loading your saved workspace...", "success");
-            updateAccountButtons();
-            window.setTimeout(() => window.location.reload(), 550);
-          } else {
-            setAuthMessage(modal, "Continue in the provider window to finish sign-in.", "success");
-          }
-        } catch (error) {
-          setAuthMessage(modal, error.message || providerLabel(provider) + " sign-in failed.", "error");
-          modal.querySelectorAll("[data-auth-provider]").forEach((button) => {
-            button.disabled = false;
-          });
-        }
-      });
     });
     modal.querySelector("[data-auth-form]")?.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -644,7 +468,6 @@
   function initAuthUi() {
     mountAccountButtons();
     window.addEventListener("storage", updateAccountButtons);
-    checkFirebaseRedirectResult();
   }
 
   window.APPracticeAuth = {
@@ -655,8 +478,6 @@
     logout,
     register,
     updateProfile,
-    signInWithProvider,
-    hasCloudAuthConfig: cloudAuthReady,
     onChange,
     scopeKey,
     open: openAuthModal

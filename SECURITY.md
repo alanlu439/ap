@@ -1,6 +1,6 @@
 # Security Policy
 
-AP Exam Practice is a static browser app. Local registration stores account details only in the visitor browser. Optional Google and Apple sign-in use Firebase Auth when configured.
+AP Exam Practice is a static browser app. Local registration stores account details only in the visitor browser.
 
 ## Reporting Issues
 
@@ -10,6 +10,5 @@ If you find a security or privacy issue, open a private report if GitHub securit
 
 - Practice progress is stored locally in the visitor browser through `localStorage`.
 - Local accounts store a name, email, PBKDF2 password hash, selected subject, and saved progress in that same browser storage.
-- Google and Apple sign-in are handled by Firebase Auth after a Firebase project is configured; provider passwords are not stored by this app.
 - These accounts are not cloud-synced and should not be treated as secure identity accounts. Do not reuse a sensitive password.
 - No official AP credentials or personal exam information should be entered into the site.
