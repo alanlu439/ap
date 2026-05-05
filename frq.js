@@ -21,6 +21,24 @@ function formatText(value) {
   return escapeHtml(value).replaceAll("\n", "<br>");
 }
 
+function oneParagraph(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function frqQuestionText(item) {
+  const stimulus = oneParagraph(item.stimulus);
+  const parts = item.parts.map((part) => oneParagraph(part.label)).filter(Boolean).join(" ");
+  if (stimulus && parts) {
+    const separator = /[.!?]$/.test(stimulus) ? " " : ". ";
+    return stimulus + separator + parts;
+  }
+  return parts || stimulus;
+}
+
+function partLetter(index) {
+  return String.fromCharCode(97 + index);
+}
+
 const statsFrqItems = [
   {
     id: 1,
@@ -427,13 +445,12 @@ function renderFrqs() {
   frqEls.list.innerHTML = frqItems.map((item, itemIndex) => `
     <article class="frq-card${frqState.submitted ? " is-graded" : ""}" id="frq-card-${itemIndex}" data-frq-index="${itemIndex}">
       <div class="frq-card-header">
-        <h3>Question ${item.id}: ${escapeHtml(item.title)}</h3>
-        <span>${item.maxPoints} rubric points</span>
+        <h3>Question ${item.id}</h3>
       </div>
-      <div class="frq-stimulus">${formatText(item.stimulus)}</div>
+      <p class="frq-question-text">${escapeHtml(frqQuestionText(item))}</p>
       ${item.parts.map((part, partIndex) => `
         <div class="frq-part">
-          <label for="frq-${itemIndex}-${partIndex}">${escapeHtml(part.label)}</label>
+          <label for="frq-${itemIndex}-${partIndex}">Response (${partLetter(partIndex)})</label>
           <textarea id="frq-${itemIndex}-${partIndex}" data-item="${itemIndex}" data-part="${partIndex}" ${frqState.submitted ? "disabled" : ""}>${escapeHtml(frqState.answers[itemIndex][partIndex] || "")}</textarea>
           <div class="frq-part-meta" id="frq-words-${itemIndex}-${partIndex}">${formatWordCount(frqState.answers[itemIndex][partIndex] || "")}</div>
         </div>

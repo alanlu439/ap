@@ -3332,3 +3332,22 @@ body {
     font-size: clamp(30px, 9vw, 40px);
   }
 }
+
+.frq-question-text {
+  max-width: 960px;
+  margin: 0 0 16px;
+  color: #1d1d1f;
+  font-size: 18px;
+  font-weight: 680;
+  line-height: 1.48;
+  overflow-wrap: anywhere;
+}
+
+.frq-card-header {
+  margin-bottom: 12px;
+}
+
+.frq-card-header span,
+.frq-stimulus {
+  display: none !important;
+}
