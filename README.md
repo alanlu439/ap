@@ -141,7 +141,7 @@ Suggested topics:
 
 ## Accounts and Sign-In
 
-Local registration stores a name, email, PBKDF2 password hash, selected subject, and practice progress in `localStorage` on the current browser. Google and Apple sign-in are wired through Firebase Auth, but require a real Firebase web app config in `firebase-config.js` plus enabled Google and Apple providers in Firebase Authentication.
+Local registration stores a name, email, PBKDF2 password hash, selected subject, and practice progress in `localStorage` on the current browser. Google and Apple sign-in are wired through Firebase Auth, but require a real Firebase web app config in `firebase-config.js` plus enabled Google and Apple providers in Firebase Authentication. Until that config is added, the app will show those provider buttons as setup-required instead of starting OAuth.
 
 Provider sign-in avoids storing a local password. Progress is still saved in the browser under that signed-in profile unless cloud database sync is added later.
 

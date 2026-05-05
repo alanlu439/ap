@@ -267,7 +267,11 @@
   }
 
   function firebaseSetupMessage() {
-    return "Google and Apple sign-in need Firebase config in firebase-config.js first.";
+    return "Google and Apple sign-in need Firebase setup first. Add your Firebase web config in firebase-config.js and enable both providers.";
+  }
+
+  function cloudAuthReady() {
+    return Boolean(getFirebaseConfig());
   }
 
   async function loadFirebaseModules() {
@@ -458,7 +462,11 @@
         ? "Create a local browser profile so progress can save under your name."
         : "Sign in on this browser to continue saved AP practice progress.";
     }
-    setAuthMessage(modal, "");
+    if (!cloudAuthReady()) {
+      setAuthMessage(modal, firebaseSetupMessage());
+    } else {
+      setAuthMessage(modal, "");
+    }
   }
 
   function renderSignedInPanel(modal) {
@@ -522,8 +530,8 @@
       '<div class="auth-signed-in" data-auth-signed-in hidden></div>',
       '<div data-auth-form-area>',
       '<div class="auth-provider-grid" aria-label="Provider sign-in options">',
-      '<button class="auth-provider-button" type="button" data-auth-provider="google"><span aria-hidden="true">G</span><strong>Continue with Google</strong></button>',
-      '<button class="auth-provider-button" type="button" data-auth-provider="apple"><span aria-hidden="true">Apple</span><strong>Continue with Apple</strong></button>',
+      '<button class="auth-provider-button" type="button" data-auth-provider="google"><span aria-hidden="true">G</span><strong>Continue with Google</strong><em data-provider-state>Setup required</em></button>',
+      '<button class="auth-provider-button" type="button" data-auth-provider="apple"><span aria-hidden="true">Apple</span><strong>Continue with Apple</strong><em data-provider-state>Setup required</em></button>',
       '</div>',
       '<div class="auth-divider"><span>or</span></div>',
       '<div class="auth-tabs" role="tablist" aria-label="Account mode">',
@@ -550,9 +558,17 @@
     modal.querySelectorAll("[data-auth-mode]").forEach((control) => {
       control.addEventListener("click", () => setAuthMode(modal, control.dataset.authMode));
     });
+    const providerReady = cloudAuthReady();
     modal.querySelectorAll("[data-auth-provider]").forEach((control) => {
+      control.classList.toggle("is-unconfigured", !providerReady);
+      control.querySelector("[data-provider-state]").textContent = providerReady ? "Ready" : "Setup required";
+      control.title = providerReady ? "" : firebaseSetupMessage();
       control.addEventListener("click", async () => {
         const provider = control.dataset.authProvider;
+        if (!cloudAuthReady()) {
+          setAuthMessage(modal, firebaseSetupMessage(), "error");
+          return;
+        }
         modal.querySelectorAll("[data-auth-provider]").forEach((button) => {
           button.disabled = true;
         });
@@ -640,7 +656,7 @@
     register,
     updateProfile,
     signInWithProvider,
-    hasCloudAuthConfig: () => Boolean(getFirebaseConfig()),
+    hasCloudAuthConfig: cloudAuthReady,
     onChange,
     scopeKey,
     open: openAuthModal

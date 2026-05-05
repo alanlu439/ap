@@ -3742,3 +3742,30 @@ body.auth-open {
   height: 1px;
   background: rgba(134, 134, 139, 0.22);
 }
+
+.auth-provider-button em {
+  margin-left: auto;
+  color: #86868b;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.auth-provider-button.is-unconfigured {
+  border-color: rgba(134, 134, 139, 0.22);
+  background: rgba(255, 255, 255, 0.46);
+  color: #86868b;
+}
+
+.auth-provider-button.is-unconfigured span,
+.auth-provider-button.is-unconfigured strong {
+  opacity: 0.72;
+}
+
+.auth-provider-button.is-unconfigured:hover,
+.auth-provider-button.is-unconfigured:focus-visible {
+  transform: none;
+  border-color: rgba(0, 113, 227, 0.28);
+}
