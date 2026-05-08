@@ -32,18 +32,12 @@
             <div>
               <h2 id="subjectTitle">Select Your AP Test</h2>
             </div>
-            <strong id="selectedSubjectStatus">Choose first</strong>
           </div>
           <div class="subject-grid" id="subjectGrid" aria-label="AP subject options"></div>
         </section>
 
         <section class="home-info-panel" aria-labelledby="homeInfoTitle">
-          <div class="subject-heading">
-            <div>
-              <h2 id="homeInfoTitle">Before Test Day</h2>
-            </div>
-            <strong>Official Info</strong>
-          </div>
+          <h2 id="homeInfoTitle" class="sr-only">Official AP test day links</h2>
           <div class="home-info-grid">
             <a class="home-info-card" href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">
               <span>Schedule</span>
@@ -60,6 +54,40 @@
               <strong>Verify Registration</strong>
               <em>Sign in to My AP and make sure your class section and exam registration are correct.</em>
             </a>
+          </div>
+        </section>
+
+        <section class="exam-timeline-panel" aria-labelledby="examTimelineTitle">
+          <div class="timeline-head">
+            <div>
+              <span>2026</span>
+              <h2 id="examTimelineTitle">AP Test Timeline</h2>
+            </div>
+            <a href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">Official Schedule</a>
+          </div>
+          <div class="deadline-row" aria-label="AP Digital Portfolio deadlines">
+            <div class="deadline-card">
+              <span>Apr 30 · 11:59 PM ET</span>
+              <strong>CSP, Seminar, Research</strong>
+              <em>Digital Portfolio tasks due</em>
+            </div>
+            <div class="deadline-card">
+              <span>May 8 · 8 PM ET</span>
+              <strong>Art and Design</strong>
+              <em>Portfolio components due</em>
+            </div>
+          </div>
+          <div class="timeline-track" aria-label="2026 AP regular exam schedule">
+            <article class="timeline-day"><span class="timeline-date">Mon · May 4</span><div class="timeline-session"><span>8 AM</span><strong>Biology · Latin</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>European History · Microeconomics</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Tue · May 5</span><div class="timeline-session"><span>8 AM</span><strong>Chemistry · Human Geography</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>U.S. Government and Politics</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Wed · May 6</span><div class="timeline-session"><span>8 AM</span><strong>English Literature</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Comparative Government · Physics 1</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Thu · May 7</span><div class="timeline-session"><span>8 AM</span><strong>Physics 2 · World History</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>African American Studies · Statistics</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Fri · May 8</span><div class="timeline-session"><span>8 AM</span><strong>Italian Language · U.S. History</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Chinese Language · Macroeconomics</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Mon · May 11</span><div class="timeline-session"><span>8 AM</span><strong>Calculus AB · Calculus BC</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Music Theory · Seminar</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Tue · May 12</span><div class="timeline-session"><span>8 AM</span><strong>French Language · Precalculus</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Japanese Language · Psychology</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Wed · May 13</span><div class="timeline-session"><span>8 AM</span><strong>English Language · German Language</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Physics C: Mechanics · Spanish Literature</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Thu · May 14</span><div class="timeline-session"><span>8 AM</span><strong>Art History · Spanish Language</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>CSP · Physics C: E&amp;M</strong></div></article>
+            <article class="timeline-day"><span class="timeline-date">Fri · May 15</span><div class="timeline-session"><span>8 AM</span><strong>Environmental Science</strong></div><div class="timeline-session afternoon"><span>12 PM</span><strong>Computer Science A</strong></div></article>
           </div>
         </section>
 
@@ -119,7 +147,6 @@
     </div>
 
     <script src="practice-data.js"></script>
-    <script src="auth.js"></script>
     <script src="start.js"></script>
     <script src="chrome.js"></script>
   </body>

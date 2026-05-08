@@ -1103,21 +1103,13 @@
     return SUBJECTS.find((subject) => subject.title === SUBJECT_ALIASES[title]) || null;
   }
 
-  function scopedStorageKey(key) {
-    return window.APPracticeAuth?.scopeKey?.(key) || key;
-  }
-
-  function selectedSubjectStorageKey() {
-    return scopedStorageKey(SELECTED_AP_SUBJECT_KEY);
-  }
-
   function getSelectedSubject() {
-    const saved = localStorage.getItem(selectedSubjectStorageKey());
+    const saved = localStorage.getItem(SELECTED_AP_SUBJECT_KEY);
     return getSubjectByTitle(saved) || getSubjectByTitle("AP Statistics") || SUBJECTS[0];
   }
 
   function storageKey(kind, subject = getSelectedSubject()) {
-    return scopedStorageKey("ap-practice-" + subject.slug + "-" + kind + "-state-v1");
+    return "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
   }
 
   function totalMinutes(format) {
@@ -2349,8 +2341,6 @@
     SELECTED_AP_SUBJECT_KEY,
     subjects: SUBJECTS,
     skillLabels,
-    scopedStorageKey,
-    selectedSubjectStorageKey,
     getSubjectByTitle,
     getSelectedSubject,
     storageKey,

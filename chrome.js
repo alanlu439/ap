@@ -259,14 +259,31 @@ function initMouseTracking() {
 
   let targetX = window.innerWidth / 2;
   let targetY = window.innerHeight / 2;
-  let currentX = targetX;
-  let currentY = targetY;
+  let cursorX = targetX;
+  let cursorY = targetY;
+  let glowX = targetX;
+  let glowY = targetY;
 
-  const move = (event) => {
-    targetX = event.clientX;
-    targetY = event.clientY;
+  const hidePointer = () => {
+    document.body.classList.remove("has-mouse");
+    document.body.classList.remove("custom-cursor-enabled");
+    cursor.classList.remove("is-action", "is-down");
+  };
+
+  const showPointer = () => {
     document.body.classList.add("has-mouse");
     document.body.classList.add("custom-cursor-enabled");
+  };
+
+  const move = (event) => {
+    if (event.clientX < 0 || event.clientY < 0 || event.clientX > window.innerWidth || event.clientY > window.innerHeight) {
+      hidePointer();
+      return;
+    }
+
+    targetX = event.clientX;
+    targetY = event.clientY;
+    showPointer();
     cursor.classList.toggle(
       "is-action",
       Boolean(event.target.closest("a, button, input, textarea, select, [role=button]"))
@@ -274,10 +291,12 @@ function initMouseTracking() {
   };
 
   const animate = () => {
-    currentX += (targetX - currentX) * 0.16;
-    currentY += (targetY - currentY) * 0.16;
-    glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-    cursor.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+    cursorX += (targetX - cursorX) * 0.34;
+    cursorY += (targetY - cursorY) * 0.34;
+    glowX += (targetX - glowX) * 0.11;
+    glowY += (targetY - glowY) * 0.11;
+    glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
+    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
     window.requestAnimationFrame(animate);
   };
 
@@ -288,9 +307,13 @@ function initMouseTracking() {
   window.addEventListener("pointerup", () => {
     cursor.classList.remove("is-down");
   });
-  window.addEventListener("pointerleave", () => {
-    document.body.classList.remove("has-mouse");
-    document.body.classList.remove("custom-cursor-enabled");
+  window.addEventListener("pointerleave", hidePointer);
+  window.addEventListener("mouseout", (event) => {
+    if (!event.relatedTarget) hidePointer();
+  });
+  window.addEventListener("blur", hidePointer);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) hidePointer();
   });
   animate();
 }

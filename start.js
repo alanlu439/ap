@@ -1,9 +1,5 @@
 const practiceData = window.APPracticeData;
 const SELECTED_AP_SUBJECT_KEY = practiceData?.SELECTED_AP_SUBJECT_KEY || "ap-practice-selected-subject-v1";
-
-function selectedSubjectStorageKey() {
-  return practiceData?.selectedSubjectStorageKey?.() || practiceData?.scopedStorageKey?.(SELECTED_AP_SUBJECT_KEY) || SELECTED_AP_SUBJECT_KEY;
-}
 const fallbackSubject = {
   title: "AP Statistics",
   short: "AP Statistics",
@@ -317,7 +313,6 @@ function initSubjectPicker() {
   const cards = document.querySelectorAll("[data-subject-card]");
   const cardsArray = Array.from(cards);
   const searchInput = document.getElementById("subjectSearch");
-  const status = document.getElementById("selectedSubjectStatus");
   if (!cards.length) return;
 
   const subjectKeywords = (card) => normalizeSearch([
@@ -326,11 +321,6 @@ function initSubjectPicker() {
     card.querySelector("span")?.textContent,
     card.querySelector("strong")?.textContent
   ].join(" "));
-
-  const selectedStatusText = (subject, available) => available
-    ? subject.title + " selected"
-    : subject.title + " selected · coming soon";
-
   const updateSearchResults = () => {
     const query = normalizeSearch(searchInput?.value);
     const visibleCards = [];
@@ -343,21 +333,6 @@ function initSubjectPicker() {
     });
 
     if (query && visibleCards[0]) visibleCards[0].classList.add("is-search-match");
-
-    if (status && query) {
-      status.textContent = visibleCards.length
-        ? visibleCards.length + " subject" + (visibleCards.length === 1 ? "" : "s") + " found"
-        : "No AP subjects found";
-    }
-
-    if (status && !query) {
-      const selectedCard = cardsArray.find((card) => card.classList.contains("is-selected"));
-      if (selectedCard) {
-        const subject = getSubjectByTitle(selectedCard.dataset.subject) || fallbackSubject;
-        status.textContent = selectedStatusText(subject, selectedCard.dataset.available === "true");
-      }
-    }
-
     return visibleCards;
   };
 
@@ -372,17 +347,15 @@ function initSubjectPicker() {
       item.setAttribute("aria-pressed", String(selected));
     });
 
-    localStorage.setItem(selectedSubjectStorageKey(), subject.title);
+    localStorage.setItem(SELECTED_AP_SUBJECT_KEY, subject.title);
     setPracticeLinksAvailable(available);
     updateModePopoutCopy(subject, available);
     updateHomeProgress();
-
-    if (status) status.textContent = selectedStatusText(subject, available);
     if (searchInput && options.openModes) searchInput.blur();
     if (options.openModes) jumpToModeSelection();
   };
 
-  const savedSubject = localStorage.getItem(selectedSubjectStorageKey());
+  const savedSubject = localStorage.getItem(SELECTED_AP_SUBJECT_KEY);
   const availableCard = cardsArray.find((card) => card.dataset.available === "true");
   const initialCard = cardsArray.find((card) => card.dataset.subject === savedSubject) || availableCard || cards[0];
   selectSubject(initialCard);
@@ -464,9 +437,6 @@ function initReadyDialog() {
     link.addEventListener("click", (event) => {
       if (link.dataset.unavailable === "true") {
         event.preventDefault();
-        const selected = getSelectedSubject();
-        const status = document.getElementById("selectedSubjectStatus");
-        if (status) status.textContent = `${selected.title} practice is coming soon`;
         return;
       }
 
