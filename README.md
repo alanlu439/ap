@@ -106,12 +106,6 @@ The first public release is available here:
 
 [AP Exam Practice v1.0.0](https://github.com/alanlu439/ap/releases/tag/v1.0.0)
 
-## GitHub Social Preview
-
-Use `assets/social-preview.png` for the repository social preview in GitHub settings. It is 1280x640 for best display.
-
-GitHub path: `Settings -> General -> Social preview -> Edit -> Upload an image`
-
 ## Official Reference Links
 
 Exam structures and the AP course catalog were checked against official College Board/AP pages, including AP Central course exam pages and AP Students course resources. The app stores the structure data and original practice-bank profiles in `practice-data.js`. Portfolio, AP Capstone, and AP Career Kickstart courses use practice mappings so the site can still offer MCQ and FRQ-style study flows while noting their nontraditional official assessment formats.
