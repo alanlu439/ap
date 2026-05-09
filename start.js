@@ -50,6 +50,48 @@ function escapeHomeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function getDeviceTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "your device timezone";
+}
+
+function formatTimelineDeadline(isoString, timeZone) {
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone,
+    timeZoneName: "short"
+  });
+  return formatter.format(new Date(isoString));
+}
+
+function initTimelineTimezone() {
+  const timeline = document.querySelector(".exam-timeline-panel");
+  if (!timeline) return;
+
+  const timeZone = getDeviceTimeZone();
+  const timeZoneLabel = document.getElementById("timelineTimezone");
+  const scheduleCopy = document.getElementById("scheduleTimeCopy");
+
+  if (timeZoneLabel) timeZoneLabel.textContent = `Device timezone: ${timeZone}`;
+  if (scheduleCopy) {
+    scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${timeZone}.`;
+  }
+
+  document.querySelectorAll("[data-deadline-utc]").forEach((item) => {
+    const converted = formatTimelineDeadline(item.dataset.deadlineUtc, timeZone);
+    item.textContent = converted;
+    item.title = `Official Eastern Time: ${item.dataset.deadlineEt}`;
+    item.setAttribute("aria-label", `${converted}. Official Eastern Time: ${item.dataset.deadlineEt}`);
+  });
+
+  document.querySelectorAll("[data-time-local]").forEach((item) => {
+    item.textContent = `${item.dataset.timeLocal} local`;
+    item.title = "Regular AP Exam start windows are based on the exam testing location.";
+  });
+}
+
 function renderSubjectCards() {
   const grid = document.getElementById("subjectGrid");
   if (!grid || !practiceData?.subjects?.length) return;
@@ -428,6 +470,7 @@ function initReadyDialog() {
 
   const openDialog = () => {
     dialog.hidden = false;
+    document.body.classList.remove("custom-cursor-enabled");
     if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
     document.body.classList.add("ready-modal-open");
     confirm.focus();
@@ -472,6 +515,7 @@ function initReadyDialog() {
 
 updateFullPracticePage();
 updateHomeProgress();
+initTimelineTimezone();
 initSubjectPicker();
 initModeCards();
 initReadyDialog();

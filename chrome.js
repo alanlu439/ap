@@ -1,5 +1,6 @@
 const chromePracticeData = window.APPracticeData;
 const CHROME_FOCUS_KEY = "ap-practice-focus-mode-v1";
+const CHROME_THEME_KEY = "ap-practice-theme-mode-v1";
 const fallbackChromeSubject = {
   title: "AP Statistics",
   short: "AP Statistics",
@@ -9,6 +10,80 @@ const fallbackChromeSubject = {
 
 function getChromeSubject() {
   return chromePracticeData?.getSelectedSubject?.() || fallbackChromeSubject;
+}
+
+function getSystemTheme() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function readThemeMode() {
+  try {
+    const saved = localStorage.getItem(CHROME_THEME_KEY);
+    if (saved === "auto" || saved === "dark" || saved === "light") return saved;
+  } catch {
+    // Storage can be blocked; the page still follows the system theme.
+  }
+  return "auto";
+}
+
+function resolveTheme(mode) {
+  return mode === "dark" || mode === "light" ? mode : getSystemTheme();
+}
+
+function applyTheme(mode = readThemeMode(), shouldPersist = false) {
+  const nextMode = mode === "dark" || mode === "light" ? mode : "auto";
+  const nextTheme = resolveTheme(nextMode);
+  document.documentElement.dataset.theme = nextTheme;
+  document.documentElement.dataset.themeMode = nextMode;
+  if (shouldPersist) {
+    try {
+      localStorage.setItem(CHROME_THEME_KEY, nextMode);
+    } catch {
+      // Theme still applies for this page even if storage is blocked.
+    }
+  }
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    const labelText = nextMode === "auto" ? "Auto" : nextMode === "dark" ? "Dark" : "Light";
+    const nextLabel = nextMode === "auto" ? "Switch to light mode" : nextMode === "light" ? "Switch to dark mode" : "Switch to auto theme";
+    button.setAttribute("aria-pressed", String(nextMode !== "auto"));
+    button.setAttribute("aria-label", `${labelText} theme active. ${nextLabel}.`);
+    button.title = nextMode === "auto" ? `Theme follows system appearance (${nextTheme})` : `${labelText} theme`;
+    const label = button.querySelector("span");
+    if (label) label.textContent = labelText;
+  });
+}
+
+function nextThemeMode() {
+  const current = readThemeMode();
+  if (current === "auto") return "light";
+  if (current === "light") return "dark";
+  return "auto";
+}
+
+function createThemeButton() {
+  const button = document.createElement("button");
+  button.className = "theme-toggle";
+  button.type = "button";
+  button.dataset.themeToggle = "true";
+  button.innerHTML = '<svg view="0 0 24 24" aria-hidden="true"><path d="M12 3v2.2M12 18.8V21M4.22 4.22l1.55 1.55M18.23 18.23l1.55 1.55M3 12h2.2M18.8 12H21M4.22 19.78l1.55-1.55M18.23 5.77l1.55-1.55"/><circle cx="12" cy="12" r="4.2"/></svg><span>Dark</span>';
+  button.addEventListener("click", () => {
+    applyTheme(nextThemeMode(), true);
+  });
+  return button;
+}
+
+function initThemeToggle() {
+  const host = document.querySelector(".page-nav") || document.querySelector(".start-nav");
+  if (host && !host.querySelector("[data-theme-toggle]")) {
+    host.appendChild(createThemeButton());
+  }
+  applyTheme(readThemeMode());
+  const systemTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+  if (systemTheme) {
+    systemTheme.addEventListener("change", () => {
+      if (readThemeMode() === "auto") applyTheme("auto");
+    });
+  }
 }
 
 function chromeStorageKey(kind, subject = getChromeSubject()) {
@@ -272,7 +347,8 @@ function initMouseTracking() {
 
   const showPointer = () => {
     document.body.classList.add("has-mouse");
-    document.body.classList.add("custom-cursor-enabled");
+    const modalOpen = document.querySelector("dialog[open], .ready-modal:not([hidden]), .mode-popout:not([hidden]), .test-picker-modal:not([hidden])");
+    document.body.classList.toggle("custom-cursor-enabled", !modalOpen);
   };
 
   const move = (event) => {
@@ -319,6 +395,7 @@ function initMouseTracking() {
 }
 
 applySubjectLogo();
+initThemeToggle();
 updateChromeProgress();
 initFocusMode();
 initScrollTop();

@@ -13,6 +13,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
     <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
+    <script>try{const m=localStorage.getItem("ap-practice-theme-mode-v1");const s=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=m==="dark"||m==="light"?m:s;document.documentElement.dataset.themeMode=m==="dark"||m==="light"?m:"auto"}catch{document.documentElement.dataset.theme="light";document.documentElement.dataset.themeMode="auto"}</script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -29,7 +30,6 @@
           </a>
         <nav class="page-nav" aria-label="Practice pages">
           <button class="text-button secondary compact back-button" type="button" data-back-button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6M10 12h10"/></svg><span>Back</span></button>
-          <button class="text-button primary compact" type="button" data-start-test>Start Test</button>
         </nav>
       </header>
 
@@ -76,9 +76,26 @@
         </section>
       </main>
 
-      <footer class="footer">
-        <span>Practice made by Alan. AP® and Advanced Placement® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site.</span>
-        <a href="legal.html">Disclaimer</a>
+      <footer class="site-footer">
+        <div class="site-footer-main">
+          <div class="footer-brand-row">
+            <div class="footer-mark-stack" aria-label="AP and College Board references">
+              <span class="footer-mark ap-mark">AP®</span>
+              <span class="footer-mark cb-mark">College Board</span>
+            </div>
+            <div>
+              <strong>AP Exam Practice</strong>
+              <span>Practice made by Alan · independent study tool</span>
+            </div>
+          </div>
+          <nav class="footer-links" aria-label="Official AP links">
+            <a href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">AP Schedule</a>
+            <a href="https://apstudents.collegeboard.org/courses" target="_blank" rel="noreferrer">AP Courses</a>
+            <a href="https://www.collegeboard.org/" target="_blank" rel="noreferrer">College Board</a>
+            <a href="legal.html">Disclaimer</a>
+          </nav>
+        </div>
+        <p>AP® and Advanced Placement® are trademarks registered by the College Board. This independent site is not affiliated with, reviewed by, or endorsed by College Board; the footer badges are text references, not official logos.</p>
       </footer>
     </div>
 

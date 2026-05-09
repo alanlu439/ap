@@ -22,6 +22,7 @@ If the page returns 404, enable GitHub Pages in repository settings:
 - Answer MCQs with saved progress and review feedback
 - Write FRQ responses and get estimated rubric feedback after submission
 - Check official AP exam schedule, visual timeline, location guidance, and registration links
+- Use an auto-adjusting light/dark theme that follows the visitor's device setting
 - Read the independent-use disclaimer and official source links
 
 ## Included Subjects
