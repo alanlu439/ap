@@ -10,10 +10,6 @@ Website URL after GitHub Pages is enabled:
 
 [https://alanlu439.github.io/ap/](https://alanlu439.github.io/ap/)
 
-If the page returns 404, enable GitHub Pages in repository settings:
-
-`Settings -> Pages -> Deploy from a branch -> main -> /root -> Save`
-
 ## What Visitors Can Do
 
 - Choose from 42 AP subjects
@@ -125,17 +121,6 @@ Exam structures and the AP course catalog were checked against official College 
 - [2026 AP Exam Dates](https://apstudents.collegeboard.org/exam-dates)
 - [Register for AP Exams](https://apstudents.collegeboard.org/register-for-ap-exams)
 - [Where do I take my AP Exam?](https://apstudents.collegeboard.org/help-center/when-where-do-i-take-ap-exam)
-
-## Repository Description
-
-Use this for the GitHub repository description:
-
-`Browser-based AP practice exam hub with subject-specific MCQ and FRQ practice, official structure timing, saved progress, and estimated grading.`
-
-Suggested topics:
-
-`ap`, `ap-exams`, `practice-exam`, `education`, `static-site`, `mcq`, `frq`, `github-pages`
-
 
 ## Disclaimer
 
