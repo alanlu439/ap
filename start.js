@@ -108,6 +108,142 @@ function formatTimelineDeadline(isoString, timeZone) {
   return formatter.format(new Date(isoString));
 }
 
+function parseTimelineLocalDate(dateString, hour) {
+  const [year, month, day] = String(dateString || "").split("-").map(Number);
+  return new Date(year, month - 1, day, Number(hour) || 0, 0, 0, 0);
+}
+
+function sameTimelineDay(first, second) {
+  return first.getFullYear() === second.getFullYear()
+    && first.getMonth() === second.getMonth()
+    && first.getDate() === second.getDate();
+}
+
+function formatTimelineCountdown(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days) return `${days}d ${hours}h ${minutes}m`;
+  if (hours) return `${hours}h ${minutes}m`;
+  if (minutes) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
+}
+
+function collectTimelineSessions(timeline) {
+  return Array.from(timeline.querySelectorAll(".timeline-session")).map((session) => {
+    const day = session.closest(".timeline-day");
+    const start = parseTimelineLocalDate(day?.dataset.date, session.dataset.startHour);
+    const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+    const name = session.querySelector("strong")?.textContent?.trim() || "AP exam";
+    const timeLabel = session.querySelector("[data-time-local]")?.dataset.timeLocal || session.querySelector("[data-time-local]")?.textContent?.trim() || "";
+    const dateLabel = day?.querySelector(".timeline-date")?.textContent?.trim() || "";
+
+    return { session, day, start, end, name, timeLabel, dateLabel };
+  }).sort((first, second) => first.start - second.start);
+}
+
+function timelineSessionStatus(item, now) {
+  if (now >= item.end) return "completed";
+  if (now >= item.start) return "live";
+  return "upcoming";
+}
+
+function updateTimelineSessionState(item, now, nextSession, selectedSession) {
+  const status = timelineSessionStatus(item, now);
+  const statusText = item.session.querySelector("em");
+  const isToday = sameTimelineDay(item.start, now);
+  const isNext = item === nextSession;
+  const isSelected = item === selectedSession;
+
+  item.session.dataset.timelineStatus = status;
+  item.session.classList.toggle("is-live", status === "live");
+  item.session.classList.toggle("is-completed", status === "completed");
+  item.session.classList.toggle("is-next", isNext);
+  item.session.classList.toggle("is-selected", isSelected);
+  item.session.setAttribute("aria-pressed", String(isSelected));
+
+  if (statusText) {
+    statusText.textContent = status === "live"
+      ? "Live now"
+      : status === "completed"
+        ? "Done"
+        : isNext
+          ? "Up next"
+          : isToday
+            ? "Today"
+            : "Upcoming";
+  }
+}
+
+function updateTimelineLiveCard(sessions, selectedSession, now) {
+  const label = document.getElementById("timelineLiveLabel");
+  const title = document.getElementById("timelineNextTitle");
+  const countdown = document.getElementById("timelineCountdown");
+  const fill = document.getElementById("timelineProgressFill");
+  if (!sessions.length || !label || !title || !countdown || !fill) return;
+
+  const activeSession = sessions.find((item) => now >= item.start && now < item.end);
+  const nextSession = sessions.find((item) => item.start > now);
+  const previousSession = [...sessions].reverse().find((item) => item.end <= now);
+  const displaySession = selectedSession || activeSession || nextSession || previousSession || sessions[0];
+
+  if (selectedSession) {
+    label.textContent = "Selected exam";
+    title.textContent = `${displaySession.name} · ${displaySession.dateLabel}`;
+  } else if (activeSession) {
+    label.textContent = "Live now";
+    title.textContent = `${displaySession.name} is in progress`;
+  } else if (nextSession) {
+    label.textContent = "Up next";
+    title.textContent = `${displaySession.name} · ${displaySession.dateLabel}`;
+  } else {
+    label.textContent = "Schedule complete";
+    title.textContent = "All regular AP exam sessions are complete.";
+  }
+
+  if (now < displaySession.start) {
+    countdown.textContent = `${displaySession.timeLabel} local · starts in ${formatTimelineCountdown(displaySession.start - now)}`;
+    fill.style.width = "0%";
+  } else if (now < displaySession.end) {
+    const progress = Math.min(100, Math.max(0, ((now - displaySession.start) / (displaySession.end - displaySession.start)) * 100));
+    countdown.textContent = `${displaySession.timeLabel} local · live for ${formatTimelineCountdown(now - displaySession.start)}`;
+    fill.style.width = `${progress}%`;
+  } else {
+    countdown.textContent = `${displaySession.timeLabel} local · completed`;
+    fill.style.width = "100%";
+  }
+}
+
+function applyTimelineFilter(sessions, filter, now) {
+  const empty = document.getElementById("timelineEmpty");
+  sessions.forEach((item) => {
+    const status = timelineSessionStatus(item, now);
+    const visible = filter === "all"
+      || (filter === "upcoming" && status !== "completed")
+      || (filter === "completed" && status === "completed")
+      || (filter === "today" && sameTimelineDay(item.start, now));
+    item.session.hidden = !visible;
+  });
+
+  const days = [...new Set(sessions.map((item) => item.day).filter(Boolean))];
+  days.forEach((day) => {
+    day.hidden = !sessions.some((item) => item.day === day && !item.session.hidden);
+    day.classList.toggle("is-today", sameTimelineDay(parseTimelineLocalDate(day.dataset.date, 0), now));
+    day.classList.toggle("has-live-session", sessions.some((item) => item.day === day && timelineSessionStatus(item, now) === "live"));
+  });
+
+  const hasVisibleSession = sessions.some((item) => !item.session.hidden);
+  if (empty) {
+    empty.hidden = hasVisibleSession;
+    empty.textContent = filter === "today"
+      ? "No regular AP exam sessions match today's device date."
+      : "No sessions match this view.";
+  }
+}
+
 function initTimelineTimezone() {
   const timeline = document.querySelector(".exam-timeline-panel");
   if (!timeline) return;
@@ -132,6 +268,38 @@ function initTimelineTimezone() {
     item.textContent = `${item.dataset.timeLocal} local`;
     item.title = "Regular AP Exam start windows are based on the exam testing location.";
   });
+
+  const sessions = collectTimelineSessions(timeline);
+  const filters = Array.from(timeline.querySelectorAll("[data-timeline-filter]"));
+  let activeFilter = "all";
+  let selectedSession = null;
+
+  const refreshTimeline = () => {
+    const now = new Date();
+    const nextSession = sessions.find((item) => item.start > now);
+    sessions.forEach((item) => updateTimelineSessionState(item, now, nextSession, selectedSession));
+    applyTimelineFilter(sessions, activeFilter, now);
+    updateTimelineLiveCard(sessions, selectedSession, now);
+  };
+
+  filters.forEach((button) => {
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.timelineFilter || "all";
+      filters.forEach((item) => item.classList.toggle("is-active", item === button));
+      selectedSession = null;
+      refreshTimeline();
+    });
+  });
+
+  sessions.forEach((item) => {
+    item.session.addEventListener("click", () => {
+      selectedSession = selectedSession === item ? null : item;
+      refreshTimeline();
+    });
+  });
+
+  refreshTimeline();
+  window.setInterval(refreshTimeline, 1000);
 }
 
 function renderSubjectCards(sortMode = "az") {
