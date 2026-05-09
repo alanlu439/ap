@@ -1,6 +1,7 @@
 const practiceData = window.APPracticeData;
 const SELECTED_AP_SUBJECT_KEY = practiceData?.SELECTED_AP_SUBJECT_KEY || "ap-practice-selected-subject-v1";
 const SUBJECT_SORT_KEY = "ap-practice-subject-sort-v1";
+const TIMELINE_TIMEZONE_KEY = "ap-practice-timeline-timezone-v1";
 const SUBJECT_SORTS = new Set(["az", "za", "group", "duration-asc", "duration-desc"]);
 const fallbackSubject = {
   title: "AP Statistics",
@@ -96,6 +97,15 @@ function getDeviceTimeZone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "your device timezone";
 }
 
+function getTimelineTimeZone() {
+  const saved = localStorage.getItem(TIMELINE_TIMEZONE_KEY);
+  return saved && saved !== "auto" ? saved : getDeviceTimeZone();
+}
+
+function formatTimeZoneName(timeZone) {
+  return String(timeZone || "Device").split("/").pop().replaceAll("_", " ");
+}
+
 function formatTimelineDeadline(isoString, timeZone) {
   const formatter = new Intl.DateTimeFormat(undefined, {
     month: "short",
@@ -106,6 +116,32 @@ function formatTimelineDeadline(isoString, timeZone) {
     timeZoneName: "short"
   });
   return formatter.format(new Date(isoString));
+}
+
+function wallTimeInTimeZone(date, timeZone) {
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      hourCycle: "h23",
+      timeZone
+    }).formatToParts(date).reduce((values, part) => {
+      values[part.type] = part.value;
+      return values;
+    }, {});
+    return new Date(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(parts.hour), Number(parts.minute), Number(parts.second));
+  } catch {
+    return new Date();
+  }
+}
+
+function nowInTimeZone(timeZone) {
+  return wallTimeInTimeZone(new Date(), timeZone);
 }
 
 function parseTimelineLocalDate(dateString, hour) {
@@ -145,10 +181,23 @@ function collectTimelineSessions(timeline) {
   }).sort((first, second) => first.start - second.start);
 }
 
+function collectTimelineDeadlines(timeline) {
+  return Array.from(timeline.querySelectorAll(".deadline-card")).map((card) => {
+    const stamp = card.querySelector("[data-deadline-utc]");
+    const due = new Date(stamp?.dataset.deadlineUtc || "");
+    const name = card.querySelector("strong")?.textContent?.trim() || "Deadline";
+    return { card, due, name };
+  }).filter((item) => !Number.isNaN(item.due.getTime()));
+}
+
 function timelineSessionStatus(item, now) {
   if (now >= item.end) return "completed";
   if (now >= item.start) return "live";
   return "upcoming";
+}
+
+function timelineDeadlineStatus(item, now) {
+  return now >= item.due ? "completed" : "upcoming";
 }
 
 function updateTimelineSessionState(item, now, nextSession, selectedSession) {
@@ -217,29 +266,48 @@ function updateTimelineLiveCard(sessions, selectedSession, now) {
   }
 }
 
-function applyTimelineFilter(sessions, filter, now) {
+function updateTimelineDeadlineState(item, now) {
+  const status = timelineDeadlineStatus(item, now);
+  item.card.dataset.timelineStatus = status;
+  item.card.hidden = false;
+  item.card.classList.toggle("is-completed", status === "completed");
+  item.card.classList.toggle("is-upcoming", status === "upcoming");
+}
+
+function applyTimelineFilter(sessions, deadlines, filter, timelineNow, actualNow, timeZone) {
   const empty = document.getElementById("timelineEmpty");
   sessions.forEach((item) => {
-    const status = timelineSessionStatus(item, now);
+    const status = timelineSessionStatus(item, timelineNow);
     const visible = filter === "all"
       || (filter === "upcoming" && status !== "completed")
       || (filter === "completed" && status === "completed")
-      || (filter === "today" && sameTimelineDay(item.start, now));
+      || (filter === "today" && sameTimelineDay(item.start, timelineNow));
     item.session.hidden = !visible;
+  });
+
+  deadlines.forEach((item) => {
+    const status = timelineDeadlineStatus(item, actualNow);
+    const deadlineWallTime = wallTimeInTimeZone(item.due, timeZone);
+    const visible = filter === "all"
+      || (filter === "upcoming" && status !== "completed")
+      || (filter === "completed" && status === "completed")
+      || (filter === "today" && sameTimelineDay(deadlineWallTime, timelineNow));
+    item.card.hidden = !visible;
   });
 
   const days = [...new Set(sessions.map((item) => item.day).filter(Boolean))];
   days.forEach((day) => {
     day.hidden = !sessions.some((item) => item.day === day && !item.session.hidden);
-    day.classList.toggle("is-today", sameTimelineDay(parseTimelineLocalDate(day.dataset.date, 0), now));
-    day.classList.toggle("has-live-session", sessions.some((item) => item.day === day && timelineSessionStatus(item, now) === "live"));
+    day.classList.toggle("is-today", sameTimelineDay(parseTimelineLocalDate(day.dataset.date, 0), timelineNow));
+    day.classList.toggle("has-live-session", sessions.some((item) => item.day === day && timelineSessionStatus(item, timelineNow) === "live"));
   });
 
   const hasVisibleSession = sessions.some((item) => !item.session.hidden);
+  const hasVisibleDeadline = deadlines.some((item) => !item.card.hidden);
   if (empty) {
-    empty.hidden = hasVisibleSession;
+    empty.hidden = hasVisibleSession || hasVisibleDeadline;
     empty.textContent = filter === "today"
-      ? "No regular AP exam sessions match today's device date."
+      ? "No AP timeline items match today's selected timezone date."
       : "No sessions match this view.";
   }
 }
@@ -248,21 +316,35 @@ function initTimelineTimezone() {
   const timeline = document.querySelector(".exam-timeline-panel");
   if (!timeline) return;
 
-  const timeZone = getDeviceTimeZone();
+  let timeZone = getTimelineTimeZone();
+  const timezoneSelect = document.getElementById("timelineTimezoneSelect");
   const timeZoneLabel = document.getElementById("timelineTimezone");
   const scheduleCopy = document.getElementById("scheduleTimeCopy");
 
-  if (timeZoneLabel) timeZoneLabel.textContent = `Device timezone: ${timeZone}`;
-  if (scheduleCopy) {
-    scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${timeZone}.`;
+  if (timezoneSelect) {
+    const savedTimeZone = localStorage.getItem(TIMELINE_TIMEZONE_KEY) || "auto";
+    timezoneSelect.value = Array.from(timezoneSelect.options).some((option) => option.value === savedTimeZone) ? savedTimeZone : "auto";
   }
 
-  document.querySelectorAll("[data-deadline-utc]").forEach((item) => {
-    const converted = formatTimelineDeadline(item.dataset.deadlineUtc, timeZone);
-    item.textContent = converted;
-    item.title = `Official Eastern Time: ${item.dataset.deadlineEt}`;
-    item.setAttribute("aria-label", `${converted}. Official Eastern Time: ${item.dataset.deadlineEt}`);
-  });
+  const updateTimezoneCopy = () => {
+    timeZone = getTimelineTimeZone();
+
+    if (timeZoneLabel) {
+      timeZoneLabel.textContent = timezoneSelect?.value === "auto"
+        ? `Auto: ${formatTimeZoneName(timeZone)}`
+        : formatTimeZoneName(timeZone);
+    }
+    if (scheduleCopy) {
+      scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${timeZone}.`;
+    }
+
+    document.querySelectorAll("[data-deadline-utc]").forEach((item) => {
+      const converted = formatTimelineDeadline(item.dataset.deadlineUtc, timeZone);
+      item.textContent = converted;
+      item.title = `Official Eastern Time: ${item.dataset.deadlineEt}`;
+      item.setAttribute("aria-label", `${converted}. Official Eastern Time: ${item.dataset.deadlineEt}`);
+    });
+  };
 
   document.querySelectorAll("[data-time-local]").forEach((item) => {
     item.textContent = `${item.dataset.timeLocal} local`;
@@ -270,16 +352,19 @@ function initTimelineTimezone() {
   });
 
   const sessions = collectTimelineSessions(timeline);
+  const deadlines = collectTimelineDeadlines(timeline);
   const filters = Array.from(timeline.querySelectorAll("[data-timeline-filter]"));
   let activeFilter = "all";
   let selectedSession = null;
 
   const refreshTimeline = () => {
-    const now = new Date();
-    const nextSession = sessions.find((item) => item.start > now);
-    sessions.forEach((item) => updateTimelineSessionState(item, now, nextSession, selectedSession));
-    applyTimelineFilter(sessions, activeFilter, now);
-    updateTimelineLiveCard(sessions, selectedSession, now);
+    const actualNow = new Date();
+    const timelineNow = nowInTimeZone(timeZone);
+    const nextSession = sessions.find((item) => item.start > timelineNow);
+    sessions.forEach((item) => updateTimelineSessionState(item, timelineNow, nextSession, selectedSession));
+    deadlines.forEach((item) => updateTimelineDeadlineState(item, actualNow));
+    applyTimelineFilter(sessions, deadlines, activeFilter, timelineNow, actualNow, timeZone);
+    updateTimelineLiveCard(sessions, selectedSession, timelineNow);
   };
 
   filters.forEach((button) => {
@@ -291,6 +376,12 @@ function initTimelineTimezone() {
     });
   });
 
+  timezoneSelect?.addEventListener("change", () => {
+    localStorage.setItem(TIMELINE_TIMEZONE_KEY, timezoneSelect.value);
+    updateTimezoneCopy();
+    refreshTimeline();
+  });
+
   sessions.forEach((item) => {
     item.session.addEventListener("click", () => {
       selectedSession = selectedSession === item ? null : item;
@@ -298,6 +389,7 @@ function initTimelineTimezone() {
     });
   });
 
+  updateTimezoneCopy();
   refreshTimeline();
   window.setInterval(refreshTimeline, 1000);
 }
