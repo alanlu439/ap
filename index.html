@@ -33,6 +33,16 @@
             <div>
               <h2 id="subjectTitle">Select Your AP Test</h2>
             </div>
+            <label class="subject-sort" for="subjectSort">
+              <span>Sort</span>
+              <select id="subjectSort" aria-label="Sort AP tests">
+                <option value="az">A-Z</option>
+                <option value="za">Z-A</option>
+                <option value="group">Category</option>
+                <option value="duration-asc">Shortest</option>
+                <option value="duration-desc">Longest</option>
+              </select>
+            </label>
           </div>
           <div class="subject-grid" id="subjectGrid" aria-label="AP subject options"></div>
         </section>

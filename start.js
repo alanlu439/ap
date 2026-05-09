@@ -1,5 +1,7 @@
 const practiceData = window.APPracticeData;
 const SELECTED_AP_SUBJECT_KEY = practiceData?.SELECTED_AP_SUBJECT_KEY || "ap-practice-selected-subject-v1";
+const SUBJECT_SORT_KEY = "ap-practice-subject-sort-v1";
+const SUBJECT_SORTS = new Set(["az", "za", "group", "duration-asc", "duration-desc"]);
 const fallbackSubject = {
   title: "AP Statistics",
   short: "AP Statistics",
@@ -50,6 +52,46 @@ function escapeHomeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function compareHomeText(first, second) {
+  return String(first || "").localeCompare(String(second || ""), undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
+}
+
+function getSubjectSortMode(value) {
+  return SUBJECT_SORTS.has(value) ? value : "az";
+}
+
+function subjectSortTitle(subject) {
+  return String(subject?.short || subject?.title || "").replace(/^AP\s+/i, "").trim();
+}
+
+function sortedSubjects(sortMode = "az") {
+  const subjects = [...(practiceData?.subjects || [])];
+  const mode = getSubjectSortMode(sortMode);
+
+  return subjects.sort((first, second) => {
+    const firstTitle = subjectSortTitle(first);
+    const secondTitle = subjectSortTitle(second);
+    const firstMinutes = totalMinutes(first.format);
+    const secondMinutes = totalMinutes(second.format);
+
+    if (mode === "za") return compareHomeText(secondTitle, firstTitle);
+    if (mode === "group") {
+      return compareHomeText(first.group, second.group) || compareHomeText(firstTitle, secondTitle);
+    }
+    if (mode === "duration-asc") {
+      return firstMinutes - secondMinutes || compareHomeText(firstTitle, secondTitle);
+    }
+    if (mode === "duration-desc") {
+      return secondMinutes - firstMinutes || compareHomeText(firstTitle, secondTitle);
+    }
+
+    return compareHomeText(firstTitle, secondTitle);
+  });
+}
+
 function getDeviceTimeZone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "your device timezone";
 }
@@ -92,12 +134,12 @@ function initTimelineTimezone() {
   });
 }
 
-function renderSubjectCards() {
+function renderSubjectCards(sortMode = "az") {
   const grid = document.getElementById("subjectGrid");
   if (!grid || !practiceData?.subjects?.length) return;
 
-  grid.innerHTML = practiceData.subjects.map((subject) => [
-    '<button class="subject-card is-available" type="button" data-subject-card data-subject="' + escapeHomeHtml(subject.title) + '" data-short="' + escapeHomeHtml(subject.short) + '" data-available="true">',
+  grid.innerHTML = sortedSubjects(sortMode).map((subject) => [
+    '<button class="subject-card is-available" type="button" data-subject-card data-subject="' + escapeHomeHtml(subject.title) + '" data-short="' + escapeHomeHtml(subject.short) + '" data-group="' + escapeHomeHtml(subject.group) + '" data-available="true">',
     '<span>' + escapeHomeHtml(subject.group) + '</span>',
     '<strong>' + escapeHomeHtml(subject.short || subject.title) + '</strong>',
     '<em>Available</em>',
@@ -351,11 +393,15 @@ function jumpToModeSelection() {
 }
 
 function initSubjectPicker() {
-  renderSubjectCards();
-  const cards = document.querySelectorAll("[data-subject-card]");
-  const cardsArray = Array.from(cards);
+  const grid = document.getElementById("subjectGrid");
   const searchInput = document.getElementById("subjectSearch");
-  if (!cards.length) return;
+  const sortSelect = document.getElementById("subjectSort");
+  let cardsArray = [];
+
+  if (!grid || !practiceData?.subjects?.length) return;
+  if (sortSelect) {
+    sortSelect.value = getSubjectSortMode(localStorage.getItem(SUBJECT_SORT_KEY));
+  }
 
   const subjectKeywords = (card) => normalizeSearch([
     card.dataset.subject,
@@ -363,6 +409,7 @@ function initSubjectPicker() {
     card.querySelector("span")?.textContent,
     card.querySelector("strong")?.textContent
   ].join(" "));
+
   const updateSearchResults = () => {
     const query = normalizeSearch(searchInput?.value);
     const visibleCards = [];
@@ -376,6 +423,12 @@ function initSubjectPicker() {
 
     if (query && visibleCards[0]) visibleCards[0].classList.add("is-search-match");
     return visibleCards;
+  };
+
+  const refreshCards = () => {
+    renderSubjectCards(sortSelect?.value || "az");
+    cardsArray = Array.from(grid.querySelectorAll("[data-subject-card]"));
+    updateSearchResults();
   };
 
   const selectSubject = (card, options = {}) => {
@@ -396,16 +449,25 @@ function initSubjectPicker() {
     if (options.openModes) jumpToModeSelection();
   };
 
+  refreshCards();
+  if (!cardsArray.length) return;
+
   const savedSubject = localStorage.getItem(SELECTED_AP_SUBJECT_KEY);
   const availableCard = cardsArray.find((card) => card.dataset.available === "true");
-  const initialCard = cardsArray.find((card) => card.dataset.subject === savedSubject) || availableCard || cards[0];
+  const initialCard = cardsArray.find((card) => card.dataset.subject === savedSubject) || availableCard || cardsArray[0];
   selectSubject(initialCard);
 
-  cardsArray.forEach((card) => {
-    card.addEventListener("click", () => {
-      selectSubject(card, { openModes: true });
-    });
+  grid.addEventListener("click", (event) => {
+    const card = event.target.closest("[data-subject-card]");
+    if (card) selectSubject(card, { openModes: true });
   });
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      localStorage.setItem(SUBJECT_SORT_KEY, getSubjectSortMode(sortSelect.value));
+      refreshCards();
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener("input", updateSearchResults);
