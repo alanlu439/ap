@@ -204,9 +204,7 @@ const statsFrqItems = [
   }
 ];
 
-const frqItems = selectedPracticeSubject.title === "AP Statistics"
-  ? statsFrqItems
-  : practiceData?.buildFrqItems?.(selectedPracticeSubject) || statsFrqItems;
+const frqItems = practiceData?.buildFrqItems?.(selectedPracticeSubject) || statsFrqItems;
 
 let frqState = loadFrqState();
 let frqTimerHandle = null;

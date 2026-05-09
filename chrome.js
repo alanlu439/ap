@@ -325,6 +325,8 @@ function applySubjectLogo() {
 }
 
 function initMouseTracking() {
+  if (window.matchMedia && !window.matchMedia("(pointer: fine)").matches) return;
+
   const glow = document.createElement("div");
   const cursor = document.createElement("div");
   glow.className = "mouse-glow";
@@ -338,17 +340,30 @@ function initMouseTracking() {
   let cursorY = targetY;
   let glowX = targetX;
   let glowY = targetY;
+  let rafId = 0;
+  let active = false;
+
+  const startAnimation = () => {
+    if (!rafId) rafId = window.requestAnimationFrame(animate);
+  };
 
   const hidePointer = () => {
     document.body.classList.remove("has-mouse");
     document.body.classList.remove("custom-cursor-enabled");
     cursor.classList.remove("is-action", "is-down");
+    active = false;
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
   };
 
   const showPointer = () => {
     document.body.classList.add("has-mouse");
     const modalOpen = document.querySelector("dialog[open], .ready-modal:not([hidden]), .mode-popout:not([hidden]), .test-picker-modal:not([hidden])");
     document.body.classList.toggle("custom-cursor-enabled", !modalOpen);
+    active = true;
+    startAnimation();
   };
 
   const move = (event) => {
@@ -367,13 +382,17 @@ function initMouseTracking() {
   };
 
   const animate = () => {
+    if (!active) {
+      rafId = 0;
+      return;
+    }
     cursorX += (targetX - cursorX) * 0.34;
     cursorY += (targetY - cursorY) * 0.34;
     glowX += (targetX - glowX) * 0.11;
     glowY += (targetY - glowY) * 0.11;
     glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
     cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
-    window.requestAnimationFrame(animate);
+    rafId = window.requestAnimationFrame(animate);
   };
 
   window.addEventListener("pointermove", move, { passive: true });
@@ -391,7 +410,6 @@ function initMouseTracking() {
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) hidePointer();
   });
-  animate();
 }
 
 applySubjectLogo();

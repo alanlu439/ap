@@ -384,9 +384,8 @@ function initSubjectPicker() {
     const available = card.dataset.available === "true";
 
     cardsArray.forEach((item) => {
-      const selected = item === card;
-      item.classList.toggle("is-selected", selected);
-      item.setAttribute("aria-pressed", String(selected));
+      item.classList.remove("is-selected");
+      item.removeAttribute("aria-pressed");
     });
 
     localStorage.setItem(SELECTED_AP_SUBJECT_KEY, subject.title);

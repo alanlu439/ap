@@ -647,9 +647,7 @@ const officialUnitRanges = {
   "Unit 9": "2%-5%"
 };
 
-const questions = selectedPracticeSubject.title === "AP Statistics"
-  ? statsQuestions
-  : practiceData?.buildMcqQuestions?.(selectedPracticeSubject) || statsQuestions;
+const questions = practiceData?.buildMcqQuestions?.(selectedPracticeSubject) || statsQuestions;
 
 let state = loadState();
 let timerHandle = null;
