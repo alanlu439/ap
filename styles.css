@@ -18,7 +18,12 @@
   --red-soft: #fae7e9;
   --shadow: 0 18px 48px rgba(8, 75, 84, 0.12);
   --shadow-soft: 0 10px 30px rgba(8, 75, 84, 0.09);
-  --radius: 8px;
+  --radius: 22px;
+  --radius-sm: 14px;
+  --radius-md: 22px;
+  --radius-lg: 28px;
+  --radius-xl: 30px;
+  --radius-pill: 999px;
   --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -3362,7 +3367,12 @@ h1 {
   --red-soft: rgba(255, 240, 239, 0.78);
   --shadow: 0 22px 54px rgba(31, 42, 55, 0.13);
   --shadow-soft: 0 12px 32px rgba(31, 42, 55, 0.09);
-  --radius: 18px;
+  --radius: 22px;
+  --radius-sm: 14px;
+  --radius-md: 22px;
+  --radius-lg: 28px;
+  --radius-xl: 30px;
+  --radius-pill: 999px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -4386,5 +4396,94 @@ html[data-theme="dark"] .ready-dialog::backdrop {
 @media (max-width: 430px) {
   .footer-links {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Radius system */
+.start-nav,
+.topbar,
+.subject-panel,
+.home-info-panel,
+.exam-timeline-panel,
+.path-hero,
+.docs-section,
+.site-footer,
+.legal-card,
+.question-card,
+.review-panel,
+.control-panel,
+.structure-panel,
+.blueprint-panel,
+.frq-section,
+.frq-card,
+.frq-rail,
+.test-picker,
+.ready-dialog,
+.mode-popout-card {
+  border-radius: var(--radius-xl);
+}
+
+.subject-card,
+.home-info-card,
+.timeline-live-card,
+.timeline-day,
+.deadline-card,
+.path-card,
+.full-score-card,
+.status-item,
+.choice,
+.mode-card,
+.test-picker-option,
+.compact-docs .docs-grid a,
+.docs-grid a,
+.frq-part textarea,
+.frq-nav-dot,
+.nav-dot {
+  border-radius: var(--radius-md);
+}
+
+.timeline-session,
+.timeline-empty,
+.result-card,
+.source-note,
+.score-chip,
+.primary,
+.secondary,
+.text-button,
+.page-nav a,
+.page-nav button {
+  border-radius: var(--radius-lg);
+}
+
+.subject-search,
+.subject-sort,
+.theme-toggle,
+.timeline-filter,
+.timezone-pill,
+.timeline-date,
+.timeline-session em,
+.timeline-head a,
+.footer-links a,
+.footer-pill,
+.timer-pill,
+.small-pill {
+  border-radius: var(--radius-pill);
+}
+
+.brand-mark,
+.brand-mark img {
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 760px) {
+  .start-nav,
+  .topbar,
+  .site-footer,
+  .subject-panel,
+  .home-info-panel,
+  .exam-timeline-panel,
+  .legal-card,
+  .docs-section {
+    border-radius: var(--radius-lg);
   }
 }
