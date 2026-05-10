@@ -6,8 +6,6 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 
 ## Try It Online
 
-Website URL after GitHub Pages is enabled:
-
 [https://alanlu439.github.io/ap/](https://alanlu439.github.io/ap/)
 
 ## What Visitors Can Do
