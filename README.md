@@ -15,9 +15,14 @@ Website URL after GitHub Pages is enabled:
 - Choose from 42 AP subjects
 - Start Full Exam, MCQ, or FRQ practice from a pop-out structure selector
 - See per-subject section counts, minutes, and score weights
+- Pick a unit focus for targeted practice
+- Track a local study dashboard with saved progress, flags, and recent score history
 - Answer MCQs with saved progress and review feedback
+- Mark MCQs as flagged or guessed, then filter review by missed, flagged, guessed, or unit
 - Write FRQ responses and get estimated rubric feedback after submission
+- Print a practice summary for MCQ or FRQ review
 - Check official AP exam schedule, visual timeline, location guidance, and registration links
+- Adjust the timeline timezone and filter by all, upcoming, today, or done
 - Use an auto-adjusting light/dark theme that follows the visitor's device setting
 - Read the independent-use disclaimer and official source links
 

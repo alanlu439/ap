@@ -5,8 +5,9 @@ const selectedPracticeSubject = practiceData?.getSelectedSubject?.() || {
   slug: "ap-statistics",
   format: { mcqCount: 40, mcqMinutes: 90, frqCount: 6, frqMinutes: 90, mcqWeight: 50, frqWeight: 50, fullMinutes: 180 }
 };
-const FRQ_SECONDS = selectedPracticeSubject.format.frqMinutes * 60;
-const FRQ_STORAGE_KEY = practiceData?.storageKey?.("frq", selectedPracticeSubject) || "ap-practice-" + selectedPracticeSubject.slug + "-frq-state-v1";
+const UNIT_FOCUS = practiceData?.getUnitFilter?.(selectedPracticeSubject) || "";
+let FRQ_SECONDS = selectedPracticeSubject.format.frqMinutes * 60;
+let FRQ_STORAGE_KEY = practiceData?.storageKey?.("frq", selectedPracticeSubject, UNIT_FOCUS) || "ap-practice-" + selectedPracticeSubject.slug + "-frq-state-v1";
 
 function escapeHtml(value) {
   return String(value)
@@ -204,7 +205,15 @@ const statsFrqItems = [
   }
 ];
 
-const frqItems = practiceData?.buildFrqItems?.(selectedPracticeSubject) || statsFrqItems;
+const allFrqItems = practiceData?.buildFrqItems?.(selectedPracticeSubject, UNIT_FOCUS) || statsFrqItems;
+const scopedFrqItems = UNIT_FOCUS && !practiceData?.buildFrqItems
+  ? practiceData?.filterItemsByUnit?.(allFrqItems, UNIT_FOCUS) || allFrqItems
+  : allFrqItems;
+const frqItems = scopedFrqItems.length ? scopedFrqItems : allFrqItems;
+if (UNIT_FOCUS && selectedPracticeSubject.format.frqCount) {
+  FRQ_SECONDS = Math.max(10 * 60, Math.round(selectedPracticeSubject.format.frqMinutes * 60 * (frqItems.length / selectedPracticeSubject.format.frqCount)));
+}
+FRQ_STORAGE_KEY = practiceData?.storageKey?.("frq", selectedPracticeSubject, UNIT_FOCUS) || FRQ_STORAGE_KEY;
 
 let frqState = loadFrqState();
 let frqTimerHandle = null;
@@ -216,6 +225,7 @@ const frqEls = {
   score: document.getElementById("frqScore"),
   start: document.getElementById("frqStartBtn"),
   submit: document.getElementById("frqSubmitBtn"),
+  flag: document.getElementById("frqFlagBtn"),
   jump: document.getElementById("frqJumpBtn"),
   reset: document.getElementById("frqResetBtn"),
   progressBar: document.getElementById("frqProgressBar"),
@@ -226,6 +236,8 @@ const frqEls = {
   summary: document.getElementById("frqSummary"),
   summaryTitle: document.getElementById("frqSummaryTitle"),
   summaryText: document.getElementById("frqSummaryText"),
+  reviewFilter: document.getElementById("frqReviewFilter"),
+  print: document.getElementById("frqPrintBtn"),
   results: document.getElementById("frqResults")
 };
 
@@ -234,6 +246,7 @@ function defaultFrqState() {
     answers: frqItems.map((item) => item.parts.map(() => "")),
     started: false,
     submitted: false,
+    flagged: Array(frqItems.length).fill(false),
     remaining: FRQ_SECONDS,
     lastTick: null,
     results: null
@@ -248,7 +261,11 @@ function loadFrqState() {
     if (!saved || !Array.isArray(saved.answers) || saved.answers.length !== frqItems.length) {
       return defaultFrqState();
     }
-    return { ...defaultFrqState(), ...saved };
+    return {
+      ...defaultFrqState(),
+      ...saved,
+      flagged: Array.isArray(saved.flagged) ? saved.flagged : Array(frqItems.length).fill(false)
+    };
   } catch {
     return defaultFrqState();
   }
@@ -316,9 +333,9 @@ function applyFrqSubjectChrome() {
 
   document.title = "AP Exam Practice | " + selectedPracticeSubject.title + " FRQ";
   if (topbarTitle) topbarTitle.textContent = selectedPracticeSubject.short + " FRQ";
-  if (topbarMeta) topbarMeta.textContent = format.frqCount + " questions · " + format.frqMinutes + " minutes · " + weight;
+  if (topbarMeta) topbarMeta.textContent = frqItems.length + " questions · " + Math.round(FRQ_SECONDS / 60) + " minutes · " + weight;
   if (headerTitle) headerTitle.textContent = "Free Response";
-  if (headerCopy) headerCopy.textContent = format.frqCount + " prompts. Rubric estimate after submit. " + (format.note || "");
+  if (headerCopy) headerCopy.textContent = frqItems.length + " prompts. Rubric estimate after submit. " + (UNIT_FOCUS ? "Focus: " + UNIT_FOCUS + "." : (format.note || ""));
 }
 
 function isFrqAnswered(index) {
@@ -335,6 +352,31 @@ function getFrqTotalMax() {
 
 function getFrqTotalScore() {
   return frqState.results ? frqState.results.reduce((sum, result) => sum + result.score, 0) : null;
+}
+
+function recordFrqAttempt(auto = false) {
+  const totalScore = getFrqTotalScore() || 0;
+  const totalMax = getFrqTotalMax();
+  practiceData?.recordScoreAttempt?.({
+    mode: "FRQ",
+    subjectTitle: selectedPracticeSubject.title,
+    subjectShort: selectedPracticeSubject.short,
+    subjectSlug: selectedPracticeSubject.slug,
+    unitFocus: UNIT_FOCUS || "All units",
+    score: totalScore,
+    maxScore: totalMax,
+    percent: totalMax ? (totalScore / totalMax) * 100 : 0,
+    timeUsedSeconds: FRQ_SECONDS - frqState.remaining,
+    flagged: frqState.flagged.filter(Boolean).length,
+    autoSubmitted: Boolean(auto),
+    weakUnits: frqState.results
+      ? frqState.results
+          .map((result, index) => ({ unit: frqItems[index]?.unit || selectedPracticeSubject.short, rate: result.maxPoints ? result.score / result.maxPoints : 0 }))
+          .sort((first, second) => first.rate - second.rate)
+          .slice(0, 3)
+          .map((item) => item.unit)
+      : []
+  });
 }
 
 function wordCount(value) {
@@ -359,6 +401,7 @@ function updateFrqWordCount(itemIndex, partIndex) {
 function setActiveFrq(index) {
   activeFrqIndex = Math.max(0, Math.min(frqItems.length - 1, index));
   renderFrqStatusOnly();
+  if (frqState.submitted) renderFrqSummary(getFrqTotalScore(), getFrqTotalMax());
 }
 
 function scrollToFrq(index, focus = false) {
@@ -397,6 +440,7 @@ function renderFrqNav() {
     const classes = ["frq-nav-dot"];
     if (index === activeFrqIndex) classes.push("current");
     if (isFrqAnswered(index)) classes.push("answered");
+    if (frqState.flagged[index]) classes.push("flagged");
     if (frqState.submitted) classes.push("graded");
 
     return `
@@ -418,6 +462,7 @@ function updateFrqNavState() {
     const index = Number(button.dataset.frqIndex);
     button.classList.toggle("current", index === activeFrqIndex);
     button.classList.toggle("answered", isFrqAnswered(index));
+    button.classList.toggle("flagged", Boolean(frqState.flagged[index]));
     button.classList.toggle("graded", frqState.submitted);
     if (index === activeFrqIndex) {
       button.setAttribute("aria-current", "true");
@@ -438,12 +483,14 @@ function renderFrqs() {
   frqEls.start.textContent = frqState.submitted ? "Review Done" : frqState.started ? "Pause Timer" : "Start Timer";
   frqEls.start.disabled = frqState.submitted;
   frqEls.submit.disabled = frqState.submitted;
+  if (frqEls.flag) frqEls.flag.textContent = frqState.flagged[activeFrqIndex] ? "Unflag" : "Flag";
   frqEls.jump.textContent = frqState.submitted || answeredCount === frqItems.length ? "Review" : "Next Blank";
 
   frqEls.list.innerHTML = frqItems.map((item, itemIndex) => `
     <article class="frq-card${frqState.submitted ? " is-graded" : ""}" id="frq-card-${itemIndex}" data-frq-index="${itemIndex}">
       <div class="frq-card-header">
         <h3>Question ${item.id}</h3>
+        <span>${escapeHtml(item.unit || selectedPracticeSubject.short)}</span>
       </div>
       <p class="frq-question-text">${escapeHtml(frqQuestionText(item))}</p>
       ${item.parts.map((part, partIndex) => `
@@ -491,6 +538,7 @@ function renderFrqStatusOnly() {
   frqEls.start.textContent = frqState.submitted ? "Review Done" : frqState.started ? "Pause Timer" : "Start Timer";
   frqEls.start.disabled = frqState.submitted;
   frqEls.submit.disabled = frqState.submitted;
+  if (frqEls.flag) frqEls.flag.textContent = frqState.flagged[activeFrqIndex] ? "Unflag" : "Flag";
   frqEls.jump.textContent = frqState.submitted || answeredCount === frqItems.length ? "Review" : "Next Blank";
   if (frqEls.progressBar) {
     frqEls.progressBar.style.width = `${(answeredCount / frqItems.length) * 100}%`;
@@ -512,14 +560,27 @@ function renderFrqSummary(totalScore, totalMax) {
   frqEls.summary.hidden = false;
   frqEls.summaryTitle.textContent = `Estimated score: ${totalScore} / ${totalMax}`;
   frqEls.summaryText.textContent = "Local rubric estimate. Official AP scoring may differ.";
-  frqEls.results.innerHTML = frqState.results.map((result) => `
+  const filter = frqEls.reviewFilter?.value || "all";
+  const activeUnit = frqItems[activeFrqIndex]?.unit;
+  const visibleResults = frqState.results.filter((result, index) => {
+    if (filter === "low") return result.score < result.maxPoints;
+    if (filter === "flagged") return Boolean(frqState.flagged[index]);
+    if (filter === "unit") return frqItems[index]?.unit === activeUnit;
+    return true;
+  });
+
+  frqEls.results.innerHTML = visibleResults.length ? visibleResults.map((result, visibleIndex) => {
+    const index = frqState.results.findIndex((item) => item.id === result.id);
+    return `
     <div class="frq-result">
       <strong>Question ${result.id}: ${escapeHtml(result.title)} - ${result.score} / ${result.maxPoints}</strong>
+      <span>${escapeHtml(frqItems[index]?.unit || selectedPracticeSubject.short)}</span>
       <ul>
         ${result.feedback.map((item) => `<li>${item.met ? "Met" : "Missing"}: ${escapeHtml(item.label)}</li>`).join("")}
       </ul>
     </div>
-  `).join("");
+  `;
+  }).join("") : '<p class="empty-copy">No FRQ prompts match this review filter.</p>';
 }
 
 function startFrqTimer() {
@@ -597,6 +658,7 @@ function submitFrqs(auto = false) {
   frqState.submitted = true;
   frqState.lastTick = null;
   stopFrqTimer();
+  recordFrqAttempt(auto);
   renderFrqs();
 }
 
@@ -619,9 +681,17 @@ frqEls.start.addEventListener("click", () => {
   renderFrqs();
 });
 
+frqEls.flag?.addEventListener("click", () => {
+  frqState.flagged[activeFrqIndex] = !frqState.flagged[activeFrqIndex];
+  saveFrqState();
+  renderFrqStatusOnly();
+});
+
 frqEls.submit.addEventListener("click", () => submitFrqs(false));
 frqEls.jump.addEventListener("click", jumpToNextBlank);
 frqEls.reset.addEventListener("click", resetFrqs);
+frqEls.reviewFilter?.addEventListener("change", () => renderFrqSummary(getFrqTotalScore(), getFrqTotalMax()));
+frqEls.print?.addEventListener("click", () => window.print());
 
 reconcileLoadedFrqTimer();
 

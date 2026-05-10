@@ -5,8 +5,9 @@ const selectedPracticeSubject = practiceData?.getSelectedSubject?.() || {
   slug: "ap-statistics",
   format: { mcqCount: 40, mcqMinutes: 90, frqCount: 6, frqMinutes: 90, mcqWeight: 50, frqWeight: 50, fullMinutes: 180 }
 };
-const TOTAL_SECONDS = selectedPracticeSubject.format.mcqMinutes * 60;
-const STORAGE_KEY = practiceData?.storageKey?.("mcq", selectedPracticeSubject) || "ap-practice-" + selectedPracticeSubject.slug + "-mcq-state-v1";
+const UNIT_FOCUS = practiceData?.getUnitFilter?.(selectedPracticeSubject) || "";
+let TOTAL_SECONDS = selectedPracticeSubject.format.mcqMinutes * 60;
+let STORAGE_KEY = practiceData?.storageKey?.("mcq", selectedPracticeSubject, UNIT_FOCUS) || "ap-practice-" + selectedPracticeSubject.slug + "-mcq-state-v1";
 
 const statsSkillLabels = {
   1: "Skill 1: Selecting Statistical Methods",
@@ -647,7 +648,13 @@ const officialUnitRanges = {
   "Unit 9": "2%-5%"
 };
 
-const questions = practiceData?.buildMcqQuestions?.(selectedPracticeSubject) || statsQuestions;
+const allQuestions = practiceData?.buildMcqQuestions?.(selectedPracticeSubject) || statsQuestions;
+const scopedQuestions = practiceData?.filterItemsByUnit?.(allQuestions, UNIT_FOCUS) || allQuestions;
+const questions = scopedQuestions.length ? scopedQuestions : allQuestions;
+if (UNIT_FOCUS && selectedPracticeSubject.format.mcqCount) {
+  TOTAL_SECONDS = Math.max(5 * 60, Math.round(selectedPracticeSubject.format.mcqMinutes * 60 * (questions.length / selectedPracticeSubject.format.mcqCount)));
+}
+STORAGE_KEY = practiceData?.storageKey?.("mcq", selectedPracticeSubject, UNIT_FOCUS) || STORAGE_KEY;
 
 let state = loadState();
 let timerHandle = null;
@@ -664,6 +671,7 @@ const els = {
   prevBtn: document.getElementById("prevBtn"),
   nextBtn: document.getElementById("nextBtn"),
   flagBtn: document.getElementById("flagBtn"),
+  guessBtn: document.getElementById("guessBtn"),
   clearBtn: document.getElementById("clearBtn"),
   startBtn: document.getElementById("startBtn"),
   submitBtn: document.getElementById("submitBtn"),
@@ -676,6 +684,9 @@ const els = {
   reviewTitle: document.getElementById("reviewTitle"),
   reviewExplanation: document.getElementById("reviewExplanation"),
   reviewTags: document.getElementById("reviewTags"),
+  reviewFilter: document.getElementById("reviewFilter"),
+  reviewList: document.getElementById("reviewList"),
+  printSummaryBtn: document.getElementById("printSummaryBtn"),
   blueprintList: document.getElementById("blueprintList")
 };
 
@@ -684,6 +695,7 @@ function defaultState() {
     current: 0,
     answers: Array(questions.length).fill(null),
     flagged: Array(questions.length).fill(false),
+    guessed: Array(questions.length).fill(false),
     started: false,
     submitted: false,
     remaining: TOTAL_SECONDS,
@@ -703,7 +715,8 @@ function loadState() {
     return {
       ...defaultState(),
       ...saved,
-      flagged: Array.isArray(saved.flagged) ? saved.flagged : Array(questions.length).fill(false)
+      flagged: Array.isArray(saved.flagged) ? saved.flagged : Array(questions.length).fill(false),
+      guessed: Array.isArray(saved.guessed) ? saved.guessed : Array(questions.length).fill(false)
     };
   } catch {
     return defaultState();
@@ -748,6 +761,16 @@ function questionPrompt(question) {
   return prompt || stimulus;
 }
 
+function answerChoiceExplanation(question, index) {
+  if (Array.isArray(question.choiceExplanations) && question.choiceExplanations[index]) {
+    return question.choiceExplanations[index];
+  }
+  if (index === question.correct) {
+    return question.explanation || "This option matches the evidence and reasoning requested by the prompt.";
+  }
+  return "This option does not fully match the evidence, condition, or reasoning required by the prompt.";
+}
+
 function applyMcqSubjectChrome() {
   const format = selectedPracticeSubject.format;
   const weight = practiceData?.formatWeight?.(format.mcqWeight) || format.mcqWeight + "%";
@@ -759,18 +782,20 @@ function applyMcqSubjectChrome() {
 
   document.title = "AP Exam Practice | " + selectedPracticeSubject.title + " MCQ";
   if (topbarTitle) topbarTitle.textContent = selectedPracticeSubject.short + " MCQ";
-  if (topbarMeta) topbarMeta.textContent = format.mcqCount + " questions · " + format.mcqMinutes + " minutes · " + weight;
+  if (topbarMeta) topbarMeta.textContent = questions.length + " questions · " + Math.round(TOTAL_SECONDS / 60) + " minutes · " + weight;
   if (examNote) {
-    examNote.innerHTML = "<strong>Section I:</strong> " + format.mcqCount + " MCQ · " + format.mcqMinutes + " min · " + weight + ".";
+    examNote.innerHTML = "<strong>Section I:</strong> " + questions.length + " MCQ · " + Math.round(TOTAL_SECONDS / 60) + " min · " + weight + "." + (UNIT_FOCUS ? " Focus: " + escapeHtml(UNIT_FOCUS) + "." : "");
   }
-  if (structureValues[1]) structureValues[1].textContent = String(format.mcqCount);
-  if (structureValues[2]) structureValues[2].textContent = format.mcqMinutes + " minutes";
+  if (structureValues[1]) structureValues[1].textContent = String(questions.length);
+  if (structureValues[2]) structureValues[2].textContent = Math.round(TOTAL_SECONDS / 60) + " minutes";
   if (structureValues[3]) structureValues[3].textContent = weight;
   if (structureValues[4]) {
     const maxChoices = Math.max(...questions.map((question) => question.choices.length));
     structureValues[4].textContent = "A-" + String.fromCharCode(64 + maxChoices);
   }
-  if (sourceNote) sourceNote.textContent = "Practice made by Alan. Auto graded after submit; no penalty for guessing.";
+  if (sourceNote) sourceNote.textContent = UNIT_FOCUS
+    ? "Unit practice focus: " + UNIT_FOCUS + ". Auto graded after submit."
+    : "Practice made by Alan. Auto graded after submit; no penalty for guessing.";
 }
 
 function currentQuestion() {
@@ -789,7 +814,7 @@ function render() {
   }
   els.answeredText.textContent = `${answeredCount} answered`;
   els.scoreText.textContent = state.submitted ? `${score} / ${questions.length}` : "--";
-  els.questionNumber.textContent = `Question ${q.id} of ${questions.length}`;
+  els.questionNumber.textContent = `Question ${state.current + 1} of ${questions.length}`;
   els.setLabel.hidden = true;
   els.setLabel.textContent = "";
   els.questionText.textContent = questionPrompt(q);
@@ -810,7 +835,7 @@ function render() {
     }
     button.innerHTML = `
       <span class="choice-letter">${String.fromCharCode(65 + index)}</span>
-      <span class="choice-text">${escapeHtml(choice)}</span>
+      <span class="choice-text">${escapeHtml(choice)}${state.submitted ? `<em class="choice-explanation">${escapeHtml(answerChoiceExplanation(q, index))}</em>` : ""}</span>
     `;
     button.addEventListener("click", () => selectAnswer(index));
     els.choices.appendChild(button);
@@ -819,6 +844,10 @@ function render() {
   els.prevBtn.disabled = state.current === 0;
   els.nextBtn.disabled = state.current === questions.length - 1;
   els.flagBtn.textContent = state.flagged[state.current] ? "Unflag" : "Flag";
+  if (els.guessBtn) {
+    els.guessBtn.textContent = state.guessed[state.current] ? "Not Guess" : "Guess";
+    els.guessBtn.setAttribute("aria-pressed", String(Boolean(state.guessed[state.current])));
+  }
   els.startBtn.textContent = state.submitted ? "Review Done" : state.started ? "Pause Timer" : "Start Timer";
   els.startBtn.disabled = state.submitted;
   els.submitBtn.disabled = state.submitted;
@@ -837,11 +866,12 @@ function renderNavigator() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "nav-dot";
-    button.textContent = q.id;
-    button.setAttribute("aria-label", `Go to question ${q.id}`);
+    button.textContent = index + 1;
+    button.setAttribute("aria-label", `Go to question ${index + 1}`);
     if (index === state.current) button.classList.add("current");
     if (state.answers[index] !== null) button.classList.add("answered");
     if (state.flagged[index]) button.classList.add("flagged");
+    if (state.guessed[index]) button.classList.add("guessed");
     if (state.submitted && state.answers[index] === q.correct) button.classList.add("right");
     if (state.submitted && state.answers[index] !== null && state.answers[index] !== q.correct) {
       button.classList.add("wrong");
@@ -857,6 +887,7 @@ function renderNavigator() {
 function renderReview() {
   if (!state.submitted) {
     els.reviewPanel.hidden = true;
+    if (els.reviewList) els.reviewList.innerHTML = "";
     return;
   }
 
@@ -875,6 +906,46 @@ function renderReview() {
     <span class="tag">${escapeHtml(q.unit)}</span>
     <span class="tag">${escapeHtml(skillLabels[q.skill])}</span>
   `;
+  renderReviewList();
+}
+
+function reviewFilterMatches(question, index, filter) {
+  if (filter === "missed") return state.answers[index] !== question.correct;
+  if (filter === "flagged") return Boolean(state.flagged[index]);
+  if (filter === "guessed") return Boolean(state.guessed[index]);
+  if (filter === "unit") return question.unit === currentQuestion().unit;
+  return true;
+}
+
+function renderReviewList() {
+  if (!els.reviewList) return;
+  const filter = els.reviewFilter?.value || "all";
+  const rows = questions
+    .map((question, index) => ({ question, index }))
+    .filter(({ question, index }) => reviewFilterMatches(question, index, filter));
+
+  els.reviewList.innerHTML = rows.length
+    ? rows.map(({ question, index }) => {
+        const selected = state.answers[index];
+        const correct = selected === question.correct;
+        const status = correct ? "Correct" : selected === null ? "Blank" : "Missed";
+        return `
+          <button class="review-list-item${index === state.current ? " is-current" : ""}" type="button" data-review-index="${index}">
+            <span>Q${index + 1}</span>
+            <strong>${status}</strong>
+            <em>${escapeHtml(question.unit.replace(/^Unit\s+\d+:\s*/, ""))}</em>
+          </button>
+        `;
+      }).join("")
+    : '<p class="empty-copy">No questions match this review filter.</p>';
+
+  els.reviewList.querySelectorAll("[data-review-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.current = Number(button.dataset.reviewIndex);
+      render();
+      document.querySelector(".question-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 }
 
 function renderBlueprint() {
@@ -917,6 +988,41 @@ function selectAnswer(index) {
 
 function calculateScore() {
   return questions.reduce((score, q, index) => score + (state.answers[index] === q.correct ? 1 : 0), 0);
+}
+
+function weakestUnits() {
+  const unitRows = questions.reduce((acc, question, index) => {
+    const key = question.unit;
+    if (!acc[key]) acc[key] = { correct: 0, total: 0 };
+    acc[key].total += 1;
+    if (state.answers[index] === question.correct) acc[key].correct += 1;
+    return acc;
+  }, {});
+
+  return Object.entries(unitRows)
+    .map(([unit, row]) => ({ unit, rate: row.total ? row.correct / row.total : 0 }))
+    .sort((first, second) => first.rate - second.rate)
+    .slice(0, 3)
+    .map((item) => item.unit);
+}
+
+function recordMcqAttempt(auto = false) {
+  const score = calculateScore();
+  practiceData?.recordScoreAttempt?.({
+    mode: "MCQ",
+    subjectTitle: selectedPracticeSubject.title,
+    subjectShort: selectedPracticeSubject.short,
+    subjectSlug: selectedPracticeSubject.slug,
+    unitFocus: UNIT_FOCUS || "All units",
+    score,
+    maxScore: questions.length,
+    percent: questions.length ? (score / questions.length) * 100 : 0,
+    timeUsedSeconds: TOTAL_SECONDS - state.remaining,
+    flagged: state.flagged.filter(Boolean).length,
+    guessed: state.guessed.filter(Boolean).length,
+    autoSubmitted: Boolean(auto),
+    weakUnits: weakestUnits()
+  });
 }
 
 function startTimer() {
@@ -992,6 +1098,7 @@ function submitSection(auto = false) {
   state.submitted = true;
   state.lastTick = null;
   stopTimer();
+  recordMcqAttempt(auto);
   render();
 }
 
@@ -1019,6 +1126,13 @@ els.flagBtn.addEventListener("click", () => {
   render();
 });
 
+if (els.guessBtn) {
+  els.guessBtn.addEventListener("click", () => {
+    state.guessed[state.current] = !state.guessed[state.current];
+    render();
+  });
+}
+
 els.clearBtn.addEventListener("click", () => {
   if (state.submitted) return;
   state.answers[state.current] = null;
@@ -1036,6 +1150,8 @@ els.startBtn.addEventListener("click", () => {
 
 els.submitBtn.addEventListener("click", () => submitSection(false));
 els.resetBtn.addEventListener("click", resetSection);
+els.reviewFilter?.addEventListener("change", renderReviewList);
+els.printSummaryBtn?.addEventListener("click", () => window.print());
 
 document.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();

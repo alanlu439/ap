@@ -1108,8 +1108,9 @@
     return getSubjectByTitle(saved) || getSubjectByTitle("AP Statistics") || SUBJECTS[0];
   }
 
-  function storageKey(kind, subject = getSelectedSubject()) {
-    return "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
+  function storageKey(kind, subject = getSelectedSubject(), scope = "") {
+    const scopeSlug = scope ? "-" + slugify(scope) : "";
+    return "ap-practice-" + subject.slug + "-" + kind + scopeSlug + "-state-v1";
   }
 
   function totalMinutes(format) {
@@ -1118,6 +1119,120 @@
 
   function formatWeight(value) {
     return Number.isInteger(value) ? value + "%" : value.toFixed(1) + "%";
+  }
+
+  const SCORE_HISTORY_KEY = "ap-practice-score-history-v1";
+  const UNIT_FILTER_PREFIX = "ap-practice-unit-focus-v1-";
+
+  function unitFilterKey(subject = getSelectedSubject()) {
+    return UNIT_FILTER_PREFIX + subject.slug;
+  }
+
+  function getUnitFilter(subject = getSelectedSubject()) {
+    try {
+      const saved = localStorage.getItem(unitFilterKey(subject)) || "";
+      return subject.units.includes(saved) ? saved : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function setUnitFilter(subject = getSelectedSubject(), unit = "") {
+    try {
+      if (unit && subject.units.includes(unit)) {
+        localStorage.setItem(unitFilterKey(subject), unit);
+      } else {
+        localStorage.removeItem(unitFilterKey(subject));
+      }
+    } catch {
+      // Unit focus is optional; practice still works without storage.
+    }
+  }
+
+  function itemMatchesUnit(item, unit = "") {
+    if (!unit) return true;
+    return String(item.unit || "").toLowerCase().includes(String(unit).toLowerCase());
+  }
+
+  function filterItemsByUnit(items, unit = "") {
+    return unit ? items.filter((item) => itemMatchesUnit(item, unit)) : items;
+  }
+
+  function choiceExplanation(question, choice, index) {
+    if (index === question.correct) {
+      return question.explanation || "This option matches the evidence and reasoning requested by the prompt.";
+    }
+    return "This distractor may sound plausible, but it does not fully satisfy the prompt's evidence, condition, or course reasoning.";
+  }
+
+  function readJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getScoreHistory() {
+    const history = readJson(SCORE_HISTORY_KEY, []);
+    return Array.isArray(history) ? history : [];
+  }
+
+  function recordScoreAttempt(attempt) {
+    try {
+      const next = [
+        {
+          id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+          date: new Date().toISOString(),
+          ...attempt
+        },
+        ...getScoreHistory()
+      ].slice(0, 80);
+      localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(next));
+      return next;
+    } catch {
+      return getScoreHistory();
+    }
+  }
+
+  function latestScoreForSubject(subject = getSelectedSubject()) {
+    return getScoreHistory().find((item) => item.subjectSlug === subject.slug) || null;
+  }
+
+  const OFFICIAL_SLUG_OVERRIDES = {
+    "AP 2-D Art and Design": "ap-2-d-art-and-design",
+    "AP 3-D Art and Design": "ap-3-d-art-and-design",
+    "AP Computer Science Principles": "ap-computer-science-principles",
+    "AP English Language and Composition": "ap-english-language-and-composition",
+    "AP English Literature and Composition": "ap-english-literature-and-composition",
+    "AP Physics 1: Algebra-Based": "ap-physics-1-algebra-based",
+    "AP Physics 2: Algebra-Based": "ap-physics-2-algebra-based",
+    "AP Physics C: Electricity and Magnetism": "ap-physics-c-electricity-and-magnetism",
+    "AP Physics C: Mechanics": "ap-physics-c-mechanics",
+    "AP United States Government and Politics": "ap-united-states-government-and-politics",
+    "AP United States History": "ap-united-states-history",
+    "AP World History: Modern": "ap-world-history-modern"
+  };
+
+  function officialCourseSlug(subject = getSelectedSubject()) {
+    return OFFICIAL_SLUG_OVERRIDES[subject.title] || slugify(subject.title);
+  }
+
+  function officialLinksForSubject(subject = getSelectedSubject()) {
+    if (subject.group === "Career") {
+      return {
+        students: "https://apstudents.collegeboard.org/courses",
+        central: "https://apcentral.collegeboard.org/courses",
+        dates: "https://apstudents.collegeboard.org/exam-dates"
+      };
+    }
+    const courseSlug = officialCourseSlug(subject);
+    return {
+      students: "https://apstudents.collegeboard.org/courses/" + courseSlug,
+      central: "https://apcentral.collegeboard.org/courses/" + courseSlug,
+      dates: "https://apstudents.collegeboard.org/exam-dates"
+    };
   }
 
   function rotateChoices(choices, seed) {
@@ -2472,21 +2587,28 @@
         prompt,
         choices,
         correct: choices.indexOf(task.correct),
-        explanation: task.explanation || fillTemplate(profile.explanation, values)
+        explanation: task.explanation || fillTemplate(profile.explanation, values),
+        choiceExplanations: choices.map((choice, choiceIndex) => choiceExplanation({
+          correct: choices.indexOf(task.correct),
+          explanation: task.explanation || fillTemplate(profile.explanation, values)
+        }, choice, choiceIndex))
       };
     });
   }
 
-  function buildFrqItems(subject = getSelectedSubject()) {
+  function buildFrqItems(subject = getSelectedSubject(), unitFocus = "") {
     const blueprint = frqBlueprintFor(subject);
+    const units = unitFocus && subject.units.includes(unitFocus) ? [unitFocus] : subject.units;
 
     return Array.from({ length: subject.format.frqCount }, (_, index) => {
-      const unit = subject.units[index % subject.units.length];
+      const unit = units[index % units.length];
+      const unitIndex = Math.max(0, subject.units.indexOf(unit));
       const frqType = blueprint[index % blueprint.length];
       const values = buildValues(subject, unit);
 
       return {
         id: index + 1,
+        unit: "Unit " + (unitIndex + 1) + ": " + unit,
         title: fillTemplate(frqType.title, values),
         maxPoints: frqType.parts.length,
         stimulus: frqPromptFor(subject, values, frqType),
@@ -2509,6 +2631,13 @@
     totalMinutes,
     formatWeight,
     getSubjectIcon,
+    getUnitFilter,
+    setUnitFilter,
+    filterItemsByUnit,
+    getScoreHistory,
+    recordScoreAttempt,
+    latestScoreForSubject,
+    officialLinksForSubject,
     buildMcqQuestions,
     buildFrqItems
   };

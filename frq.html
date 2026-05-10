@@ -59,6 +59,7 @@
           <button class="text-button primary" id="frqStartBtn" type="button">Start Timer</button>
           <button class="text-button submit" id="frqSubmitBtn" type="button">Submit + Grade</button>
           <a class="text-button secondary nav-link" href="mcq.html">MCQ</a>
+          <button class="text-button secondary" id="frqFlagBtn" type="button">Flag</button>
           <button class="text-button secondary" id="frqJumpBtn" type="button">Next Blank</button>
           <button class="text-button secondary" id="frqResetBtn" type="button">Clear</button>
         </div>
@@ -82,6 +83,18 @@
             <h3 id="frqSummaryTitle">FRQ score estimate</h3>
           </div>
           <p id="frqSummaryText"></p>
+          <div class="review-tools">
+            <label for="frqReviewFilter">
+              <span>Review</span>
+              <select id="frqReviewFilter" aria-label="Filter FRQ review">
+                <option value="all">All prompts</option>
+                <option value="low">Needs work</option>
+                <option value="flagged">Flagged</option>
+                <option value="unit">This unit</option>
+              </select>
+            </label>
+            <button class="text-button secondary compact" id="frqPrintBtn" type="button">Print Summary</button>
+          </div>
           <div class="frq-results" id="frqResults"></div>
         </section>
       </section>

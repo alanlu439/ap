@@ -26,8 +26,8 @@ function getSubjectByTitle(title) {
   return practiceData?.getSubjectByTitle?.(title) || (title === fallbackSubject.title ? fallbackSubject : null);
 }
 
-function storageKey(kind, subject = getSelectedSubject()) {
-  return practiceData?.storageKey?.(kind, subject) || `ap-practice-${subject.slug}-${kind}-state-v1`;
+function storageKey(kind, subject = getSelectedSubject(), scope = "") {
+  return practiceData?.storageKey?.(kind, subject, scope) || `ap-practice-${subject.slug}-${kind}${scope ? "-" + normalizeSearch(scope).replaceAll(" ", "-") : ""}-state-v1`;
 }
 
 function totalMinutes(format) {
@@ -276,6 +276,7 @@ function updateTimelineDeadlineState(item, now) {
 
 function applyTimelineFilter(sessions, deadlines, filter, timelineNow, actualNow, timeZone) {
   const empty = document.getElementById("timelineEmpty");
+  const deadlineRow = document.querySelector(".deadline-row");
   sessions.forEach((item) => {
     const status = timelineSessionStatus(item, timelineNow);
     const visible = filter === "all"
@@ -304,6 +305,7 @@ function applyTimelineFilter(sessions, deadlines, filter, timelineNow, actualNow
 
   const hasVisibleSession = sessions.some((item) => !item.session.hidden);
   const hasVisibleDeadline = deadlines.some((item) => !item.card.hidden);
+  if (deadlineRow) deadlineRow.hidden = !hasVisibleDeadline;
   if (empty) {
     empty.hidden = hasVisibleSession || hasVisibleDeadline;
     empty.textContent = filter === "today"
@@ -330,12 +332,14 @@ function initTimelineTimezone() {
     timeZone = getTimelineTimeZone();
 
     if (timeZoneLabel) {
-      timeZoneLabel.textContent = timezoneSelect?.value === "auto"
-        ? `Auto: ${formatTimeZoneName(timeZone)}`
-        : formatTimeZoneName(timeZone);
+      timeZoneLabel.textContent = "Timezone";
+    }
+    if (timezoneSelect) {
+      const autoOption = timezoneSelect.querySelector("option[value=\"auto\"]");
+      if (autoOption) autoOption.textContent = `Auto (${formatTimeZoneName(timeZone)})`;
     }
     if (scheduleCopy) {
-      scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${timeZone}.`;
+      scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${formatTimeZoneName(timeZone)}.`;
     }
 
     document.querySelectorAll("[data-deadline-utc]").forEach((item) => {
@@ -412,25 +416,36 @@ function formatReadyCopy(mode, subject = getSelectedSubject()) {
   const fullTime = totalMinutes(format);
   const mcqWeight = formatWeight(format.mcqWeight);
   const frqWeight = formatWeight(format.frqWeight);
+  const focus = practiceData?.getUnitFilter?.(subject);
+  const focusCopy = focus ? ` Focus: ${focus}.` : "";
+  const mcqCount = focus && practiceData?.buildMcqQuestions
+    ? Math.max(1, practiceData.filterItemsByUnit(practiceData.buildMcqQuestions(subject), focus).length)
+    : format.mcqCount;
+  const frqCount = focus && practiceData?.buildFrqItems
+    ? Math.max(1, practiceData.buildFrqItems(subject, focus).length)
+    : format.frqCount;
+  const mcqMinutes = focus ? Math.max(5, Math.round(format.mcqMinutes * (mcqCount / format.mcqCount))) : format.mcqMinutes;
+  const frqMinutes = focus ? Math.max(10, Math.round(format.frqMinutes * (frqCount / format.frqCount))) : format.frqMinutes;
+  const practiceMinutes = focus ? mcqMinutes + frqMinutes : fullTime;
 
   if (mode === "full") {
     return {
       title: `Ready for ${subject.title} Full Practice?`,
-      detail: `You will start with Section I, then move to Section II. Total practice time: ${fullTime} minutes.`
+      detail: `You will start with Section I, then move to Section II. Total practice time: ${practiceMinutes} minutes.${focusCopy}`
     };
   }
 
   if (mode === "mcq") {
     return {
       title: `Ready for ${subject.title} Section I?`,
-      detail: `${format.mcqCount} multiple-choice questions. ${format.mcqMinutes} minutes. ${mcqWeight} of the exam score.`
+      detail: `${mcqCount} multiple-choice questions. ${mcqMinutes} minutes. ${mcqWeight} of the exam score.${focusCopy}`
     };
   }
 
   if (mode === "frq") {
     return {
       title: `Ready for ${subject.title} Section II?`,
-      detail: `${format.frqCount} free-response questions. ${format.frqMinutes} minutes. ${frqWeight} of the exam score.`
+      detail: `${frqCount} free-response questions. ${frqMinutes} minutes. ${frqWeight} of the exam score.${focusCopy}`
     };
   }
 
@@ -439,7 +454,7 @@ function formatReadyCopy(mode, subject = getSelectedSubject()) {
 
 function readMcqProgress(subject = getSelectedSubject()) {
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey("mcq", subject)) || "{}");
+    const saved = JSON.parse(localStorage.getItem(storageKey("mcq", subject, practiceData?.getUnitFilter?.(subject) || "")) || "{}");
     if (!Array.isArray(saved.answers)) return { answered: 0, submitted: false };
     return {
       answered: saved.answers.filter((answer) => answer !== null).length,
@@ -452,7 +467,7 @@ function readMcqProgress(subject = getSelectedSubject()) {
 
 function readFrqProgress(subject = getSelectedSubject()) {
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey("frq", subject)) || "{}");
+    const saved = JSON.parse(localStorage.getItem(storageKey("frq", subject, practiceData?.getUnitFilter?.(subject) || "")) || "{}");
     if (!Array.isArray(saved.answers)) return { answered: 0, submitted: false };
     return {
       answered: saved.answers.filter((answers) =>
@@ -467,7 +482,7 @@ function readFrqProgress(subject = getSelectedSubject()) {
 
 function readSectionState(kind, subject = getSelectedSubject()) {
   try {
-    return JSON.parse(localStorage.getItem(storageKey(kind, subject)) || "{}");
+    return JSON.parse(localStorage.getItem(storageKey(kind, subject, practiceData?.getUnitFilter?.(subject) || "")) || "{}");
   } catch {
     return {};
   }
@@ -554,6 +569,8 @@ function updateHomeProgress() {
         ? `Resume ${frq.answered}/${format.frqCount}`
         : "Open FRQ";
   }
+
+  updateStudyDashboard(subject);
 }
 
 function setPracticeLinksAvailable(available) {
@@ -570,6 +587,75 @@ function setPracticeLinksAvailable(available) {
   });
 }
 
+function formatAttemptDate(isoString) {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(new Date(isoString));
+  } catch {
+    return "Recent";
+  }
+}
+
+function countSavedFlags(subject = getSelectedSubject()) {
+  const unit = practiceData?.getUnitFilter?.(subject) || "";
+  const mcq = readSectionState("mcq", subject);
+  const frq = readSectionState("frq", subject);
+  const mcqFlags = Array.isArray(mcq.flagged) ? mcq.flagged.filter(Boolean).length : 0;
+  const frqFlags = Array.isArray(frq.flagged) ? frq.flagged.filter(Boolean).length : 0;
+  if (!unit) return mcqFlags + frqFlags;
+
+  return mcqFlags + frqFlags;
+}
+
+function updateStudyDashboard(subject = getSelectedSubject()) {
+  const focus = practiceData?.getUnitFilter?.(subject) || "";
+  const mcq = readMcqProgress(subject);
+  const frq = readFrqProgress(subject);
+  const history = practiceData?.getScoreHistory?.() || [];
+  const subjectHistory = history.filter((item) => item.subjectSlug === subject.slug);
+  const latest = subjectHistory[0] || null;
+  const focusEl = document.getElementById("dashboardFocus");
+  const subjectEl = document.getElementById("dashboardSubject");
+  const progressEl = document.getElementById("dashboardProgress");
+  const progressHint = document.getElementById("dashboardProgressHint");
+  const scoreEl = document.getElementById("dashboardLastScore");
+  const scoreMeta = document.getElementById("dashboardLastScoreMeta");
+  const flagsEl = document.getElementById("dashboardFlags");
+  const historyList = document.getElementById("scoreHistoryList");
+
+  if (focusEl) focusEl.textContent = focus || "All units";
+  if (subjectEl) subjectEl.textContent = subject.title;
+  if (progressEl) {
+    progressEl.textContent = mcq.answered || frq.answered
+      ? `${mcq.answered}/${subject.format.mcqCount} MCQ · ${frq.answered}/${subject.format.frqCount} FRQ`
+      : "No saved work";
+  }
+  if (progressHint) {
+    progressHint.textContent = focus ? "Showing saved work for this focus." : "MCQ and FRQ save locally.";
+  }
+  if (latest && scoreEl && scoreMeta) {
+    scoreEl.textContent = `${Math.round(latest.percent)}%`;
+    scoreMeta.textContent = `${latest.mode} · ${formatAttemptDate(latest.date)}`;
+  } else {
+    if (scoreEl) scoreEl.textContent = "--";
+    if (scoreMeta) scoreMeta.textContent = "Submit a section to track scores.";
+  }
+  if (flagsEl) {
+    const count = countSavedFlags(subject);
+    flagsEl.textContent = `${count} saved`;
+  }
+  if (historyList) {
+    const rows = (subjectHistory.length ? subjectHistory : history).slice(0, 4);
+    historyList.innerHTML = rows.length
+      ? rows.map((item) => '<li><strong>' + escapeHomeHtml(item.subjectShort || item.subjectTitle || "AP") + ' ' + escapeHomeHtml(item.mode || "Practice") + '</strong><span>' + Math.round(Number(item.percent) || 0) + '% · ' + escapeHomeHtml(formatAttemptDate(item.date)) + '</span></li>').join("")
+      : '<li><strong>No attempts yet</strong><span>Submit MCQ or FRQ to build history.</span></li>';
+  }
+}
+
 function updateModePopoutCopy(subject, available = true) {
   const subjectObject = typeof subject === "string" ? getSubjectByTitle(subject) || getSelectedSubject() : subject;
   const format = subjectObject.format;
@@ -578,33 +664,68 @@ function updateModePopoutCopy(subject, available = true) {
   const fullCard = document.querySelector("[data-mode=\"full\"]");
   const mcqCard = document.querySelector("[data-mode=\"mcq\"]");
   const frqCard = document.querySelector("[data-mode=\"frq\"]");
+  const unitSelect = document.getElementById("unitFocusSelect");
+  const officialLinks = practiceData?.officialLinksForSubject?.(subjectObject);
+  const studentsLink = document.getElementById("officialStudentsLink");
+  const centralLink = document.getElementById("officialCentralLink");
 
   if (subjectName) subjectName.textContent = subjectObject.title;
+  if (unitSelect) {
+    const currentUnit = practiceData?.getUnitFilter?.(subjectObject) || "";
+    unitSelect.innerHTML = '<option value="">All units</option>' + subjectObject.units.map((unit) =>
+      '<option value="' + escapeHomeHtml(unit) + '">' + escapeHomeHtml(unit) + '</option>'
+    ).join("");
+    unitSelect.value = currentUnit;
+  }
+
+  if (studentsLink && officialLinks) studentsLink.href = officialLinks.students;
+  if (centralLink && officialLinks) centralLink.href = officialLinks.central;
+
+  const currentFocus = practiceData?.getUnitFilter?.(subjectObject) || "";
+  const mcqCount = currentFocus && practiceData?.buildMcqQuestions
+    ? Math.max(1, practiceData.filterItemsByUnit(practiceData.buildMcqQuestions(subjectObject), currentFocus).length)
+    : format.mcqCount;
+  const frqCount = currentFocus && practiceData?.buildFrqItems
+    ? Math.max(1, practiceData.buildFrqItems(subjectObject, currentFocus).length)
+    : format.frqCount;
+  const mcqMinutes = currentFocus ? Math.max(5, Math.round(format.mcqMinutes * (mcqCount / format.mcqCount))) : format.mcqMinutes;
+  const frqMinutes = currentFocus ? Math.max(10, Math.round(format.frqMinutes * (frqCount / format.frqCount))) : format.frqMinutes;
+
   if (status) {
     status.textContent = available
-      ? `${format.note || "Practice made by Alan."}`
+      ? `${format.note || "Practice made by Alan."}${currentFocus ? " Focus: " + currentFocus + "." : ""}`
       : "Practice for this subject is coming soon.";
   }
 
   if (fullCard) {
-    fullCard.querySelector("strong").textContent = `${totalMinutes(format)} min`;
-    fullCard.querySelector("span:last-child").textContent = `${format.mcqCount} MCQ + ${format.frqCount} FRQ`;
+    fullCard.querySelector("strong").textContent = `${currentFocus ? mcqMinutes + frqMinutes : totalMinutes(format)} min`;
+    fullCard.querySelector("span:last-child").textContent = `${mcqCount} MCQ + ${frqCount} FRQ`;
   }
 
   if (mcqCard) {
-    mcqCard.querySelector("strong").textContent = `${format.mcqCount} MCQ`;
-    mcqCard.querySelector("span:last-child").textContent = `${format.mcqMinutes} min · ${formatWeight(format.mcqWeight)}`;
+    mcqCard.querySelector("strong").textContent = `${mcqCount} MCQ`;
+    mcqCard.querySelector("span:last-child").textContent = `${mcqMinutes} min · ${formatWeight(format.mcqWeight)}`;
   }
 
   if (frqCard) {
-    frqCard.querySelector("strong").textContent = `${format.frqCount} FRQ`;
-    frqCard.querySelector("span:last-child").textContent = `${format.frqMinutes} min · ${formatWeight(format.frqWeight)}`;
+    frqCard.querySelector("strong").textContent = `${frqCount} FRQ`;
+    frqCard.querySelector("span:last-child").textContent = `${frqMinutes} min · ${formatWeight(format.frqWeight)}`;
   }
 }
 
 function updateFullPracticePage(subject = getSelectedSubject()) {
   if (!document.querySelector(".path-page")) return;
   const format = subject.format;
+  const focus = practiceData?.getUnitFilter?.(subject) || "";
+  const mcqCount = focus && practiceData?.buildMcqQuestions
+    ? Math.max(1, practiceData.filterItemsByUnit(practiceData.buildMcqQuestions(subject), focus).length)
+    : format.mcqCount;
+  const frqCount = focus && practiceData?.buildFrqItems
+    ? Math.max(1, practiceData.buildFrqItems(subject, focus).length)
+    : format.frqCount;
+  const mcqMinutes = focus ? Math.max(5, Math.round(format.mcqMinutes * (mcqCount / format.mcqCount))) : format.mcqMinutes;
+  const frqMinutes = focus ? Math.max(10, Math.round(format.frqMinutes * (frqCount / format.frqCount))) : format.frqMinutes;
+  const practiceMinutes = focus ? mcqMinutes + frqMinutes : totalMinutes(format);
   const topbarMeta = document.querySelector(".topbar .brand-block p");
   const pathHeroTitle = document.querySelector(".path-hero h2");
   const pathHeroCopy = document.querySelector(".path-hero p");
@@ -614,14 +735,14 @@ function updateFullPracticePage(subject = getSelectedSubject()) {
   document.title = `AP Exam Practice | ${subject.title} Full Practice`;
   if (topbarMeta) topbarMeta.textContent = `${subject.title} · MCQ, then FRQ`;
   if (pathHeroTitle) pathHeroTitle.textContent = `${subject.short} full practice.`;
-  if (pathHeroCopy) pathHeroCopy.textContent = `Start with ${format.mcqCount} MCQ, then complete ${format.frqCount} FRQ. Auto-saved.`;
-  if (pathTotal) pathTotal.textContent = `${totalMinutes(format)} min`;
+  if (pathHeroCopy) pathHeroCopy.textContent = `Start with ${mcqCount} MCQ, then complete ${frqCount} FRQ. Auto-saved.${focus ? " Focus: " + focus + "." : ""}`;
+  if (pathTotal) pathTotal.textContent = `${practiceMinutes} min`;
 
   if (pathCards[0]) {
-    pathCards[0].querySelector("p").textContent = `${format.mcqCount} questions. ${format.mcqMinutes} minutes. ${formatWeight(format.mcqWeight)}.`;
+    pathCards[0].querySelector("p").textContent = `${mcqCount} questions. ${mcqMinutes} minutes. ${formatWeight(format.mcqWeight)}.`;
   }
   if (pathCards[1]) {
-    pathCards[1].querySelector("p").textContent = `${format.frqCount} questions. ${format.frqMinutes} minutes. ${formatWeight(format.frqWeight)}.`;
+    pathCards[1].querySelector("p").textContent = `${frqCount} questions. ${frqMinutes} minutes. ${formatWeight(format.frqWeight)}.`;
   }
 
   updateFullScoreCard(subject);
@@ -656,6 +777,7 @@ function initSubjectPicker() {
   const grid = document.getElementById("subjectGrid");
   const searchInput = document.getElementById("subjectSearch");
   const sortSelect = document.getElementById("subjectSort");
+  const unitSelect = document.getElementById("unitFocusSelect");
   let cardsArray = [];
 
   if (!grid || !practiceData?.subjects?.length) return;
@@ -726,6 +848,15 @@ function initSubjectPicker() {
     sortSelect.addEventListener("change", () => {
       localStorage.setItem(SUBJECT_SORT_KEY, getSubjectSortMode(sortSelect.value));
       refreshCards();
+    });
+  }
+
+  if (unitSelect) {
+    unitSelect.addEventListener("change", () => {
+      const subject = getSelectedSubject();
+      practiceData?.setUnitFilter?.(subject, unitSelect.value);
+      updateModePopoutCopy(subject, true);
+      updateHomeProgress();
     });
   }
 

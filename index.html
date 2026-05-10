@@ -47,6 +47,44 @@
           <div class="subject-grid" id="subjectGrid" aria-label="AP subject options"></div>
         </section>
 
+        <section class="study-dashboard-panel" aria-labelledby="studyDashboardTitle">
+          <div class="subject-heading">
+            <div>
+              <h2 id="studyDashboardTitle">Study Dashboard</h2>
+            </div>
+            <a class="small-pill" href="mcq.html" data-resume-link>Start</a>
+          </div>
+          <div class="dashboard-grid" aria-label="Study progress summary">
+            <div class="dashboard-card">
+              <span>Focus</span>
+              <strong id="dashboardFocus">All units</strong>
+              <em id="dashboardSubject">Select a subject</em>
+            </div>
+            <div class="dashboard-card">
+              <span>Progress</span>
+              <strong id="dashboardProgress">No saved work</strong>
+              <em id="dashboardProgressHint">MCQ and FRQ save locally.</em>
+            </div>
+            <div class="dashboard-card">
+              <span>Last Score</span>
+              <strong id="dashboardLastScore">--</strong>
+              <em id="dashboardLastScoreMeta">Submit a section to track scores.</em>
+            </div>
+            <div class="dashboard-card">
+              <span>Flags</span>
+              <strong id="dashboardFlags">0 saved</strong>
+              <em>Flag questions to revisit them in review.</em>
+            </div>
+          </div>
+          <div class="score-history-card">
+            <div>
+              <span>History</span>
+              <strong>Recent attempts</strong>
+            </div>
+            <ol id="scoreHistoryList" aria-label="Recent score history"></ol>
+          </div>
+        </section>
+
         <section class="home-info-panel" aria-labelledby="homeInfoTitle">
           <h2 id="homeInfoTitle" class="sr-only">Official AP test day links</h2>
           <div class="home-info-grid">
@@ -74,7 +112,24 @@
               <span>2026</span>
               <h2 id="examTimelineTitle">AP Test Timeline</h2>
             </div>
-            <div class="timeline-actions"><label class="timezone-picker" for="timelineTimezoneSelect"><span id="timelineTimezone">Device timezone</span><select id="timelineTimezoneSelect" aria-label="Timeline timezone"><option value="auto">Auto</option><option value="America/New_York">Eastern</option><option value="America/Chicago">Central</option><option value="America/Denver">Mountain</option><option value="America/Los_Angeles">Pacific</option><option value="America/Anchorage">Alaska</option><option value="Pacific/Honolulu">Hawaii</option><option value="Asia/Bangkok">Bangkok</option><option value="Europe/London">London</option><option value="UTC">UTC</option></select></label><a href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">Official Schedule</a></div>
+            <div class="timeline-actions">
+              <label class="timezone-picker" for="timelineTimezoneSelect">
+                <span id="timelineTimezone">Timezone</span>
+                <select id="timelineTimezoneSelect" aria-label="Timeline timezone">
+                  <option value="auto">Auto</option>
+                  <option value="America/New_York">Eastern</option>
+                  <option value="America/Chicago">Central</option>
+                  <option value="America/Denver">Mountain</option>
+                  <option value="America/Los_Angeles">Pacific</option>
+                  <option value="America/Anchorage">Alaska</option>
+                  <option value="Pacific/Honolulu">Hawaii</option>
+                  <option value="Asia/Bangkok">Bangkok</option>
+                  <option value="Europe/London">London</option>
+                  <option value="UTC">UTC</option>
+                </select>
+              </label>
+              <a href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">Official Schedule</a>
+            </div>
           </div>
           <div class="timeline-live-card" aria-live="polite">
             <span id="timelineLiveLabel">Live schedule</span>
@@ -128,6 +183,12 @@
               </button>
             </div>
             <p id="modePopoutStatus">Choose one option to begin.</p>
+            <label class="unit-picker" for="unitFocusSelect">
+              <span>Practice focus</span>
+              <select id="unitFocusSelect" aria-label="Choose unit focus">
+                <option value="">All units</option>
+              </select>
+            </label>
             <div class="mode-grid" id="modeGrid" aria-label="Practice modes">
               <a class="mode-card is-selected" href="full.html" data-mode="full" data-ready="full">
                 <span class="mode-title">Full Exam</span>
@@ -144,6 +205,10 @@
                 <strong>6 FRQ</strong>
                 <span>90 minutes</span>
               </a>
+            </div>
+            <div class="official-subject-links" id="officialSubjectLinks" aria-label="Official subject resources">
+              <a id="officialStudentsLink" href="https://apstudents.collegeboard.org/courses" target="_blank" rel="noreferrer">AP Students</a>
+              <a id="officialCentralLink" href="https://apcentral.collegeboard.org/courses" target="_blank" rel="noreferrer">AP Central</a>
             </div>
           </section>
         </div>

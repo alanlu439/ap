@@ -70,6 +70,7 @@
                 <span aria-hidden="true">‹</span>
               </button>
               <button class="text-button secondary" id="flagBtn" type="button">Flag</button>
+              <button class="text-button secondary" id="guessBtn" type="button">Guess</button>
               <button class="text-button secondary" id="clearBtn" type="button">Clear</button>
               <button class="text-button primary" id="startBtn" type="button">Start Timer</button>
               <button class="icon-button secondary" id="nextBtn" type="button" aria-label="Next question">
@@ -85,6 +86,20 @@
             </div>
             <p id="reviewExplanation"></p>
             <div class="tags" id="reviewTags"></div>
+            <div class="review-tools">
+              <label for="reviewFilter">
+                <span>Review</span>
+                <select id="reviewFilter" aria-label="Filter reviewed questions">
+                  <option value="all">All questions</option>
+                  <option value="missed">Missed only</option>
+                  <option value="flagged">Flagged</option>
+                  <option value="guessed">Guessed</option>
+                  <option value="unit">This unit</option>
+                </select>
+              </label>
+              <button class="text-button secondary compact" id="printSummaryBtn" type="button">Print Summary</button>
+            </div>
+            <div class="review-list" id="reviewList" aria-label="Question review list"></div>
           </section>
         </section>
 
