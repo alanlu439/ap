@@ -51,11 +51,6 @@
           <div class="subject-heading dashboard-heading">
             <div>
               <h2 id="studyDashboardTitle">Study Dashboard</h2>
-              <p id="dashboardSummary">Select a subject to see progress, scores, and review priorities.</p>
-            </div>
-            <div class="dashboard-quick-actions">
-              <button class="small-pill secondary" type="button" id="dashboardChooseBtn">Choose Section</button>
-              <a class="small-pill" href="mcq.html" data-resume-link id="dashboardResumeLink">Start</a>
             </div>
           </div>
           <div class="dashboard-hero-card">
@@ -67,6 +62,20 @@
               <span id="dashboardSubjectBadge">No subject selected</span>
               <strong id="dashboardNextStep">Pick a subject to begin.</strong>
               <em id="dashboardNextMeta">Your work saves in this browser.</em>
+              <div class="dashboard-hero-stats" aria-label="Dashboard overview">
+                <div>
+                  <span>Subject</span>
+                  <strong id="dashboardHeroSubject">--</strong>
+                </div>
+                <div>
+                  <span>Next</span>
+                  <strong id="dashboardHeroNext">MCQ</strong>
+                </div>
+                <div>
+                  <span>Review</span>
+                  <strong id="dashboardHeroReview">0 items</strong>
+                </div>
+              </div>
               <div class="dashboard-progress-track" aria-hidden="true"><span id="dashboardOverallBar"></span></div>
             </div>
           </div>

@@ -175,10 +175,83 @@ function collectTimelineSessions(timeline) {
     const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
     const name = session.querySelector("strong")?.textContent?.trim() || "AP exam";
     const timeLabel = session.querySelector("[data-time-local]")?.dataset.timeLocal || session.querySelector("[data-time-local]")?.textContent?.trim() || "";
-    const dateLabel = day?.querySelector(".timeline-date")?.textContent?.trim() || "";
+    const dateLabel = day?.dataset.dateLabel || day?.querySelector(".timeline-date")?.textContent?.trim() || "";
 
     return { session, day, start, end, name, timeLabel, dateLabel };
   }).sort((first, second) => first.start - second.start);
+}
+
+function setTimelineDayCollapsed(day, collapsed) {
+  const toggle = day?.querySelector(".timeline-date-toggle");
+  if (!day || !toggle) return;
+  day.classList.toggle("is-collapsed", collapsed);
+  toggle.setAttribute("aria-expanded", String(!collapsed));
+}
+
+function enhanceTimelineDays(timeline) {
+  Array.from(timeline.querySelectorAll(".timeline-day")).forEach((day, index) => {
+    if (day.querySelector(".timeline-day-body")) return;
+
+    const dateNode = day.querySelector(".timeline-date");
+    const labelText = dateNode?.textContent?.trim() || `Day ${index + 1}`;
+    const body = document.createElement("div");
+    const safeDate = (day.dataset.date || String(index)).replace(/[^a-z0-9-]/gi, "-");
+    const sessions = Array.from(day.querySelectorAll(".timeline-session"));
+
+    body.className = "timeline-day-body";
+    body.id = `timeline-day-${safeDate}`;
+    sessions.forEach((session) => body.appendChild(session));
+
+    if (dateNode) {
+      const toggle = document.createElement("button");
+      const label = document.createElement("span");
+      const count = document.createElement("span");
+
+      toggle.type = "button";
+      toggle.className = "timeline-date timeline-date-toggle";
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-controls", body.id);
+
+      label.className = "timeline-date-label";
+      label.textContent = labelText;
+      count.className = "timeline-count";
+      count.textContent = `${sessions.length} ${sessions.length === 1 ? "exam" : "exams"}`;
+
+      toggle.append(label, count);
+      dateNode.replaceWith(toggle);
+    }
+
+    day.dataset.dateLabel = labelText;
+    day.appendChild(body);
+    setTimelineDayCollapsed(day, true);
+  });
+}
+
+function syncTimelineDayCollapse(sessions, filter, selectedSession, timelineNow, manuallyToggledDays) {
+  const days = [...new Set(sessions.map((item) => item.day).filter(Boolean))];
+
+  days.forEach((day) => {
+    const visibleSessions = sessions.filter((item) => item.day === day && !item.session.hidden);
+    const count = day.querySelector(".timeline-count");
+    const visibleCount = visibleSessions.length;
+
+    if (count) {
+      const countValue = visibleCount || sessions.filter((item) => item.day === day).length;
+      count.textContent = `${countValue} ${countValue === 1 ? "exam" : "exams"}`;
+    }
+
+    if (day.hidden || manuallyToggledDays.has(day)) return;
+
+    const shouldExpand = visibleSessions.some((item) => {
+      const status = timelineSessionStatus(item, timelineNow);
+      return item === selectedSession
+        || status === "live"
+        || item.session.classList.contains("is-next")
+        || (filter === "today" && sameTimelineDay(item.start, timelineNow));
+    });
+
+    setTimelineDayCollapsed(day, !shouldExpand);
+  });
 }
 
 function collectTimelineDeadlines(timeline) {
@@ -318,6 +391,8 @@ function initTimelineTimezone() {
   const timeline = document.querySelector(".exam-timeline-panel");
   if (!timeline) return;
 
+  enhanceTimelineDays(timeline);
+
   let timeZone = getTimelineTimeZone();
   const timezoneSelect = document.getElementById("timelineTimezoneSelect");
   const timeZoneLabel = document.getElementById("timelineTimezone");
@@ -358,6 +433,7 @@ function initTimelineTimezone() {
   const sessions = collectTimelineSessions(timeline);
   const deadlines = collectTimelineDeadlines(timeline);
   const filters = Array.from(timeline.querySelectorAll("[data-timeline-filter]"));
+  const manuallyToggledDays = new Set();
   let activeFilter = "all";
   let selectedSession = null;
 
@@ -368,6 +444,7 @@ function initTimelineTimezone() {
     sessions.forEach((item) => updateTimelineSessionState(item, timelineNow, nextSession, selectedSession));
     deadlines.forEach((item) => updateTimelineDeadlineState(item, actualNow));
     applyTimelineFilter(sessions, deadlines, activeFilter, timelineNow, actualNow, timeZone);
+    syncTimelineDayCollapse(sessions, activeFilter, selectedSession, timelineNow, manuallyToggledDays);
     updateTimelineLiveCard(sessions, selectedSession, timelineNow);
   };
 
@@ -376,6 +453,7 @@ function initTimelineTimezone() {
       activeFilter = button.dataset.timelineFilter || "all";
       filters.forEach((item) => item.classList.toggle("is-active", item === button));
       selectedSession = null;
+      manuallyToggledDays.clear();
       refreshTimeline();
     });
   });
@@ -390,6 +468,15 @@ function initTimelineTimezone() {
     item.session.addEventListener("click", () => {
       selectedSession = selectedSession === item ? null : item;
       refreshTimeline();
+    });
+  });
+
+  timeline.querySelectorAll(".timeline-date-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      const day = button.closest(".timeline-day");
+      if (!day) return;
+      manuallyToggledDays.add(day);
+      setTimelineDayCollapsed(day, !day.classList.contains("is-collapsed"));
     });
   });
 
@@ -670,14 +757,15 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const weakUnit = latest?.weakUnits?.[0] || "";
   const focusEl = document.getElementById("dashboardFocus");
   const subjectEl = document.getElementById("dashboardSubject");
-  const summaryEl = document.getElementById("dashboardSummary");
   const ring = document.getElementById("dashboardRing");
   const ringValue = document.getElementById("dashboardRingValue");
   const subjectBadge = document.getElementById("dashboardSubjectBadge");
   const nextStep = document.getElementById("dashboardNextStep");
   const nextMeta = document.getElementById("dashboardNextMeta");
   const overallBar = document.getElementById("dashboardOverallBar");
-  const resumeLink = document.getElementById("dashboardResumeLink") || document.querySelector("[data-resume-link]");
+  const heroSubject = document.getElementById("dashboardHeroSubject");
+  const heroNext = document.getElementById("dashboardHeroNext");
+  const heroReview = document.getElementById("dashboardHeroReview");
   const mcqEl = document.getElementById("dashboardMcqProgress");
   const mcqHint = document.getElementById("dashboardMcqHint");
   const frqEl = document.getElementById("dashboardFrqProgress");
@@ -690,14 +778,11 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const weakMeta = document.getElementById("dashboardWeakMeta");
   const historyList = document.getElementById("scoreHistoryList");
 
-  if (summaryEl) {
-    summaryEl.textContent = focus
-      ? `${subject.title} · focused practice for ${focus}.`
-      : `${subject.title} · all units.`;
-  }
   if (focusEl) focusEl.textContent = focus || "All units";
   if (subjectEl) subjectEl.textContent = subject.title;
-  if (subjectBadge) subjectBadge.textContent = subject.short || subject.title;
+  if (subjectBadge) subjectBadge.textContent = "User Dashboard";
+  if (heroSubject) heroSubject.textContent = subject.short || subject.title;
+  if (heroReview) heroReview.textContent = formatDashboardItems(reviewQueue);
   if (ring) ring.style.setProperty("--dashboard-progress", progressPercent + "%");
   if (ringValue) ringValue.textContent = progressPercent + "%";
   if (overallBar) overallBar.style.width = progressPercent + "%";
@@ -721,20 +806,18 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
         ? "Resume Section II."
         : `${meta.frqMinutes} minutes.`;
   }
-  if (nextStep && nextMeta && resumeLink) {
+  if (nextStep && nextMeta) {
+    const progressCopy = `${progressAnswered} of ${progressTotal} tasks complete${focus ? " · " + focus : ""}.`;
     if (!mcq.submitted) {
-      resumeLink.href = "mcq.html";
-      resumeLink.textContent = mcq.answered ? "Resume MCQ" : "Start MCQ";
-      nextStep.textContent = mcq.answered ? "Continue Section I." : "Start Section I.";
-      nextMeta.textContent = `${Math.min(mcq.answered, meta.mcqCount)} of ${meta.mcqCount} MCQs answered${focus ? " for " + focus : ""}.`;
+      if (heroNext) heroNext.textContent = mcq.answered ? "Resume MCQ" : "Section I";
+      nextStep.textContent = mcq.answered ? "Continue MCQ practice." : "Ready for MCQ practice.";
+      nextMeta.textContent = progressCopy;
     } else if (!frq.submitted) {
-      resumeLink.href = "frq.html";
-      resumeLink.textContent = frq.answered ? "Resume FRQ" : "Start FRQ";
-      nextStep.textContent = frq.answered ? "Continue Section II." : "Move to Section II.";
-      nextMeta.textContent = `${Math.min(frq.answered, meta.frqCount)} of ${meta.frqCount} FRQs started${focus ? " for " + focus : ""}.`;
+      if (heroNext) heroNext.textContent = frq.answered ? "Resume FRQ" : "Section II";
+      nextStep.textContent = frq.answered ? "Continue FRQ practice." : "Ready for FRQ practice.";
+      nextMeta.textContent = progressCopy;
     } else {
-      resumeLink.href = "mcq.html";
-      resumeLink.textContent = "Review";
+      if (heroNext) heroNext.textContent = "Review";
       nextStep.textContent = "Review submitted work.";
       nextMeta.textContent = "Both sections have submitted work saved locally.";
     }
@@ -894,7 +977,6 @@ function initSubjectPicker() {
   const searchInput = document.getElementById("subjectSearch");
   const sortSelect = document.getElementById("subjectSort");
   const unitSelect = document.getElementById("unitFocusSelect");
-  const dashboardChooseBtn = document.getElementById("dashboardChooseBtn");
   let cardsArray = [];
 
   if (!grid || !practiceData?.subjects?.length) return;
@@ -976,11 +1058,6 @@ function initSubjectPicker() {
       updateHomeProgress();
     });
   }
-
-  dashboardChooseBtn?.addEventListener("click", () => {
-    updateModePopoutCopy(getSelectedSubject(), true);
-    jumpToModeSelection();
-  });
 
   if (searchInput) {
     searchInput.addEventListener("input", updateSearchResults);
