@@ -601,57 +601,173 @@ function formatAttemptDate(isoString) {
 }
 
 function countSavedFlags(subject = getSelectedSubject()) {
-  const unit = practiceData?.getUnitFilter?.(subject) || "";
   const mcq = readSectionState("mcq", subject);
   const frq = readSectionState("frq", subject);
   const mcqFlags = Array.isArray(mcq.flagged) ? mcq.flagged.filter(Boolean).length : 0;
   const frqFlags = Array.isArray(frq.flagged) ? frq.flagged.filter(Boolean).length : 0;
-  if (!unit) return mcqFlags + frqFlags;
-
   return mcqFlags + frqFlags;
 }
 
-function updateStudyDashboard(subject = getSelectedSubject()) {
+function countSavedGuesses(subject = getSelectedSubject()) {
+  const mcq = readSectionState("mcq", subject);
+  return Array.isArray(mcq.guessed) ? mcq.guessed.filter(Boolean).length : 0;
+}
+
+function getFocusedPracticeMeta(subject = getSelectedSubject()) {
   const focus = practiceData?.getUnitFilter?.(subject) || "";
+  const format = subject.format;
+  const mcqItems = practiceData?.buildMcqQuestions?.(subject) || [];
+  const focusedMcq = focus && practiceData?.filterItemsByUnit ? practiceData.filterItemsByUnit(mcqItems, focus) : mcqItems;
+  const frqItems = practiceData?.buildFrqItems?.(subject, focus) || [];
+  const mcqCount = focus ? Math.max(1, focusedMcq.length) : format.mcqCount;
+  const frqCount = focus ? Math.max(1, frqItems.length) : format.frqCount;
+
+  return {
+    focus,
+    mcqItems: focus ? focusedMcq : mcqItems,
+    mcqCount,
+    frqCount,
+    mcqMinutes: focus ? Math.max(5, Math.round(format.mcqMinutes * (mcqCount / format.mcqCount))) : format.mcqMinutes,
+    frqMinutes: focus ? Math.max(10, Math.round(format.frqMinutes * (frqCount / format.frqCount))) : format.frqMinutes
+  };
+}
+
+function countSavedMisses(subject = getSelectedSubject()) {
+  const saved = readSectionState("mcq", subject);
+  if (!saved.submitted || !Array.isArray(saved.answers)) return 0;
+  const questions = getFocusedPracticeMeta(subject).mcqItems;
+  if (!questions.length || questions.length !== saved.answers.length) return 0;
+  return questions.reduce((total, question, index) => total + (saved.answers[index] === question.correct ? 0 : 1), 0);
+}
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function formatDashboardItems(count) {
+  return count + " item" + (count === 1 ? "" : "s");
+}
+
+function updateStudyDashboard(subject = getSelectedSubject()) {
+  const meta = getFocusedPracticeMeta(subject);
+  const focus = meta.focus;
   const mcq = readMcqProgress(subject);
   const frq = readFrqProgress(subject);
   const history = practiceData?.getScoreHistory?.() || [];
   const subjectHistory = history.filter((item) => item.subjectSlug === subject.slug);
-  const latest = subjectHistory[0] || null;
+  const focusHistory = focus ? subjectHistory.filter((item) => item.unitFocus === focus) : subjectHistory;
+  const rowsSource = focusHistory.length ? focusHistory : subjectHistory;
+  const latest = rowsSource[0] || subjectHistory[0] || null;
+  const best = subjectHistory.reduce((top, item) => Math.max(top, Number(item.percent) || 0), 0);
+  const previous = rowsSource[1] || null;
+  const progressTotal = meta.mcqCount + meta.frqCount;
+  const progressAnswered = Math.min(progressTotal, mcq.answered + frq.answered);
+  const progressPercent = progressTotal ? clampPercent((progressAnswered / progressTotal) * 100) : 0;
+  const missed = countSavedMisses(subject);
+  const flagged = countSavedFlags(subject);
+  const guessed = countSavedGuesses(subject);
+  const reviewQueue = missed + flagged + guessed;
+  const weakUnit = latest?.weakUnits?.[0] || "";
   const focusEl = document.getElementById("dashboardFocus");
   const subjectEl = document.getElementById("dashboardSubject");
-  const progressEl = document.getElementById("dashboardProgress");
-  const progressHint = document.getElementById("dashboardProgressHint");
+  const summaryEl = document.getElementById("dashboardSummary");
+  const ring = document.getElementById("dashboardRing");
+  const ringValue = document.getElementById("dashboardRingValue");
+  const subjectBadge = document.getElementById("dashboardSubjectBadge");
+  const nextStep = document.getElementById("dashboardNextStep");
+  const nextMeta = document.getElementById("dashboardNextMeta");
+  const overallBar = document.getElementById("dashboardOverallBar");
+  const resumeLink = document.getElementById("dashboardResumeLink") || document.querySelector("[data-resume-link]");
+  const mcqEl = document.getElementById("dashboardMcqProgress");
+  const mcqHint = document.getElementById("dashboardMcqHint");
+  const frqEl = document.getElementById("dashboardFrqProgress");
+  const frqHint = document.getElementById("dashboardFrqHint");
   const scoreEl = document.getElementById("dashboardLastScore");
   const scoreMeta = document.getElementById("dashboardLastScoreMeta");
-  const flagsEl = document.getElementById("dashboardFlags");
+  const reviewEl = document.getElementById("dashboardReviewQueue");
+  const reviewHint = document.getElementById("dashboardReviewHint");
+  const weakEl = document.getElementById("dashboardWeakUnit");
+  const weakMeta = document.getElementById("dashboardWeakMeta");
   const historyList = document.getElementById("scoreHistoryList");
 
+  if (summaryEl) {
+    summaryEl.textContent = focus
+      ? `${subject.title} · focused practice for ${focus}.`
+      : `${subject.title} · all units.`;
+  }
   if (focusEl) focusEl.textContent = focus || "All units";
   if (subjectEl) subjectEl.textContent = subject.title;
-  if (progressEl) {
-    progressEl.textContent = mcq.answered || frq.answered
-      ? `${mcq.answered}/${subject.format.mcqCount} MCQ · ${frq.answered}/${subject.format.frqCount} FRQ`
-      : "No saved work";
+  if (subjectBadge) subjectBadge.textContent = subject.short || subject.title;
+  if (ring) ring.style.setProperty("--dashboard-progress", progressPercent + "%");
+  if (ringValue) ringValue.textContent = progressPercent + "%";
+  if (overallBar) overallBar.style.width = progressPercent + "%";
+  if (mcqEl) {
+    mcqEl.textContent = `${Math.min(mcq.answered, meta.mcqCount)} / ${meta.mcqCount}`;
   }
-  if (progressHint) {
-    progressHint.textContent = focus ? "Showing saved work for this focus." : "MCQ and FRQ save locally.";
+  if (mcqHint) {
+    mcqHint.textContent = mcq.submitted
+      ? "Submitted. Review is open."
+      : mcq.answered
+        ? "Resume Section I."
+        : `${meta.mcqMinutes} minutes.`;
+  }
+  if (frqEl) {
+    frqEl.textContent = `${Math.min(frq.answered, meta.frqCount)} / ${meta.frqCount}`;
+  }
+  if (frqHint) {
+    frqHint.textContent = frq.submitted
+      ? "Submitted. Rubric review is open."
+      : frq.answered
+        ? "Resume Section II."
+        : `${meta.frqMinutes} minutes.`;
+  }
+  if (nextStep && nextMeta && resumeLink) {
+    if (!mcq.submitted) {
+      resumeLink.href = "mcq.html";
+      resumeLink.textContent = mcq.answered ? "Resume MCQ" : "Start MCQ";
+      nextStep.textContent = mcq.answered ? "Continue Section I." : "Start Section I.";
+      nextMeta.textContent = `${Math.min(mcq.answered, meta.mcqCount)} of ${meta.mcqCount} MCQs answered${focus ? " for " + focus : ""}.`;
+    } else if (!frq.submitted) {
+      resumeLink.href = "frq.html";
+      resumeLink.textContent = frq.answered ? "Resume FRQ" : "Start FRQ";
+      nextStep.textContent = frq.answered ? "Continue Section II." : "Move to Section II.";
+      nextMeta.textContent = `${Math.min(frq.answered, meta.frqCount)} of ${meta.frqCount} FRQs started${focus ? " for " + focus : ""}.`;
+    } else {
+      resumeLink.href = "mcq.html";
+      resumeLink.textContent = "Review";
+      nextStep.textContent = "Review submitted work.";
+      nextMeta.textContent = "Both sections have submitted work saved locally.";
+    }
   }
   if (latest && scoreEl && scoreMeta) {
     scoreEl.textContent = `${Math.round(latest.percent)}%`;
-    scoreMeta.textContent = `${latest.mode} · ${formatAttemptDate(latest.date)}`;
+    scoreMeta.textContent = `${latest.mode} · ${formatAttemptDate(latest.date)}${best ? " · best " + Math.round(best) + "%" : ""}`;
+    if (previous) {
+      const delta = Math.round((Number(latest.percent) || 0) - (Number(previous.percent) || 0));
+      if (delta !== 0) scoreMeta.textContent += ` · ${delta > 0 ? "+" : ""}${delta} pts`;
+    }
   } else {
     if (scoreEl) scoreEl.textContent = "--";
     if (scoreMeta) scoreMeta.textContent = "Submit a section to track scores.";
   }
-  if (flagsEl) {
-    const count = countSavedFlags(subject);
-    flagsEl.textContent = `${count} saved`;
+  if (reviewEl) reviewEl.textContent = formatDashboardItems(reviewQueue);
+  if (reviewHint) {
+    reviewHint.textContent = reviewQueue
+      ? `${missed} missed · ${flagged} flagged · ${guessed} guessed`
+      : "Missed, flagged, and guessed items appear here.";
+  }
+  if (weakEl) {
+    weakEl.textContent = weakUnit || "No data yet";
+  }
+  if (weakMeta) {
+    weakMeta.textContent = weakUnit
+      ? `Based on the latest ${latest?.mode || "practice"} attempt.`
+      : "Submit MCQ or FRQ to identify priority units.";
   }
   if (historyList) {
-    const rows = (subjectHistory.length ? subjectHistory : history).slice(0, 4);
+    const rows = (rowsSource.length ? rowsSource : history).slice(0, 4);
     historyList.innerHTML = rows.length
-      ? rows.map((item) => '<li><strong>' + escapeHomeHtml(item.subjectShort || item.subjectTitle || "AP") + ' ' + escapeHomeHtml(item.mode || "Practice") + '</strong><span>' + Math.round(Number(item.percent) || 0) + '% · ' + escapeHomeHtml(formatAttemptDate(item.date)) + '</span></li>').join("")
+      ? rows.map((item) => '<li><strong>' + escapeHomeHtml(item.subjectShort || item.subjectTitle || "AP") + ' ' + escapeHomeHtml(item.mode || "Practice") + '</strong><span>' + Math.round(Number(item.percent) || 0) + '% · ' + escapeHomeHtml(item.unitFocus || "All units") + '</span><em>' + escapeHomeHtml(formatAttemptDate(item.date)) + '</em></li>').join("")
       : '<li><strong>No attempts yet</strong><span>Submit MCQ or FRQ to build history.</span></li>';
   }
 }
@@ -778,6 +894,7 @@ function initSubjectPicker() {
   const searchInput = document.getElementById("subjectSearch");
   const sortSelect = document.getElementById("subjectSort");
   const unitSelect = document.getElementById("unitFocusSelect");
+  const dashboardChooseBtn = document.getElementById("dashboardChooseBtn");
   let cardsArray = [];
 
   if (!grid || !practiceData?.subjects?.length) return;
@@ -859,6 +976,11 @@ function initSubjectPicker() {
       updateHomeProgress();
     });
   }
+
+  dashboardChooseBtn?.addEventListener("click", () => {
+    updateModePopoutCopy(getSelectedSubject(), true);
+    jumpToModeSelection();
+  });
 
   if (searchInput) {
     searchInput.addEventListener("input", updateSearchResults);

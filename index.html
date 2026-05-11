@@ -48,22 +48,38 @@
         </section>
 
         <section class="study-dashboard-panel" aria-labelledby="studyDashboardTitle">
-          <div class="subject-heading">
+          <div class="subject-heading dashboard-heading">
             <div>
               <h2 id="studyDashboardTitle">Study Dashboard</h2>
+              <p id="dashboardSummary">Select a subject to see progress, scores, and review priorities.</p>
             </div>
-            <a class="small-pill" href="mcq.html" data-resume-link>Start</a>
+            <div class="dashboard-quick-actions">
+              <button class="small-pill secondary" type="button" id="dashboardChooseBtn">Choose Section</button>
+              <a class="small-pill" href="mcq.html" data-resume-link id="dashboardResumeLink">Start</a>
+            </div>
+          </div>
+          <div class="dashboard-hero-card">
+            <div class="dashboard-ring" id="dashboardRing" aria-label="Overall practice completion">
+              <strong id="dashboardRingValue">0%</strong>
+              <span>complete</span>
+            </div>
+            <div class="dashboard-hero-copy">
+              <span id="dashboardSubjectBadge">No subject selected</span>
+              <strong id="dashboardNextStep">Pick a subject to begin.</strong>
+              <em id="dashboardNextMeta">Your work saves in this browser.</em>
+              <div class="dashboard-progress-track" aria-hidden="true"><span id="dashboardOverallBar"></span></div>
+            </div>
           </div>
           <div class="dashboard-grid" aria-label="Study progress summary">
             <div class="dashboard-card">
-              <span>Focus</span>
-              <strong id="dashboardFocus">All units</strong>
-              <em id="dashboardSubject">Select a subject</em>
+              <span>MCQ</span>
+              <strong id="dashboardMcqProgress">0 / 0</strong>
+              <em id="dashboardMcqHint">Section I progress</em>
             </div>
             <div class="dashboard-card">
-              <span>Progress</span>
-              <strong id="dashboardProgress">No saved work</strong>
-              <em id="dashboardProgressHint">MCQ and FRQ save locally.</em>
+              <span>FRQ</span>
+              <strong id="dashboardFrqProgress">0 / 0</strong>
+              <em id="dashboardFrqHint">Section II progress</em>
             </div>
             <div class="dashboard-card">
               <span>Last Score</span>
@@ -71,9 +87,21 @@
               <em id="dashboardLastScoreMeta">Submit a section to track scores.</em>
             </div>
             <div class="dashboard-card">
-              <span>Flags</span>
-              <strong id="dashboardFlags">0 saved</strong>
-              <em>Flag questions to revisit them in review.</em>
+              <span>Focus</span>
+              <strong id="dashboardFocus">All units</strong>
+              <em id="dashboardSubject">Select a subject</em>
+            </div>
+          </div>
+          <div class="dashboard-insights" aria-label="Dashboard insights">
+            <div class="dashboard-insight">
+              <span>Review Queue</span>
+              <strong id="dashboardReviewQueue">0 items</strong>
+              <em id="dashboardReviewHint">Flag or submit questions to build a review list.</em>
+            </div>
+            <div class="dashboard-insight">
+              <span>Needs Practice</span>
+              <strong id="dashboardWeakUnit">No data yet</strong>
+              <em id="dashboardWeakMeta">Weak units appear after a submitted section.</em>
             </div>
           </div>
           <div class="score-history-card">

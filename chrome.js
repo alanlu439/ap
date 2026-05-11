@@ -86,8 +86,8 @@ function initThemeToggle() {
   }
 }
 
-function chromeStorageKey(kind, subject = getChromeSubject()) {
-  return chromePracticeData?.storageKey?.(kind, subject) || "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
+function chromeStorageKey(kind, subject = getChromeSubject(), scope = "") {
+  return chromePracticeData?.storageKey?.(kind, subject, scope) || "ap-practice-" + subject.slug + "-" + kind + "-state-v1";
 }
 
 function chromeWeight(value) {
@@ -131,8 +131,9 @@ function readChromeJson(key) {
 }
 
 function getChromeProgress(subject = getChromeSubject()) {
-  const mcq = readChromeJson(chromeStorageKey("mcq", subject));
-  const frq = readChromeJson(chromeStorageKey("frq", subject));
+  const scope = chromePracticeData?.getUnitFilter?.(subject) || "";
+  const mcq = readChromeJson(chromeStorageKey("mcq", subject, scope));
+  const frq = readChromeJson(chromeStorageKey("frq", subject, scope));
   const mcqAnswered = Array.isArray(mcq.answers) ? mcq.answers.filter((answer) => answer !== null).length : 0;
   const frqAnswered = Array.isArray(frq.answers)
     ? frq.answers.filter((answers) =>
@@ -155,6 +156,13 @@ function getResumeTarget(progress) {
   return "mcq.html";
 }
 
+function getResumeText(progress) {
+  if (progress.mcqSubmitted && !progress.frqSubmitted) return progress.frqAnswered ? "Resume FRQ" : "Start FRQ";
+  if (progress.frqSubmitted) return "Review";
+  if (progress.mcqAnswered || progress.mcqSubmitted) return progress.mcqSubmitted ? "Review MCQ" : "Resume MCQ";
+  return "Start MCQ";
+}
+
 function updateChromeProgress() {
   const subject = getChromeSubject();
   const progress = getChromeProgress(subject);
@@ -168,7 +176,7 @@ function updateChromeProgress() {
 
   resumeLinks.forEach((link) => {
     link.setAttribute("href", resumeTarget);
-    link.textContent = progress.mcqAnswered || progress.frqAnswered ? "Resume" : "Start";
+    link.textContent = getResumeText(progress);
   });
   progressLabels.forEach((item) => {
     item.textContent = label;
