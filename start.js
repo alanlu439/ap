@@ -204,20 +204,26 @@ function enhanceTimelineDays(timeline) {
 
     if (dateNode) {
       const toggle = document.createElement("button");
+      const main = document.createElement("span");
       const label = document.createElement("span");
       const count = document.createElement("span");
+      const preview = document.createElement("span");
 
       toggle.type = "button";
       toggle.className = "timeline-date timeline-date-toggle";
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-controls", body.id);
 
+      main.className = "timeline-date-main";
       label.className = "timeline-date-label";
       label.textContent = labelText;
       count.className = "timeline-count";
       count.textContent = `${sessions.length} ${sessions.length === 1 ? "exam" : "exams"}`;
+      preview.className = "timeline-preview";
+      preview.textContent = sessions.map((session) => session.querySelector("strong")?.textContent?.trim()).filter(Boolean).join(" · ");
 
-      toggle.append(label, count);
+      main.append(label, count);
+      toggle.append(main, preview);
       dateNode.replaceWith(toggle);
     }
 
@@ -735,6 +741,52 @@ function formatDashboardItems(count) {
   return count + " item" + (count === 1 ? "" : "s");
 }
 
+function formatDashboardMinutes(minutes) {
+  const rounded = Math.max(0, Math.round(minutes));
+  if (!rounded) return "Done";
+  if (rounded < 60) return `${rounded} min`;
+  const hours = Math.floor(rounded / 60);
+  const remainder = rounded % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+}
+
+function dashboardPlanItems({ mcq, frq, meta, reviewQueue, weakUnit, latest }) {
+  const items = [];
+  if (!mcq.submitted) {
+    items.push(mcq.answered ? `Finish ${Math.max(0, meta.mcqCount - mcq.answered)} MCQs` : "Start Section I MCQ");
+  } else if (!frq.submitted) {
+    items.push(frq.answered ? `Finish ${Math.max(0, meta.frqCount - frq.answered)} FRQs` : "Start Section II FRQ");
+  } else {
+    items.push("Review submitted work");
+  }
+  if (reviewQueue) items.push(`Clear ${formatDashboardItems(reviewQueue)} from review`);
+  if (weakUnit) items.push(`Practice ${weakUnit}`);
+  if (latest) items.push(`Beat ${Math.round(Number(latest.percent) || 0)}% next attempt`);
+  while (items.length < 4) items.push(["Choose a unit focus", "Complete one timed section", "Check official test details", "Review score history"][items.length] || "Keep practicing");
+  return items.slice(0, 4);
+}
+
+function syncDashboardControls(subject = getSelectedSubject()) {
+  const subjectSelect = document.getElementById("dashboardSubjectSelect");
+  const unitSelect = document.getElementById("dashboardUnitSelect");
+  if (!subjectSelect && !unitSelect) return;
+
+  if (subjectSelect && !subjectSelect.options.length) {
+    subjectSelect.innerHTML = sortedSubjects("az").map((item) =>
+      '<option value="' + escapeHomeHtml(item.title) + '">' + escapeHomeHtml(item.short || item.title) + '</option>'
+    ).join("");
+  }
+  if (subjectSelect) subjectSelect.value = subject.title;
+
+  if (unitSelect) {
+    const focus = practiceData?.getUnitFilter?.(subject) || "";
+    unitSelect.innerHTML = '<option value="">All units</option>' + (subject.units || []).map((unit) =>
+      '<option value="' + escapeHomeHtml(unit) + '">' + escapeHomeHtml(unit) + '</option>'
+    ).join("");
+    unitSelect.value = focus;
+  }
+}
+
 function updateStudyDashboard(subject = getSelectedSubject()) {
   const meta = getFocusedPracticeMeta(subject);
   const focus = meta.focus;
@@ -750,6 +802,17 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const progressTotal = meta.mcqCount + meta.frqCount;
   const progressAnswered = Math.min(progressTotal, mcq.answered + frq.answered);
   const progressPercent = progressTotal ? clampPercent((progressAnswered / progressTotal) * 100) : 0;
+  const submittedSections = (mcq.submitted ? 1 : 0) + (frq.submitted ? 1 : 0);
+  const attemptCount = subjectHistory.length;
+  const averageScore = attemptCount
+    ? Math.round(subjectHistory.reduce((sum, item) => sum + (Number(item.percent) || 0), 0) / attemptCount)
+    : 0;
+  const trendDelta = latest && previous
+    ? Math.round((Number(latest.percent) || 0) - (Number(previous.percent) || 0))
+    : null;
+  const remainingMcq = mcq.submitted ? 0 : meta.mcqMinutes * (Math.max(0, meta.mcqCount - Math.min(mcq.answered, meta.mcqCount)) / Math.max(1, meta.mcqCount));
+  const remainingFrq = frq.submitted ? 0 : meta.frqMinutes * (Math.max(0, meta.frqCount - Math.min(frq.answered, meta.frqCount)) / Math.max(1, meta.frqCount));
+  const remainingMinutes = remainingMcq + remainingFrq;
   const missed = countSavedMisses(subject);
   const flagged = countSavedFlags(subject);
   const guessed = countSavedGuesses(subject);
@@ -766,23 +829,46 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const heroSubject = document.getElementById("dashboardHeroSubject");
   const heroNext = document.getElementById("dashboardHeroNext");
   const heroReview = document.getElementById("dashboardHeroReview");
+  const heroBest = document.getElementById("dashboardHeroBest");
   const mcqEl = document.getElementById("dashboardMcqProgress");
   const mcqHint = document.getElementById("dashboardMcqHint");
   const frqEl = document.getElementById("dashboardFrqProgress");
   const frqHint = document.getElementById("dashboardFrqHint");
   const scoreEl = document.getElementById("dashboardLastScore");
   const scoreMeta = document.getElementById("dashboardLastScoreMeta");
+  const bestEl = document.getElementById("dashboardBestScore");
+  const bestMeta = document.getElementById("dashboardBestMeta");
+  const timeEl = document.getElementById("dashboardTimeRemaining");
+  const timeMeta = document.getElementById("dashboardTimeMeta");
+  const completionEl = document.getElementById("dashboardCompletionStatus");
+  const completionMeta = document.getElementById("dashboardCompletionMeta");
+  const actionFull = document.getElementById("dashboardActionFullStatus");
+  const actionMcq = document.getElementById("dashboardActionMcqStatus");
+  const actionFrq = document.getElementById("dashboardActionFrqStatus");
+  const structureTitle = document.getElementById("dashboardStructureTitle");
+  const structureMeta = document.getElementById("dashboardStructureMeta");
+  const weightSplit = document.getElementById("dashboardWeightSplit");
+  const weightMeta = document.getElementById("dashboardWeightMeta");
+  const trendEl = document.getElementById("dashboardTrend");
+  const trendMeta = document.getElementById("dashboardTrendMeta");
+  const averageEl = document.getElementById("dashboardAverageScore");
+  const averageMeta = document.getElementById("dashboardAverageMeta");
   const reviewEl = document.getElementById("dashboardReviewQueue");
   const reviewHint = document.getElementById("dashboardReviewHint");
   const weakEl = document.getElementById("dashboardWeakUnit");
   const weakMeta = document.getElementById("dashboardWeakMeta");
+  const savedWorkEl = document.getElementById("dashboardSavedWork");
+  const savedWorkMeta = document.getElementById("dashboardSavedMeta");
   const historyList = document.getElementById("scoreHistoryList");
+  const planList = document.getElementById("dashboardPlanList");
 
+  syncDashboardControls(subject);
   if (focusEl) focusEl.textContent = focus || "All units";
   if (subjectEl) subjectEl.textContent = subject.title;
   if (subjectBadge) subjectBadge.textContent = "User Dashboard";
   if (heroSubject) heroSubject.textContent = subject.short || subject.title;
   if (heroReview) heroReview.textContent = formatDashboardItems(reviewQueue);
+  if (heroBest) heroBest.textContent = attemptCount ? `${Math.round(best)}%` : "--";
   if (ring) ring.style.setProperty("--dashboard-progress", progressPercent + "%");
   if (ringValue) ringValue.textContent = progressPercent + "%";
   if (overallBar) overallBar.style.width = progressPercent + "%";
@@ -822,13 +908,42 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
       nextMeta.textContent = "Both sections have submitted work saved locally.";
     }
   }
+  if (bestEl) bestEl.textContent = attemptCount ? `${Math.round(best)}%` : "--";
+  if (bestMeta) {
+    const bestAttempt = subjectHistory.find((item) => Math.round(Number(item.percent) || 0) === Math.round(best));
+    bestMeta.textContent = bestAttempt ? `${bestAttempt.mode || "Practice"} · ${formatAttemptDate(bestAttempt.date)}` : "No submitted attempts yet.";
+  }
+  if (timeEl) timeEl.textContent = formatDashboardMinutes(remainingMinutes);
+  if (timeMeta) {
+    timeMeta.textContent = submittedSections === 2
+      ? "Both sections submitted."
+      : `${formatDashboardMinutes(meta.mcqMinutes + meta.frqMinutes)} total practice time.`;
+  }
+  if (completionEl) completionEl.textContent = `${submittedSections} / 2`;
+  if (completionMeta) completionMeta.textContent = `${progressPercent}% answered · ${focus || "all units"}.`;
+  if (actionFull) actionFull.textContent = `${meta.mcqCount + meta.frqCount} questions · ${formatDashboardMinutes(meta.mcqMinutes + meta.frqMinutes)}`;
+  if (actionMcq) actionMcq.textContent = mcq.submitted ? "Review MCQ" : mcq.answered ? `Resume ${Math.min(mcq.answered, meta.mcqCount)} / ${meta.mcqCount}` : `${meta.mcqCount} MCQ · ${meta.mcqMinutes} min`;
+  if (actionFrq) actionFrq.textContent = frq.submitted ? "Review FRQ" : frq.answered ? `Resume ${Math.min(frq.answered, meta.frqCount)} / ${meta.frqCount}` : `${meta.frqCount} FRQ · ${meta.frqMinutes} min`;
+  if (structureTitle) structureTitle.textContent = `${meta.mcqCount} MCQ + ${meta.frqCount} FRQ`;
+  if (structureMeta) {
+    structureMeta.textContent = `${formatDashboardMinutes(meta.mcqMinutes + meta.frqMinutes)} total · ${subject.format.note || "Practice made by Alan."}${focus ? " · " + focus : ""}`;
+  }
+  if (weightSplit) weightSplit.textContent = `${formatWeight(subject.format.mcqWeight)} / ${formatWeight(subject.format.frqWeight)}`;
+  if (weightMeta) weightMeta.textContent = `Section I / Section II for ${subject.short || subject.title}.`;
+  if (trendEl) {
+    trendEl.textContent = trendDelta === null
+      ? "--"
+      : trendDelta === 0
+        ? "Even"
+        : `${trendDelta > 0 ? "+" : ""}${trendDelta} pts`;
+  }
+  if (trendMeta) trendMeta.textContent = previous ? "Compared with the previous saved attempt." : "Submit two attempts to compare.";
+  if (averageEl) averageEl.textContent = attemptCount ? `${averageScore}%` : "--";
+  if (averageMeta) averageMeta.textContent = attemptCount ? `${attemptCount} saved attempt${attemptCount === 1 ? "" : "s"}.` : "No score history yet.";
   if (latest && scoreEl && scoreMeta) {
     scoreEl.textContent = `${Math.round(latest.percent)}%`;
-    scoreMeta.textContent = `${latest.mode} · ${formatAttemptDate(latest.date)}${best ? " · best " + Math.round(best) + "%" : ""}`;
-    if (previous) {
-      const delta = Math.round((Number(latest.percent) || 0) - (Number(previous.percent) || 0));
-      if (delta !== 0) scoreMeta.textContent += ` · ${delta > 0 ? "+" : ""}${delta} pts`;
-    }
+    scoreMeta.textContent = `${latest.mode} · ${formatAttemptDate(latest.date)} · best ${Math.round(best)}%`;
+    if (trendDelta) scoreMeta.textContent += ` · ${trendDelta > 0 ? "+" : ""}${trendDelta} pts`;
   } else {
     if (scoreEl) scoreEl.textContent = "--";
     if (scoreMeta) scoreMeta.textContent = "Submit a section to track scores.";
@@ -847,11 +962,20 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
       ? `Based on the latest ${latest?.mode || "practice"} attempt.`
       : "Submit MCQ or FRQ to identify priority units.";
   }
+  if (savedWorkEl) savedWorkEl.textContent = `${progressAnswered} / ${progressTotal}`;
+  if (savedWorkMeta) {
+    savedWorkMeta.textContent = `${mcq.answered} MCQ answers · ${frq.answered} FRQ responses saved locally.`;
+  }
   if (historyList) {
     const rows = (rowsSource.length ? rowsSource : history).slice(0, 4);
     historyList.innerHTML = rows.length
       ? rows.map((item) => '<li><strong>' + escapeHomeHtml(item.subjectShort || item.subjectTitle || "AP") + ' ' + escapeHomeHtml(item.mode || "Practice") + '</strong><span>' + Math.round(Number(item.percent) || 0) + '% · ' + escapeHomeHtml(item.unitFocus || "All units") + '</span><em>' + escapeHomeHtml(formatAttemptDate(item.date)) + '</em></li>').join("")
       : '<li><strong>No attempts yet</strong><span>Submit MCQ or FRQ to build history.</span></li>';
+  }
+  if (planList) {
+    planList.innerHTML = dashboardPlanItems({ mcq, frq, meta, reviewQueue, weakUnit, latest })
+      .map((item, index) => '<li><span>' + (index + 1) + '</span><strong>' + escapeHomeHtml(item) + '</strong></li>')
+      .join("");
   }
 }
 
@@ -1080,6 +1204,29 @@ function initSubjectPicker() {
   updateSearchResults();
 }
 
+function initDashboardPage() {
+  const dashboard = document.querySelector(".dashboard-page");
+  if (!dashboard) return;
+
+  const subjectSelect = document.getElementById("dashboardSubjectSelect");
+  const unitSelect = document.getElementById("dashboardUnitSelect");
+  syncDashboardControls(getSelectedSubject());
+
+  subjectSelect?.addEventListener("change", () => {
+    const subject = getSubjectByTitle(subjectSelect.value) || getSelectedSubject();
+    localStorage.setItem(SELECTED_AP_SUBJECT_KEY, subject.title);
+    syncDashboardControls(subject);
+    updateHomeProgress();
+  });
+
+  unitSelect?.addEventListener("change", () => {
+    const subject = getSelectedSubject();
+    practiceData?.setUnitFilter?.(subject, unitSelect.value);
+    syncDashboardControls(subject);
+    updateHomeProgress();
+  });
+}
+
 function initModeCards() {
   const modeGrid = document.getElementById("modeGrid");
   const modePopout = document.getElementById("modePopout");
@@ -1164,6 +1311,7 @@ function initReadyDialog() {
   });
 }
 
+initDashboardPage();
 updateFullPracticePage();
 updateHomeProgress();
 initTimelineTimezone();

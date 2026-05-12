@@ -26,6 +26,7 @@
             </div>
           </a>
           <div class="subject-search" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg><input id="subjectSearch" type="search" autocomplete="off" placeholder="Search AP subjects" aria-label="Search AP subjects"></div>
+          <a class="nav-cta text-button primary dashboard-nav-link" href="dashboard.html"><span>Dashboard</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-9"/></svg></a>
         </nav>
 
         <section class="subject-panel" aria-labelledby="subjectTitle">
@@ -45,81 +46,6 @@
             </label>
           </div>
           <div class="subject-grid" id="subjectGrid" aria-label="AP subject options"></div>
-        </section>
-
-        <section class="study-dashboard-panel" aria-labelledby="studyDashboardTitle">
-          <div class="subject-heading dashboard-heading">
-            <div>
-              <h2 id="studyDashboardTitle">Study Dashboard</h2>
-            </div>
-          </div>
-          <div class="dashboard-hero-card">
-            <div class="dashboard-ring" id="dashboardRing" aria-label="Overall practice completion">
-              <strong id="dashboardRingValue">0%</strong>
-              <span>complete</span>
-            </div>
-            <div class="dashboard-hero-copy">
-              <span id="dashboardSubjectBadge">No subject selected</span>
-              <strong id="dashboardNextStep">Pick a subject to begin.</strong>
-              <em id="dashboardNextMeta">Your work saves in this browser.</em>
-              <div class="dashboard-hero-stats" aria-label="Dashboard overview">
-                <div>
-                  <span>Subject</span>
-                  <strong id="dashboardHeroSubject">--</strong>
-                </div>
-                <div>
-                  <span>Next</span>
-                  <strong id="dashboardHeroNext">MCQ</strong>
-                </div>
-                <div>
-                  <span>Review</span>
-                  <strong id="dashboardHeroReview">0 items</strong>
-                </div>
-              </div>
-              <div class="dashboard-progress-track" aria-hidden="true"><span id="dashboardOverallBar"></span></div>
-            </div>
-          </div>
-          <div class="dashboard-grid" aria-label="Study progress summary">
-            <div class="dashboard-card">
-              <span>MCQ</span>
-              <strong id="dashboardMcqProgress">0 / 0</strong>
-              <em id="dashboardMcqHint">Section I progress</em>
-            </div>
-            <div class="dashboard-card">
-              <span>FRQ</span>
-              <strong id="dashboardFrqProgress">0 / 0</strong>
-              <em id="dashboardFrqHint">Section II progress</em>
-            </div>
-            <div class="dashboard-card">
-              <span>Last Score</span>
-              <strong id="dashboardLastScore">--</strong>
-              <em id="dashboardLastScoreMeta">Submit a section to track scores.</em>
-            </div>
-            <div class="dashboard-card">
-              <span>Focus</span>
-              <strong id="dashboardFocus">All units</strong>
-              <em id="dashboardSubject">Select a subject</em>
-            </div>
-          </div>
-          <div class="dashboard-insights" aria-label="Dashboard insights">
-            <div class="dashboard-insight">
-              <span>Review Queue</span>
-              <strong id="dashboardReviewQueue">0 items</strong>
-              <em id="dashboardReviewHint">Flag or submit questions to build a review list.</em>
-            </div>
-            <div class="dashboard-insight">
-              <span>Needs Practice</span>
-              <strong id="dashboardWeakUnit">No data yet</strong>
-              <em id="dashboardWeakMeta">Weak units appear after a submitted section.</em>
-            </div>
-          </div>
-          <div class="score-history-card">
-            <div>
-              <span>History</span>
-              <strong>Recent attempts</strong>
-            </div>
-            <ol id="scoreHistoryList" aria-label="Recent score history"></ol>
-          </div>
         </section>
 
         <section class="home-info-panel" aria-labelledby="homeInfoTitle">
