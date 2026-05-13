@@ -5690,6 +5690,108 @@ html[data-theme="dark"] .mode-popout .unit-picker select {
   color: #8cc8ff;
 }
 
+/* Dashboard spacing and dark-mode refinements */
+.app-shell:has(.dashboard-page) {
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.app-shell:has(.dashboard-page) .topbar {
+  gap: 18px;
+  padding: clamp(18px, 2.4vw, 26px);
+}
+
+.dashboard-page {
+  gap: clamp(24px, 3vw, 36px);
+}
+
+.dashboard-page .dashboard-command-header {
+  gap: clamp(24px, 3vw, 36px);
+  padding: clamp(34px, 5vw, 58px);
+}
+
+.dashboard-page .study-dashboard-panel {
+  gap: clamp(22px, 3vw, 34px);
+  padding: clamp(30px, 4.5vw, 52px);
+}
+
+.dashboard-page .dashboard-control-bar label {
+  padding: clamp(18px, 2.4vw, 26px);
+}
+
+.dashboard-page .dashboard-hero-card {
+  gap: clamp(24px, 3.5vw, 42px);
+  padding: clamp(26px, 4vw, 44px);
+}
+
+.dashboard-page .dashboard-action-card,
+.dashboard-page .dashboard-intel-card,
+.dashboard-page .dashboard-card,
+.dashboard-page .dashboard-panel-block,
+.dashboard-page .score-history-card {
+  padding: clamp(20px, 2.8vw, 32px);
+}
+
+.dashboard-page .docs-section {
+  padding: clamp(30px, 4vw, 46px);
+}
+
+html[data-theme="dark"] .docs-grid a {
+  border-color: rgba(255, 255, 255, 0.13);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)),
+    rgba(16, 24, 38, 0.72);
+  color: #dbe7f7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+html[data-theme="dark"] .docs-grid a:hover,
+html[data-theme="dark"] .docs-grid a:focus-visible {
+  border-color: rgba(140, 200, 255, 0.42);
+  background:
+    radial-gradient(ellipse at 88% 12%, rgba(10, 132, 255, 0.18), transparent 48%),
+    linear-gradient(145deg, rgba(34, 52, 78, 0.82), rgba(18, 27, 42, 0.74));
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .exam-note {
+  border-color: rgba(140, 200, 255, 0.24);
+  background:
+    radial-gradient(ellipse at 92% 18%, rgba(10, 132, 255, 0.16), transparent 52%),
+    linear-gradient(145deg, rgba(23, 34, 50, 0.88), rgba(12, 19, 31, 0.78));
+  color: #dbe7f7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 16px 34px rgba(0, 0, 0, 0.18);
+}
+
+html[data-theme="dark"] .choice-letter {
+  background: rgba(255, 255, 255, 0.08);
+  color: #8cc8ff;
+}
+
+html[data-theme="dark"] .choice.selected {
+  border-color: rgba(10, 132, 255, 0.78);
+  background:
+    radial-gradient(ellipse at 12% 20%, rgba(10, 132, 255, 0.22), transparent 42%),
+    linear-gradient(145deg, rgba(20, 47, 78, 0.78), rgba(11, 18, 30, 0.72)),
+    rgba(10, 23, 42, 0.86);
+  box-shadow:
+    inset 0 0 0 1px rgba(140, 200, 255, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 16px 36px rgba(10, 132, 255, 0.2);
+}
+
+html[data-theme="dark"] .choice.selected .choice-letter {
+  background: linear-gradient(145deg, #0071e3, #5ac8fa);
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .choice.selected .choice-text {
+  color: #ffffff !important;
+}
+
 @media (max-width: 920px) {
   .dashboard-command-header,
   .dashboard-pro-grid,
@@ -5715,6 +5817,43 @@ html[data-theme="dark"] .mode-popout .unit-picker select {
 }
 
 @media (max-width: 760px) {
+  .app-shell:has(.dashboard-page) {
+    padding: 16px;
+  }
+
+  .app-shell:has(.dashboard-page) .topbar {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .dashboard-page {
+    gap: 18px;
+  }
+
+  .dashboard-page .dashboard-command-header,
+  .dashboard-page .study-dashboard-panel,
+  .dashboard-page .docs-section {
+    padding: 24px;
+  }
+
+  .dashboard-page .dashboard-command-header {
+    gap: 18px;
+  }
+
+  .dashboard-page .dashboard-command-header h2 {
+    font-size: clamp(34px, 10vw, 46px);
+  }
+
+  .dashboard-page .dashboard-control-bar label,
+  .dashboard-page .dashboard-hero-card,
+  .dashboard-page .dashboard-action-card,
+  .dashboard-page .dashboard-intel-card,
+  .dashboard-page .dashboard-card,
+  .dashboard-page .dashboard-panel-block,
+  .dashboard-page .score-history-card {
+    padding: 20px;
+  }
+
   .dashboard-control-bar,
   .dashboard-action-strip,
   .dashboard-intel-grid,
