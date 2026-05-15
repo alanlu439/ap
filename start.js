@@ -393,6 +393,93 @@ function applyTimelineFilter(sessions, deadlines, filter, timelineNow, actualNow
   }
 }
 
+function syncTimelineTimezonePicker(timezoneSelect) {
+  if (!timezoneSelect) return;
+  const picker = timezoneSelect.closest(".timezone-picker");
+  if (!picker) return;
+
+  const selectedOption = timezoneSelect.selectedOptions?.[0] || timezoneSelect.options?.[0];
+  const value = picker.querySelector("[data-timezone-value]");
+  if (value && selectedOption) value.textContent = selectedOption.textContent;
+
+  picker.querySelectorAll("[data-timezone-option]").forEach((item) => {
+    const option = Array.from(timezoneSelect.options).find((candidate) => candidate.value === item.dataset.timezoneOption);
+    if (option) item.textContent = option.textContent;
+    item.setAttribute("aria-selected", String(item.dataset.timezoneOption === timezoneSelect.value));
+  });
+}
+
+function initTimelineTimezonePicker(timezoneSelect) {
+  if (!timezoneSelect) return;
+  const picker = timezoneSelect.closest(".timezone-picker");
+  if (!picker) return;
+
+  if (picker.dataset.customReady === "true") {
+    syncTimelineTimezonePicker(timezoneSelect);
+    return;
+  }
+
+  picker.dataset.customReady = "true";
+
+  const button = document.createElement("button");
+  const menu = document.createElement("div");
+
+  button.type = "button";
+  button.className = "timezone-button";
+  button.setAttribute("aria-haspopup", "listbox");
+  button.setAttribute("aria-expanded", "false");
+  button.innerHTML = [
+    '<span data-timezone-value>Auto</span>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+  ].join("");
+
+  menu.className = "timezone-menu";
+  menu.setAttribute("role", "listbox");
+  menu.hidden = true;
+
+  Array.from(timezoneSelect.options).forEach((option) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "timezone-option";
+    item.dataset.timezoneOption = option.value;
+    item.setAttribute("role", "option");
+    item.textContent = option.textContent;
+    menu.appendChild(item);
+  });
+
+  const closeMenu = () => {
+    menu.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+  };
+
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const shouldOpen = menu.hidden;
+    menu.hidden = !shouldOpen;
+    button.setAttribute("aria-expanded", String(shouldOpen));
+  });
+
+  menu.addEventListener("click", (event) => {
+    const item = event.target.closest("[data-timezone-option]");
+    if (!item) return;
+    timezoneSelect.value = item.dataset.timezoneOption || "auto";
+    timezoneSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    closeMenu();
+  });
+
+  picker.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!picker.contains(event.target)) closeMenu();
+  });
+
+  picker.append(button, menu);
+  syncTimelineTimezonePicker(timezoneSelect);
+}
+
 function initTimelineTimezone() {
   const timeline = document.querySelector(".exam-timeline-panel");
   if (!timeline) return;
@@ -407,6 +494,7 @@ function initTimelineTimezone() {
   if (timezoneSelect) {
     const savedTimeZone = localStorage.getItem(TIMELINE_TIMEZONE_KEY) || "auto";
     timezoneSelect.value = Array.from(timezoneSelect.options).some((option) => option.value === savedTimeZone) ? savedTimeZone : "auto";
+    initTimelineTimezonePicker(timezoneSelect);
   }
 
   const updateTimezoneCopy = () => {
@@ -418,6 +506,7 @@ function initTimelineTimezone() {
     if (timezoneSelect) {
       const autoOption = timezoneSelect.querySelector("option[value=\"auto\"]");
       if (autoOption) autoOption.textContent = `Auto (${formatTimeZoneName(timeZone)})`;
+      syncTimelineTimezonePicker(timezoneSelect);
     }
     if (scheduleCopy) {
       scheduleCopy.textContent = `2026 AP Exams run May 4-15. Regular exams use testing-location local time; fixed digital deadlines are converted to ${formatTimeZoneName(timeZone)}.`;

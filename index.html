@@ -76,9 +76,9 @@
               <h2 id="examTimelineTitle">AP Test Timeline</h2>
             </div>
             <div class="timeline-actions">
-              <label class="timezone-picker" for="timelineTimezoneSelect">
+              <div class="timezone-picker" id="timelineTimezonePicker">
                 <span id="timelineTimezone">Timezone</span>
-                <select id="timelineTimezoneSelect" aria-label="Timeline timezone">
+                <select id="timelineTimezoneSelect" aria-label="Timeline timezone" hidden>
                   <option value="auto">Auto</option>
                   <option value="America/New_York">Eastern</option>
                   <option value="America/Chicago">Central</option>
@@ -90,7 +90,7 @@
                   <option value="Europe/London">London</option>
                   <option value="UTC">UTC</option>
                 </select>
-              </label>
+              </div>
               <a href="https://apstudents.collegeboard.org/exam-dates" target="_blank" rel="noreferrer">Official Schedule</a>
             </div>
           </div>
@@ -99,12 +99,6 @@
             <strong id="timelineNextTitle">Finding the next AP exam...</strong>
             <em id="timelineCountdown">Using your device time.</em>
             <div class="timeline-progress" aria-hidden="true"><span id="timelineProgressFill"></span></div>
-          </div>
-          <div class="timeline-controls" aria-label="Timeline filters">
-            <button class="timeline-filter is-active" type="button" data-timeline-filter="all">All</button>
-            <button class="timeline-filter" type="button" data-timeline-filter="upcoming">Upcoming</button>
-            <button class="timeline-filter" type="button" data-timeline-filter="today">Today</button>
-            <button class="timeline-filter" type="button" data-timeline-filter="completed">Done</button>
           </div>
           <div class="deadline-row" aria-label="AP Digital Portfolio deadlines">
             <div class="deadline-card">
