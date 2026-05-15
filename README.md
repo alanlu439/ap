@@ -20,9 +20,13 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 - Write FRQ responses and get estimated rubric feedback after submission
 - Print a practice summary for MCQ or FRQ review
 - Check official AP exam schedule, visual timeline, location guidance, and registration links
-- Adjust the timeline timezone and filter by all, upcoming, today, or done
+- Adjust the timeline timezone and expand each test day for schedule details
 - Use an auto-adjusting light/dark theme that follows the visitor's device setting
 - Read the independent-use disclaimer and official source links
+
+## Promo Video
+
+[Download the website promo video](promo/ap-exam-practice-promo.mp4)
 
 ## Included Subjects
 
@@ -86,7 +90,8 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 ├── styles.css          # Visual system and responsive layout
 ├── assets/ap-icon.svg  # App icon and favicon
 ├── assets/social-preview.svg # Editable social preview source
-└── assets/social-preview.png # 1280x640 GitHub social preview image
+├── assets/social-preview.png # 1280x640 GitHub social preview image
+└── promo/ap-exam-practice-promo.mp4 # Short website promo video
 ```
 
 ## Run Locally
