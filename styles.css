@@ -6698,6 +6698,398 @@ html[data-theme="dark"] .choice.selected .choice-letter {
   }
 }
 
+/* Final dashboard density and timeline spacing pass */
+.timeline-day-body {
+  gap: 14px;
+  padding: 18px 18px 20px;
+}
+
+.timeline-session {
+  min-height: 104px;
+  padding: 20px 22px;
+}
+
+.timeline-session span {
+  margin-bottom: 8px;
+}
+
+.timeline-session strong {
+  line-height: 1.28;
+}
+
+.app-shell:has(.dashboard-page) {
+  padding: clamp(14px, 2.1vw, 24px);
+}
+
+.app-shell:has(.dashboard-page) .topbar {
+  min-height: 58px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 28px;
+}
+
+.app-shell:has(.dashboard-page) .brand-mark {
+  width: 50px;
+  height: 50px;
+}
+
+.app-shell:has(.dashboard-page) .brand-block h1 {
+  font-size: clamp(22px, 3vw, 32px);
+}
+
+.app-shell:has(.dashboard-page) .brand-block p {
+  font-size: 12px;
+}
+
+.app-shell:has(.dashboard-page) .page-nav a,
+.app-shell:has(.dashboard-page) .page-nav button,
+.app-shell:has(.dashboard-page) .theme-toggle {
+  min-height: 42px;
+  padding: 0 16px;
+}
+
+.dashboard-page {
+  gap: clamp(12px, 1.8vw, 20px);
+}
+
+.dashboard-page .dashboard-command-header {
+  align-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  padding: clamp(18px, 2.7vw, 30px);
+}
+
+.dashboard-page .dashboard-command-header > div:first-child {
+  gap: 4px;
+}
+
+.dashboard-page .dashboard-command-header h2 {
+  font-size: clamp(30px, 3.8vw, 48px);
+}
+
+.dashboard-page .dashboard-control-bar {
+  gap: 8px;
+}
+
+.dashboard-page .dashboard-control-bar label {
+  gap: 5px;
+  padding: 12px 14px;
+  border-radius: 22px;
+}
+
+.dashboard-page .dashboard-control-bar select {
+  min-height: 32px;
+  font-size: 15px;
+}
+
+.dashboard-page .study-dashboard-panel {
+  gap: 12px;
+  padding: clamp(18px, 2.8vw, 30px);
+}
+
+.dashboard-page .dashboard-hero-card {
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+}
+
+.dashboard-page .dashboard-ring {
+  width: 96px;
+}
+
+.dashboard-page .dashboard-ring strong {
+  font-size: 25px;
+}
+
+.dashboard-page .dashboard-hero-copy {
+  gap: 6px;
+}
+
+.dashboard-page .dashboard-hero-copy strong {
+  font-size: clamp(22px, 2.6vw, 32px);
+}
+
+.dashboard-page .dashboard-hero-copy em {
+  font-size: 13px;
+}
+
+.dashboard-page .dashboard-hero-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.dashboard-page .dashboard-hero-stats div {
+  min-height: 46px;
+  padding: 8px 10px;
+  border-radius: 16px;
+}
+
+.dashboard-page .dashboard-hero-stats strong {
+  font-size: 14px;
+}
+
+.dashboard-page .dashboard-progress-track {
+  height: 6px;
+}
+
+.dashboard-page .dashboard-action-strip,
+.dashboard-page .dashboard-intel-grid,
+.dashboard-page .dashboard-kpi-grid,
+.dashboard-page .dashboard-pro-grid {
+  gap: 8px;
+}
+
+.dashboard-page .dashboard-action-card {
+  min-height: 72px;
+  padding: 13px 14px;
+}
+
+.dashboard-page .dashboard-action-card strong {
+  font-size: clamp(16px, 1.6vw, 19px);
+}
+
+.dashboard-page .dashboard-intel-card {
+  min-height: 82px;
+  gap: 5px;
+  padding: 13px 14px;
+}
+
+.dashboard-page .dashboard-intel-card strong {
+  font-size: clamp(17px, 1.8vw, 23px);
+}
+
+.dashboard-page .dashboard-intel-card em {
+  font-size: 13px;
+}
+
+.dashboard-page .dashboard-card,
+.dashboard-page .dashboard-panel-block,
+.dashboard-page .score-history-card {
+  gap: 6px;
+  min-height: 84px;
+  padding: 14px;
+}
+
+.dashboard-page .dashboard-card strong,
+.dashboard-page .dashboard-panel-block strong,
+.dashboard-page .score-history-card strong {
+  font-size: clamp(18px, 2vw, 24px);
+}
+
+.dashboard-page .dashboard-card em,
+.dashboard-page .dashboard-panel-block em {
+  font-size: 13px;
+}
+
+.dashboard-page .dashboard-panel-block {
+  min-height: 0;
+}
+
+.dashboard-page .dashboard-plan-list {
+  gap: 8px;
+}
+
+.dashboard-page .dashboard-plan-list li {
+  min-height: 50px;
+  padding: 10px;
+}
+
+.dashboard-page .dashboard-plan-list li span {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.dashboard-page .dashboard-plan-list li strong {
+  font-size: 14px;
+}
+
+.dashboard-page .score-history-card {
+  grid-template-columns: minmax(150px, 0.24fr) 1fr;
+}
+
+.dashboard-page .score-history-card ol {
+  gap: 8px;
+}
+
+.dashboard-page .score-history-card li {
+  min-height: 64px;
+  padding: 10px;
+}
+
+.dashboard-page .dashboard-resources {
+  padding: 18px;
+}
+
+.dashboard-page .dashboard-resources h2 {
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.dashboard-page .compact-docs .docs-grid {
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dashboard-page .compact-docs .docs-grid a {
+  min-height: 58px;
+  padding: 14px 16px;
+}
+
+@media (max-width: 920px) {
+  .dashboard-page .dashboard-command-header {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page .dashboard-control-bar,
+  .dashboard-page .dashboard-action-strip,
+  .dashboard-page .dashboard-intel-grid,
+  .dashboard-page .dashboard-kpi-grid,
+  .dashboard-page .dashboard-hero-stats,
+  .dashboard-page .dashboard-plan-list,
+  .dashboard-page .score-history-card ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-page .dashboard-pro-grid,
+  .dashboard-page .score-history-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .timeline-day-body {
+    gap: 12px;
+    padding: 14px 14px 16px;
+  }
+
+  .timeline-session {
+    padding: 18px;
+  }
+
+  .app-shell:has(.dashboard-page) {
+    padding: 12px;
+  }
+
+  .app-shell:has(.dashboard-page) .topbar {
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 10px;
+  }
+
+  .app-shell:has(.dashboard-page) .brand-mark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .app-shell:has(.dashboard-page) .page-nav a,
+  .app-shell:has(.dashboard-page) .page-nav button,
+  .app-shell:has(.dashboard-page) .theme-toggle {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .dashboard-page .dashboard-command-header,
+  .dashboard-page .study-dashboard-panel,
+  .dashboard-page .docs-section {
+    padding: 14px;
+  }
+
+  .dashboard-page .dashboard-command-header h2 {
+    font-size: clamp(26px, 7vw, 34px);
+    line-height: 1;
+  }
+
+  .dashboard-page .dashboard-control-bar,
+  .dashboard-page .dashboard-action-strip,
+  .dashboard-page .dashboard-intel-grid,
+  .dashboard-page .dashboard-kpi-grid,
+  .dashboard-page .dashboard-hero-stats,
+  .dashboard-page .dashboard-plan-list,
+  .dashboard-page .score-history-card ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-page .dashboard-intel-card-wide {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-page .dashboard-hero-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .dashboard-page .dashboard-ring {
+    width: 68px;
+  }
+
+  .dashboard-page .dashboard-ring::before {
+    inset: 10px;
+  }
+
+  .dashboard-page .dashboard-ring strong {
+    font-size: 18px;
+  }
+
+  .dashboard-page .dashboard-ring span {
+    font-size: 8px;
+  }
+
+  .dashboard-page .dashboard-hero-copy strong {
+    font-size: clamp(19px, 5.2vw, 26px);
+  }
+
+  .dashboard-page .dashboard-hero-copy em {
+    font-size: 12px;
+  }
+
+  .dashboard-page .dashboard-hero-stats div {
+    min-height: 40px;
+    padding: 7px 8px;
+  }
+
+  .dashboard-page .dashboard-hero-stats strong {
+    font-size: 13px;
+  }
+
+  .dashboard-page .dashboard-action-card {
+    min-height: 60px;
+    padding: 11px 12px;
+  }
+
+  .dashboard-page .dashboard-intel-card,
+  .dashboard-page .dashboard-card,
+  .dashboard-page .dashboard-panel-block,
+  .dashboard-page .score-history-card {
+    padding: 12px;
+  }
+
+  .dashboard-page .dashboard-card,
+  .dashboard-page .dashboard-panel-block,
+  .dashboard-page .score-history-card {
+    min-height: 66px;
+  }
+
+  .dashboard-page .dashboard-plan-list li {
+    min-height: 44px;
+    padding: 9px;
+  }
+}
+
+@media (max-width: 430px) {
+  .dashboard-page .dashboard-control-bar,
+  .dashboard-page .dashboard-action-strip,
+  .dashboard-page .dashboard-kpi-grid,
+  .dashboard-page .dashboard-hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page .dashboard-hero-card {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   body {
     background: #fff !important;
