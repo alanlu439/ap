@@ -946,8 +946,10 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const reviewHint = document.getElementById("dashboardReviewHint");
   const weakEl = document.getElementById("dashboardWeakUnit");
   const weakMeta = document.getElementById("dashboardWeakMeta");
+  const weakMirrorEl = document.getElementById("dashboardWeakUnitMirror");
   const savedWorkEl = document.getElementById("dashboardSavedWork");
   const savedWorkMeta = document.getElementById("dashboardSavedMeta");
+  const savedWorkMirrorEl = document.getElementById("dashboardSavedWorkMirror");
   const historyList = document.getElementById("scoreHistoryList");
   const planList = document.getElementById("dashboardPlanList");
 
@@ -1046,12 +1048,14 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   if (weakEl) {
     weakEl.textContent = weakUnit || "No data yet";
   }
+  if (weakMirrorEl) weakMirrorEl.textContent = weakUnit || "No data yet";
   if (weakMeta) {
     weakMeta.textContent = weakUnit
       ? `Based on the latest ${latest?.mode || "practice"} attempt.`
       : "Submit MCQ or FRQ to identify priority units.";
   }
   if (savedWorkEl) savedWorkEl.textContent = `${progressAnswered} / ${progressTotal}`;
+  if (savedWorkMirrorEl) savedWorkMirrorEl.textContent = `${progressAnswered} / ${progressTotal}`;
   if (savedWorkMeta) {
     savedWorkMeta.textContent = `${mcq.answered} MCQ answers · ${frq.answered} FRQ responses saved locally.`;
   }
@@ -1299,6 +1303,53 @@ function initDashboardPage() {
 
   const subjectSelect = document.getElementById("dashboardSubjectSelect");
   const unitSelect = document.getElementById("dashboardUnitSelect");
+  const tabs = Array.from(document.querySelectorAll("[data-dashboard-tab]"));
+  const panels = Array.from(document.querySelectorAll("[data-dashboard-panel]"));
+  const viewKey = "ap-practice-dashboard-view-v1";
+
+  const setDashboardView = (view, { focus = false } = {}) => {
+    const nextView = panels.some((panel) => panel.dataset.dashboardPanel === view) ? view : "overview";
+    tabs.forEach((tab) => {
+      const selected = tab.dataset.dashboardTab === nextView;
+      tab.classList.toggle("is-active", selected);
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected && focus) tab.focus();
+    });
+    panels.forEach((panel) => {
+      const selected = panel.dataset.dashboardPanel === nextView;
+      panel.hidden = !selected;
+      panel.classList.toggle("is-active", selected);
+    });
+    try {
+      localStorage.setItem(viewKey, nextView);
+    } catch {}
+  };
+
+  if (tabs.length && panels.length) {
+    let savedView = "overview";
+    try {
+      savedView = localStorage.getItem(viewKey) || "overview";
+    } catch {}
+    setDashboardView(savedView);
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => setDashboardView(tab.dataset.dashboardTab || "overview"));
+      tab.addEventListener("keydown", (event) => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const lastIndex = tabs.length - 1;
+        const nextIndex = event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? lastIndex
+            : event.key === "ArrowRight"
+              ? (index + 1) % tabs.length
+              : (index - 1 + tabs.length) % tabs.length;
+        setDashboardView(tabs[nextIndex].dataset.dashboardTab || "overview", { focus: true });
+      });
+    });
+  }
+
   syncDashboardControls(getSelectedSubject());
 
   subjectSelect?.addEventListener("change", () => {
