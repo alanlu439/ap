@@ -2,6 +2,7 @@ const practiceData = window.APPracticeData;
 const SELECTED_AP_SUBJECT_KEY = practiceData?.SELECTED_AP_SUBJECT_KEY || "ap-practice-selected-subject-v1";
 const SUBJECT_SORT_KEY = "ap-practice-subject-sort-v1";
 const TIMELINE_TIMEZONE_KEY = "ap-practice-timeline-timezone-v1";
+const STUDENT_NAME_KEY = "ap-practice-student-name-v1";
 const SUBJECT_SORTS = new Set(["az", "za", "group", "duration-asc", "duration-desc"]);
 const fallbackSubject = {
   title: "AP Statistics",
@@ -855,6 +856,31 @@ function dashboardPlanItems({ mcq, frq, meta, reviewQueue, weakUnit, latest }) {
   return items.slice(0, 4);
 }
 
+function getStudentName() {
+  try {
+    return (localStorage.getItem(STUDENT_NAME_KEY) || "").trim();
+  } catch {
+    return "";
+  }
+}
+
+function studentDashboardTitle(name = getStudentName()) {
+  const clean = String(name || "").trim().slice(0, 32);
+  if (!clean) return "Student dashboard";
+  return `${clean}${clean.toLowerCase().endsWith("s") ? "'" : "'s"} dashboard`;
+}
+
+function updateDashboardTitle() {
+  const title = document.getElementById("studyDashboardTitle");
+  if (title) title.textContent = studentDashboardTitle();
+}
+
+function syncStudentNameInput(input = document.getElementById("dashboardStudentName")) {
+  const studentName = getStudentName();
+  if (input && input.value !== studentName) input.value = studentName;
+  updateDashboardTitle();
+}
+
 function syncDashboardControls(subject = getSelectedSubject()) {
   const subjectSelect = document.getElementById("dashboardSubjectSelect");
   const unitSelect = document.getElementById("dashboardUnitSelect");
@@ -954,6 +980,7 @@ function updateStudyDashboard(subject = getSelectedSubject()) {
   const planList = document.getElementById("dashboardPlanList");
 
   syncDashboardControls(subject);
+  updateDashboardTitle();
   if (focusEl) focusEl.textContent = focus || "All units";
   if (subjectEl) subjectEl.textContent = subject.title;
   if (subjectBadge) subjectBadge.textContent = "User Dashboard";
@@ -1303,6 +1330,7 @@ function initDashboardPage() {
 
   const subjectSelect = document.getElementById("dashboardSubjectSelect");
   const unitSelect = document.getElementById("dashboardUnitSelect");
+  const studentNameInput = document.getElementById("dashboardStudentName");
   const tabs = Array.from(document.querySelectorAll("[data-dashboard-tab]"));
   const panels = Array.from(document.querySelectorAll("[data-dashboard-panel]"));
   const viewKey = "ap-practice-dashboard-view-v1";
@@ -1351,6 +1379,14 @@ function initDashboardPage() {
   }
 
   syncDashboardControls(getSelectedSubject());
+  syncStudentNameInput(studentNameInput);
+
+  studentNameInput?.addEventListener("input", () => {
+    try {
+      localStorage.setItem(STUDENT_NAME_KEY, studentNameInput.value.trim());
+    } catch {}
+    updateDashboardTitle();
+  });
 
   subjectSelect?.addEventListener("change", () => {
     const subject = getSubjectByTitle(subjectSelect.value) || getSelectedSubject();
