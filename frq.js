@@ -228,6 +228,8 @@ const frqEls = {
   flag: document.getElementById("frqFlagBtn"),
   jump: document.getElementById("frqJumpBtn"),
   reset: document.getElementById("frqResetBtn"),
+  prev: document.getElementById("frqPrevBtn"),
+  next: document.getElementById("frqNextBtn"),
   progressBar: document.getElementById("frqProgressBar"),
   saveStatus: document.getElementById("frqSaveStatus"),
   railText: document.getElementById("frqRailText"),
@@ -284,7 +286,14 @@ function normalizeAnswer(value) {
 }
 
 function criterionMet(text, criterion) {
-  return criterion.groups.every((group) => group.some((term) => text.includes(term.toLowerCase())));
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  if (criterion.minWords && words < criterion.minWords) return false;
+
+  const hits = criterion.groups.reduce((count, group) => {
+    return count + (group.some((term) => text.includes(term.toLowerCase())) ? 1 : 0);
+  }, 0);
+  const needed = Math.min(criterion.groups.length, criterion.minHits || criterion.groups.length);
+  return hits >= needed;
 }
 
 function gradeFrqItem(item, answers) {
@@ -485,6 +494,8 @@ function renderFrqs() {
   frqEls.submit.disabled = frqState.submitted;
   if (frqEls.flag) frqEls.flag.textContent = frqState.flagged[activeFrqIndex] ? "Unflag" : "Flag";
   frqEls.jump.textContent = frqState.submitted || answeredCount === frqItems.length ? "Review" : "Next Blank";
+  if (frqEls.prev) frqEls.prev.disabled = activeFrqIndex <= 0;
+  if (frqEls.next) frqEls.next.disabled = activeFrqIndex >= frqItems.length - 1;
 
   frqEls.list.innerHTML = frqItems.map((item, itemIndex) => `
     <article class="frq-card${frqState.submitted ? " is-graded" : ""}" id="frq-card-${itemIndex}" data-frq-index="${itemIndex}">
@@ -689,6 +700,8 @@ frqEls.flag?.addEventListener("click", () => {
 
 frqEls.submit.addEventListener("click", () => submitFrqs(false));
 frqEls.jump.addEventListener("click", jumpToNextBlank);
+frqEls.prev?.addEventListener("click", () => scrollToFrq(Math.max(0, activeFrqIndex - 1), true));
+frqEls.next?.addEventListener("click", () => scrollToFrq(Math.min(frqItems.length - 1, activeFrqIndex + 1), true));
 frqEls.reset.addEventListener("click", resetFrqs);
 frqEls.reviewFilter?.addEventListener("change", () => renderFrqSummary(getFrqTotalScore(), getFrqTotalMax()));
 frqEls.print?.addEventListener("click", () => window.print());

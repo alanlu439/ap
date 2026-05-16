@@ -1920,8 +1920,8 @@
     }
   };
 
-  function part(label, criterionLabel, groups) {
-    return { label, criteria: [{ label: criterionLabel, groups }] };
+  function part(label, criterionLabel, groups, options = {}) {
+    return { label, criteria: [{ label: criterionLabel, groups, ...options }] };
   }
 
   function frq(title, stimulus, parts) {
@@ -1930,55 +1930,55 @@
 
   function claimParts() {
     return [
-      part("(a) State a defensible claim or answer.", "States a defensible claim", [["claim", "argue", "answer", "thesis", "because"]]),
-      part("(b) Use specific evidence from the stimulus or course content.", "Uses specific evidence", [["evidence", "data", "source", "example", "shows"]]),
-      part("(c) Explain how the evidence supports the claim.", "Explains reasoning", [["because", "therefore", "explains", "causes", "reason"]]),
-      part("(d) Address a limitation, comparison, or broader implication.", "Adds complexity or implication", [["however", "although", "compare", "limitation", "implication"]])
+      part("(a) State a defensible claim or answer.", "States a defensible claim", [["claim", "argue", "answer", "thesis", "position", "because"]], { minWords: 6 }),
+      part("(b) Use specific evidence from the stimulus or course content.", "Uses specific evidence", [["evidence", "data", "source", "example", "detail", "document", "shows"]], { minWords: 8 }),
+      part("(c) Explain how the evidence supports the claim.", "Explains reasoning", [["because", "therefore", "explains", "causes", "supports", "reason", "leads"]], { minWords: 10 }),
+      part("(d) Address a limitation, comparison, or broader implication.", "Adds complexity or implication", [["however", "although", "compare", "contrast", "limitation", "implication", "context"]], { minWords: 10, minHits: 1 })
     ];
   }
 
   function scienceParts() {
     return [
-      part("(a) State a testable claim or prediction.", "States claim or prediction", [["claim", "predict", "increase", "decrease", "relationship"]]),
-      part("(b) Identify the independent variable, dependent variable, or control.", "Identifies variables or control", [["independent", "dependent", "control", "variable"]]),
-      part("(c) Use data or a model as evidence.", "Uses data or model evidence", [["data", "evidence", "trend", "graph", "model"]]),
-      part("(d) Explain the mechanism or source of uncertainty.", "Explains mechanism or uncertainty", [["because", "mechanism", "uncertainty", "error", "process"]])
+      part("(a) State a testable claim or prediction.", "States claim or prediction", [["claim", "predict", "hypothesis", "increase", "decrease", "relationship"]], { minWords: 6 }),
+      part("(b) Identify the independent variable, dependent variable, or control.", "Identifies variables or control", [["independent", "dependent", "control", "variable", "constant", "treatment"]], { minWords: 6, minHits: 1 }),
+      part("(c) Use data or a model as evidence.", "Uses data or model evidence", [["data", "evidence", "trend", "graph", "table", "model", "diagram"]], { minWords: 8 }),
+      part("(d) Explain the mechanism or source of uncertainty.", "Explains mechanism or uncertainty", [["because", "mechanism", "uncertainty", "error", "process", "particle", "system", "control"]], { minWords: 10, minHits: 1 })
     ];
   }
 
   function mathParts() {
     return [
-      part("(a) Identify the needed representation or quantity.", "Identifies representation or quantity", [["graph", "table", "quantity", "rate", "function", "model"]]),
-      part("(b) Set up the calculation or symbolic relationship.", "Sets up valid work", [["equation", "derivative", "integral", "limit", "calculate", "setup"]]),
-      part("(c) Carry out the work and report the result.", "Reports a result", [["equals", "result", "value", "answer", "approximately"]]),
-      part("(d) Interpret or justify the result in context.", "Interprets or justifies", [["because", "context", "units", "means", "therefore", "valid"]])
+      part("(a) Identify the needed representation or quantity.", "Identifies representation or quantity", [["graph", "table", "quantity", "rate", "function", "model", "variable"]], { minWords: 5 }),
+      part("(b) Set up the calculation or symbolic relationship.", "Sets up valid work", [["equation", "derivative", "integral", "limit", "calculate", "setup", "expression"]], { minWords: 5 }),
+      part("(c) Carry out the work and report the result.", "Reports a result", [["equals", "result", "value", "answer", "approximately", "approx", "="]], { minWords: 3, minHits: 1 }),
+      part("(d) Interpret or justify the result in context.", "Interprets or justifies", [["because", "context", "units", "means", "therefore", "valid", "represents"]], { minWords: 8, minHits: 1 })
     ];
   }
 
   function essayParts() {
     return [
-      part("(a) Write a defensible thesis.", "States a defensible thesis", [["claim", "thesis", "argue", "reveals", "shows"]]),
-      part("(b) Select specific textual or source evidence.", "Uses evidence", [["evidence", "quote", "detail", "source", "example"]]),
-      part("(c) Explain how the evidence supports the line of reasoning.", "Provides commentary", [["because", "therefore", "suggests", "emphasizes", "develops"]]),
-      part("(d) Address complexity, purpose, or context.", "Addresses complexity", [["although", "however", "complex", "purpose", "context", "tension"]])
+      part("(a) Write a defensible thesis.", "States a defensible thesis", [["claim", "thesis", "argue", "reveals", "shows", "position"]], { minWords: 8 }),
+      part("(b) Select specific textual or source evidence.", "Uses evidence", [["evidence", "quote", "detail", "source", "example", "document", "passage"]], { minWords: 8 }),
+      part("(c) Explain how the evidence supports the line of reasoning.", "Provides commentary", [["because", "therefore", "suggests", "emphasizes", "develops", "supports", "conveys"]], { minWords: 12 }),
+      part("(d) Address complexity, purpose, or context.", "Addresses complexity", [["although", "however", "complex", "purpose", "context", "tension", "audience", "period"]], { minWords: 12, minHits: 1 })
     ];
   }
 
   function codeParts() {
     return [
-      part("(a) Describe the purpose, input, or output.", "Describes purpose or I/O", [["purpose", "input", "output", "program", "method"]]),
-      part("(b) Explain the algorithm or abstraction.", "Explains algorithm or abstraction", [["algorithm", "abstraction", "loop", "condition", "list", "class"]]),
-      part("(c) Trace a test case or justify behavior.", "Traces behavior", [["test", "case", "trace", "returns", "result", "because"]]),
-      part("(d) Identify an improvement, limitation, or impact.", "Identifies improvement or impact", [["improve", "limitation", "impact", "security", "efficiency", "privacy"]])
+      part("(a) Describe the purpose, input, or output.", "Describes purpose or I/O", [["purpose", "input", "output", "program", "method", "procedure"]], { minWords: 6 }),
+      part("(b) Explain the algorithm or abstraction.", "Explains algorithm or abstraction", [["algorithm", "abstraction", "loop", "condition", "list", "array", "class", "method"]], { minWords: 8 }),
+      part("(c) Trace a test case or justify behavior.", "Traces behavior", [["test", "case", "trace", "returns", "result", "because", "iteration"]], { minWords: 8 }),
+      part("(d) Identify an improvement, limitation, or impact.", "Identifies improvement or impact", [["improve", "limitation", "impact", "security", "efficiency", "privacy", "bias"]], { minWords: 8, minHits: 1 })
     ];
   }
 
   function portfolioParts() {
     return [
-      part("(a) State the inquiry or artistic intent.", "States inquiry or intent", [["inquiry", "intent", "idea", "question", "investigation"]]),
-      part("(b) Describe specific visual evidence.", "Uses visual evidence", [["visual", "composition", "material", "process", "form", "evidence"]]),
-      part("(c) Explain revision or experimentation.", "Explains process", [["revise", "revision", "experiment", "process", "develop", "because"]]),
-      part("(d) Justify why the work belongs in the portfolio.", "Justifies selection", [["selected", "portfolio", "because", "demonstrates", "supports"]])
+      part("(a) State the inquiry or artistic intent.", "States inquiry or intent", [["inquiry", "intent", "idea", "question", "investigation", "sustained"]], { minWords: 6 }),
+      part("(b) Describe specific visual evidence.", "Uses visual evidence", [["visual", "composition", "material", "process", "form", "evidence", "surface", "space"]], { minWords: 8 }),
+      part("(c) Explain revision or experimentation.", "Explains process", [["revise", "revision", "experiment", "process", "develop", "iteration", "choice"]], { minWords: 10, minHits: 1 }),
+      part("(d) Justify why the work belongs in the portfolio.", "Justifies selection", [["selected", "portfolio", "because", "demonstrates", "supports", "skill", "intent"]], { minWords: 8, minHits: 1 })
     ];
   }
 
@@ -2367,20 +2367,34 @@
   }
 
   function fillTemplate(template, values) {
-    return String(template)
-      .replaceAll("{unit}", values.unit)
-      .replaceAll("{unitLower}", values.unitLower)
-      .replaceAll("{unitKey}", values.unitKey)
-      .replaceAll("{subjectTitle}", values.subjectTitle)
-      .replaceAll("{subjectShort}", values.subjectShort)
-      .replaceAll("{subjectKey}", values.subjectKey)
-      .replaceAll("{evidence}", values.evidence)
-      .replaceAll("{focus}", values.focus);
+    const replacements = {
+      unit: values.unit,
+      unitLower: values.unitLower,
+      unitKey: values.unitKey,
+      subjectTitle: values.subjectTitle,
+      subjectShort: values.subjectShort,
+      subjectKey: values.subjectKey,
+      evidence: values.evidence,
+      focus: values.focus,
+      sampleSize: values.sampleSize,
+      valueOne: values.valueOne,
+      valueTwo: values.valueTwo,
+      percentOne: values.percentOne,
+      percentTwo: values.percentTwo,
+      sourceType: values.sourceType,
+      comparisonGroup: values.comparisonGroup
+    };
+
+    return Object.entries(replacements).reduce((output, [key, value]) => {
+      return output.replaceAll("{" + key + "}", value === undefined ? "" : String(value));
+    }, String(template));
   }
 
   function filledCriteria(criteria, values) {
     return criteria.map((criterion) => ({
       label: fillTemplate(criterion.label, values),
+      minHits: criterion.minHits,
+      minWords: criterion.minWords,
       groups: criterion.groups.map((group) => group.map((term) => fillTemplate(term, values).toLowerCase()))
     }));
   }
@@ -2399,12 +2413,215 @@
     };
   }
 
+  function buildItemValues(subject, unit, index) {
+    const values = buildValues(subject, unit);
+    const base = index + subject.slug.length;
+
+    return {
+      ...values,
+      sampleSize: 24 + ((base * 7) % 88),
+      valueOne: 12 + ((base * 3) % 37),
+      valueTwo: 28 + ((base * 5) % 53),
+      percentOne: 6 + ((base * 4) % 32),
+      percentTwo: 34 + ((base * 3) % 46),
+      sourceType: ["graph", "table", "passage", "map", "model", "data display"][base % 6],
+      comparisonGroup: ["control group", "second sample", "alternate model", "comparison period"][base % 4]
+    };
+  }
+
   function oneLine(value) {
     return String(value || "").replace(/\s+/g, " ").trim();
   }
 
   function makeTask(stimulus, question, correct, distractors, explanation) {
     return { stimulus, question, correct, distractors, explanation };
+  }
+
+  const MCQ_SCENARIO_DETAILS = {
+    Statistics: [
+      "The item gives a random sample of {sampleSize} observations, a statistic of {percentOne}%, and a claim about a population.",
+      "A two-variable display compares a response near {valueOne} with another near {valueTwo} and asks for an inference-safe conclusion.",
+      "A simulation or sampling distribution is described with repeated trials and a success rate near {percentOne}%.",
+      "A significance test or confidence interval appears in context, with assumptions that must be checked before the conclusion."
+    ],
+    Calculus: [
+      "A differentiable model for {unitLower} is shown by a graph and a short table with values near {valueOne} and {valueTwo}.",
+      "A rate function in context is measured over a closed interval, so accumulation, units, and sign matter.",
+      "The item compares information from f, f', and f'' to justify a conclusion about behavior.",
+      "A contextual model asks for a calculus statement that remains valid under the stated domain."
+    ],
+    Precalculus: [
+      "A model for {unitLower} is fit only on a stated interval and is represented by a rule, graph, and table.",
+      "Two representations of the same function include an intercept, a rate of change, and a restricted domain.",
+      "The item asks whether a transformation, inverse, or composition preserves the stated relationship.",
+      "A real-world data set with {sampleSize} observations is modeled and compared with an alternate model."
+    ],
+    Biology: [
+      "A biological investigation reports a measured response changing from {valueOne} to {valueTwo} while the {comparisonGroup} remains lower.",
+      "A diagram of a pathway or feedback loop shows how one early step affects a later biological outcome.",
+      "A data display connects {unitLower} to variation across individuals, cells, populations, or ecosystems.",
+      "The item asks for a prediction that follows from a model and can be tested with controlled evidence."
+    ],
+    Chemistry: [
+      "A lab scenario gives measured amounts, a balanced relationship, and a particulate diagram for {unitLower}.",
+      "A reaction system is disturbed and the item asks for a prediction consistent with the model and conditions.",
+      "A data table includes values near {valueOne} and {valueTwo}, requiring units and chemical reasoning together.",
+      "A molecular-level explanation must agree with the observed change and the represented particles."
+    ],
+    Physics: [
+      "A physical system is represented by a diagram and a graph with units; the relevant value is near {valueOne}.",
+      "A lab group collects repeated measurements and asks how to reduce uncertainty in the model.",
+      "The prompt requires translating among words, equations, graphs, and a physical interpretation.",
+      "A prediction must use the stated assumptions, sign convention, and units for {unitLower}."
+    ],
+    History: [
+      "A {sourceType} from a named period has an author, audience, purpose, and point of view connected to {unitLower}.",
+      "Several developments are placed in sequence, and the item asks for causation, comparison, or continuity and change.",
+      "A claim must be limited to the period and supported with specific historical evidence.",
+      "A source is useful only when its context and limitation are considered with the broader development."
+    ],
+    Government: [
+      "A scenario links an institution, a constitutional principle, and a political outcome related to {unitLower}.",
+      "A data display compares groups or institutions with values near {percentOne}% and {percentTwo}%.",
+      "The item asks for an application of a required document, case, or political concept to new facts.",
+      "A political conclusion must stay within what the scenario and data support."
+    ],
+    Economics: [
+      "A market or macro model begins in equilibrium before a policy change or shock affects incentives.",
+      "A table compares marginal benefit, marginal cost, nominal value, or real value for {unitLower}.",
+      "The item asks which curve, schedule, or account changes and what happens to equilibrium.",
+      "A conclusion must use economic vocabulary and avoid claiming that one policy benefits every group."
+    ],
+    Psychology: [
+      "A research design names participants, an operational definition, a measurement, and a possible confounding variable.",
+      "A scenario describes behavior or cognition and asks which concept best explains the pattern.",
+      "A data display reports a response difference near {percentOne}% across conditions.",
+      "A conclusion must distinguish correlation, causation, ethics, and generalizability."
+    ],
+    Geography: [
+      "A map and table show a spatial pattern at local and regional scales for {unitLower}.",
+      "A scenario asks how scale, place, region, movement, or human-environment interaction changes an interpretation.",
+      "A data display compares rates near {percentOne}% and {percentTwo}% across locations.",
+      "The item requires a geographic explanation rather than a list of place names."
+    ],
+    EnglishLanguage: [
+      "A nonfiction passage addresses a specific audience through evidence, organization, diction, and syntax.",
+      "The item asks how a rhetorical choice advances purpose rather than merely naming a device.",
+      "A source-based argument requires a claim, evidence, and commentary about {unitLower}.",
+      "A revision must improve line of reasoning while preserving audience and purpose."
+    ],
+    EnglishLiterature: [
+      "A poem or prose passage develops meaning through narration, imagery, structure, or figurative language.",
+      "The item asks which interpretation is best supported by details from the passage.",
+      "A tonal or structural shift changes the reader's understanding of character, conflict, or theme.",
+      "A literary claim must connect evidence to meaning instead of summarizing plot."
+    ],
+    WorldLanguage: [
+      "An authentic-style message or article has a purpose, audience, register, and cultural context.",
+      "The item asks for interpretation or response using source details rather than word-by-word translation.",
+      "A comparison prompt requires a product, practice, or perspective connected to {unitLower}.",
+      "The best answer fits the task, register, and cultural context."
+    ],
+    Latin: [
+      "A Latin passage provides a verb form, case ending, word order clue, and context.",
+      "The item asks for translation or analysis that preserves grammar and meaning.",
+      "A short excerpt uses syntax or emphasis to shape interpretation.",
+      "The strongest answer uses Latin evidence rather than cognate guessing."
+    ],
+    SpanishLiterature: [
+      "A literary excerpt is paired with genre, period, imagery, tone, or historical context.",
+      "The item asks for interpretation supported by a device and textual evidence.",
+      "A comparison pairs a text with another work or artwork connected to {unitLower}.",
+      "The answer must use both evidence and context, not only plot summary."
+    ],
+    ComputerScienceA: [
+      "A Java method includes a loop, a conditional, a collection or object state, and a boundary case.",
+      "The item asks what code does for an input near {valueOne}, not what the author intended.",
+      "A class design question asks which replacement preserves specification and encapsulation.",
+      "The correct trace must handle types, scope, indexes, and method calls in order."
+    ],
+    ComputerSciencePrinciples: [
+      "A pseudocode algorithm processes a list using selection, iteration, and abstraction.",
+      "A computing-impact scenario involves data collection, privacy, security, or access.",
+      "The item asks for the actual behavior or consequence of a computing choice.",
+      "The answer must distinguish data, algorithms, networks, and social impact."
+    ],
+    Cybersecurity: [
+      "A security log shows assets, events, risk, and possible controls for {unitLower}.",
+      "A scenario asks which response best preserves evidence and reduces risk.",
+      "A control must match confidentiality, integrity, availability, authentication, or authorization.",
+      "The item asks for a practical security decision rather than the newest tool."
+    ],
+    Business: [
+      "A decision compares costs, expected benefits, risk, cash flow, and customer value.",
+      "A personal-finance case asks whether to borrow, save, invest, or insure.",
+      "A table includes values near {valueOne} and {valueTwo}, requiring tradeoff analysis.",
+      "The answer must balance financial reasoning with stakeholder needs."
+    ],
+    ArtPortfolio: [
+      "A portfolio statement names an inquiry, materials, process evidence, and revisions.",
+      "The item asks which critique best links visual evidence to intent.",
+      "A selected-works rationale must show skill, decision-making, and relationship to investigation.",
+      "The answer should evaluate process and evidence rather than personal taste."
+    ],
+    ArtHistory: [
+      "An artwork is described by medium, function, content, visual features, and cultural setting.",
+      "Two works are compared by form, patronage, function, or context.",
+      "The item asks for visual and contextual evidence, not only identification.",
+      "A claim about meaning must be supported by a specific detail."
+    ],
+    MusicTheory: [
+      "A notated or listening-style excerpt gives key, meter, melody, bass motion, and cadence evidence.",
+      "The item asks for a chord, rhythm, cadence, or voice-leading decision.",
+      "A melody contains a leap, stepwise motion, and a cadence that must be resolved by rule.",
+      "The best answer matches the notation and common-practice constraints."
+    ],
+    Capstone: [
+      "A research scenario includes a question, sources, method, limitation, and defense prompt.",
+      "The item asks how to narrow inquiry, evaluate credibility, or synthesize evidence.",
+      "A presentation defense must justify a choice with relevance and limitation.",
+      "The answer must support a focused claim rather than summarize sources separately."
+    ],
+    Social: [
+      "A scenario about {unitLower} includes evidence, a claim, and a competing interpretation.",
+      "The item asks for a course concept applied to a concrete situation.",
+      "A data display or source supports a limited conclusion, not a universal claim.",
+      "The answer must connect evidence to reasoning and avoid personal opinion."
+    ]
+  };
+
+  const FRQ_CONTEXT_DETAILS = {
+    Statistics: "The task includes a data summary, design feature, or inference condition that must be named in context.",
+    Calculus: "The task includes a table or graph, units, and a contextual quantity that requires setup and interpretation.",
+    Precalculus: "The task includes a model, domain restriction, and comparison of representations.",
+    Biology: "The task includes a biological mechanism, variables, and evidence from a model or data display.",
+    Chemistry: "The task includes measured quantities, a chemical model, and a particle-level or energy explanation.",
+    Physics: "The task includes a diagram, units, assumptions, and a model that must be translated into a justified result.",
+    History: "The task includes sourcing information and asks for a historically defensible claim supported by evidence.",
+    Government: "The task includes a political scenario, data or a required case/document, and a limited conclusion.",
+    Economics: "The task includes an economic model, graph shift, incentive, or policy effect in context.",
+    Psychology: "The task includes participants, operational definitions, data, ethics, and a limitation.",
+    Geography: "The task includes a map or spatial data at more than one scale.",
+    EnglishLanguage: "The task includes audience, purpose, evidence, and commentary on rhetorical choices.",
+    EnglishLiterature: "The task includes literary details that must be tied to meaning rather than plot summary.",
+    WorldLanguage: "The task includes interpretive context, register, and a cultural comparison or interpersonal response.",
+    Latin: "The task includes grammar, translation, and contextual analysis of a Latin passage.",
+    SpanishLiterature: "The task includes text evidence, literary device, period context, and comparison when relevant.",
+    ComputerScienceA: "The task includes a specification, input/output behavior, and a boundary case.",
+    ComputerSciencePrinciples: "The task includes pseudocode, data, abstraction, and a computing impact or limitation.",
+    Cybersecurity: "The task includes a security event, affected asset, risk, and appropriate control.",
+    Business: "The task includes costs, benefits, risk, cash flow, and a recommendation.",
+    ArtPortfolio: "The task includes inquiry, selected evidence, process documentation, and revision decisions.",
+    ArtHistory: "The task includes form, function, content, and context.",
+    MusicTheory: "The task includes notation or listening-style evidence, cadence, rhythm, and voice leading.",
+    Capstone: "The task includes inquiry, source credibility, synthesis, method, and limitation.",
+    Social: "The task includes a source, evidence, claim, and competing interpretation."
+  };
+
+  function mcqScenarioFor(subject, index, values) {
+    const key = profileKeyFor(subject);
+    const pool = MCQ_SCENARIO_DETAILS[key] || MCQ_SCENARIO_DETAILS[subject.group] || MCQ_SCENARIO_DETAILS.Social;
+    return fillTemplate(pool[index % pool.length], values);
   }
 
   const MCQ_STYLE_TASKS = {
@@ -2521,8 +2738,9 @@
   function buildMcqTask(subject, index, values) {
     const tasks = mcqTasksFor(subject);
     const rawTask = tasks[index % tasks.length];
+    const scenario = mcqScenarioFor(subject, index, values);
     return {
-      stimulus: fillTemplate(rawTask.stimulus, values),
+      stimulus: oneLine(scenario + " " + fillTemplate(rawTask.stimulus, values)),
       question: fillTemplate(rawTask.question, values),
       correct: fillTemplate(rawTask.correct, values),
       distractors: rawTask.distractors.map((choice) => fillTemplate(choice, values)),
@@ -2561,7 +2779,8 @@
   function frqPromptFor(subject, values, frqType) {
     const key = profileKeyFor(subject);
     const base = FRQ_STYLE_PROMPTS[key] || FRQ_STYLE_PROMPTS[subject.group] || FRQ_STYLE_PROMPTS.Social;
-    return fillTemplate(base, values) + " " + fillTemplate(frqType.stimulus, values);
+    const context = FRQ_CONTEXT_DETAILS[key] || FRQ_CONTEXT_DETAILS[subject.group] || FRQ_CONTEXT_DETAILS.Social;
+    return oneLine(fillTemplate(base, values) + " " + fillTemplate(context, values) + " " + fillTemplate(frqType.stimulus, values));
   }
 
   function buildMcqQuestions(subject = getSelectedSubject()) {
@@ -2571,7 +2790,7 @@
 
     return Array.from({ length: subject.format.mcqCount }, (_, index) => {
       const unit = subject.units[index % subject.units.length];
-      const values = buildValues(subject, unit);
+      const values = buildItemValues(subject, unit, index);
       const task = buildMcqTask(subject, index, values);
       const choices = rotateChoices([task.correct, ...task.distractors.slice(0, choiceCount - 1)], index + subject.slug.length);
       const setStart = Math.floor(index / setLength) * setLength + 1;
@@ -2604,7 +2823,7 @@
       const unit = units[index % units.length];
       const unitIndex = Math.max(0, subject.units.indexOf(unit));
       const frqType = blueprint[index % blueprint.length];
-      const values = buildValues(subject, unit);
+      const values = buildItemValues(subject, unit, index);
 
       return {
         id: index + 1,

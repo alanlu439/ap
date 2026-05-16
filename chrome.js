@@ -185,10 +185,16 @@ function updateChromeProgress() {
 
 function initFocusMode() {
   const buttons = document.querySelectorAll("[data-focus-toggle]");
+  if (!buttons.length) {
+    document.body.classList.remove("focus-mode");
+    document.documentElement.dataset.focusMode = "off";
+    return;
+  }
   const apply = (enabled) => {
     document.body.classList.toggle("focus-mode", enabled);
+    document.documentElement.dataset.focusMode = enabled ? "on" : "off";
     buttons.forEach((button) => {
-      button.textContent = enabled ? "Vibrant" : "Focus";
+      button.textContent = enabled ? "Exit Focus" : "Focus";
       button.setAttribute("aria-pressed", String(enabled));
     });
   };
