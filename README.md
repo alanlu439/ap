@@ -16,6 +16,7 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 - Pick a unit focus for targeted practice
 - Track a local study dashboard with saved progress, flags, and recent score history
 - Answer MCQs with saved progress and review feedback
+- Practice with original CB-aligned MCQ and FRQ banks modeled on released AP task types and scoring categories
 - Mark MCQs as flagged or guessed, then filter review by missed, flagged, guessed, or unit
 - Write FRQ responses and get estimated rubric feedback after submission
 - Print a practice summary for MCQ or FRQ review
@@ -117,9 +118,10 @@ The first public release is available here:
 
 ## Official Reference Links
 
-Exam structures and the AP course catalog were checked against official College Board/AP pages, including AP Central course exam pages and AP Students course resources. The app stores the structure data and original practice-bank profiles in `practice-data.js`. Portfolio, AP Capstone, and AP Career Kickstart courses use practice mappings so the site can still offer MCQ and FRQ-style study flows while noting their nontraditional official assessment formats.
+Exam structures, task types, and scoring categories were checked against official College Board/AP pages, including AP Central course exam pages, AP Students course resources, and AP Central released free-response/scoring archives. The app stores the structure data and original practice-bank profiles in `practice-data.js`. The questions are original practice items generated to follow official AP-style skills, task verbs, and rubric categories; they do not copy official AP Exam questions or scoring text. Portfolio, AP Capstone, and AP Career Kickstart courses use practice mappings so the site can still offer MCQ and FRQ-style study flows while noting their nontraditional official assessment formats.
 
 - [AP Central Courses](https://apcentral.collegeboard.org/courses)
+- [AP Central Released Free-Response Questions and Scoring Information](https://apcentral.collegeboard.org/courses/past-exam-questions)
 - [AP Students Courses](https://apstudents.collegeboard.org/courses)
 - [2026 AP Exam Dates](https://apstudents.collegeboard.org/exam-dates)
 - [Register for AP Exams](https://apstudents.collegeboard.org/register-for-ap-exams)

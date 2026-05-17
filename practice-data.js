@@ -1930,37 +1930,46 @@
 
   function claimParts() {
     return [
-      part("(a) State a defensible claim or answer.", "States a defensible claim", [["claim", "argue", "answer", "thesis", "position", "because"]], { minWords: 6 }),
-      part("(b) Use specific evidence from the stimulus or course content.", "Uses specific evidence", [["evidence", "data", "source", "example", "detail", "document", "shows"]], { minWords: 8 }),
-      part("(c) Explain how the evidence supports the claim.", "Explains reasoning", [["because", "therefore", "explains", "causes", "supports", "reason", "leads"]], { minWords: 10 }),
-      part("(d) Address a limitation, comparison, or broader implication.", "Adds complexity or implication", [["however", "although", "compare", "contrast", "limitation", "implication", "context"]], { minWords: 10, minHits: 1 })
+      part("(a) Make a defensible claim that directly answers the task.", "Directly answers with a defensible claim", [["claim", "argue", "answer", "thesis", "position", "because"]], { minWords: 6 }),
+      part("(b) Use specific evidence from the source, data, or course content.", "Uses specific relevant evidence", [["evidence", "data", "source", "example", "detail", "document", "shows"]], { minWords: 8 }),
+      part("(c) Explain how the evidence supports the claim using course reasoning.", "Explains the evidence with course reasoning", [["because", "therefore", "explains", "causes", "supports", "reason", "leads"]], { minWords: 10 }),
+      part("(d) Qualify the claim with a limitation, comparison, context, or implication.", "Adds qualification or complexity", [["however", "although", "compare", "contrast", "limitation", "implication", "context"]], { minWords: 10, minHits: 1 })
     ];
   }
 
   function scienceParts() {
     return [
-      part("(a) State a testable claim or prediction.", "States claim or prediction", [["claim", "predict", "hypothesis", "increase", "decrease", "relationship"]], { minWords: 6 }),
-      part("(b) Identify the independent variable, dependent variable, or control.", "Identifies variables or control", [["independent", "dependent", "control", "variable", "constant", "treatment"]], { minWords: 6, minHits: 1 }),
-      part("(c) Use data or a model as evidence.", "Uses data or model evidence", [["data", "evidence", "trend", "graph", "table", "model", "diagram"]], { minWords: 8 }),
-      part("(d) Explain the mechanism or source of uncertainty.", "Explains mechanism or uncertainty", [["because", "mechanism", "uncertainty", "error", "process", "particle", "system", "control"]], { minWords: 10, minHits: 1 })
+      part("(a) State a testable claim or prediction in context.", "States a contextual claim or prediction", [["claim", "predict", "hypothesis", "increase", "decrease", "relationship"]], { minWords: 6 }),
+      part("(b) Identify the variable, control, procedure, or measured quantity needed to test the claim.", "Identifies design elements", [["independent", "dependent", "control", "variable", "constant", "treatment", "measure"]], { minWords: 6, minHits: 1 }),
+      part("(c) Use data, a model, or a graph as evidence for the answer.", "Uses data or model evidence", [["data", "evidence", "trend", "graph", "table", "model", "diagram"]], { minWords: 8 }),
+      part("(d) Explain the mechanism, uncertainty, or model limitation that affects the conclusion.", "Explains mechanism or uncertainty", [["because", "mechanism", "uncertainty", "error", "process", "particle", "system", "control", "limitation"]], { minWords: 10, minHits: 1 })
     ];
   }
 
   function mathParts() {
     return [
-      part("(a) Identify the needed representation or quantity.", "Identifies representation or quantity", [["graph", "table", "quantity", "rate", "function", "model", "variable"]], { minWords: 5 }),
-      part("(b) Set up the calculation or symbolic relationship.", "Sets up valid work", [["equation", "derivative", "integral", "limit", "calculate", "setup", "expression"]], { minWords: 5 }),
-      part("(c) Carry out the work and report the result.", "Reports a result", [["equals", "result", "value", "answer", "approximately", "approx", "="]], { minWords: 3, minHits: 1 }),
-      part("(d) Interpret or justify the result in context.", "Interprets or justifies", [["because", "context", "units", "means", "therefore", "valid", "represents"]], { minWords: 8, minHits: 1 })
+      part("(a) Identify the representation, quantity, or condition needed for the method.", "Identifies relevant information", [["graph", "table", "quantity", "rate", "function", "model", "variable", "condition"]], { minWords: 5 }),
+      part("(b) Set up a valid calculation, equation, or symbolic relationship.", "Sets up valid work", [["equation", "derivative", "integral", "limit", "calculate", "setup", "expression"]], { minWords: 5 }),
+      part("(c) Complete the procedure and report a result with appropriate notation or units.", "Reports a result", [["equals", "result", "value", "answer", "approximately", "approx", "units", "="]], { minWords: 3, minHits: 1 }),
+      part("(d) Interpret or justify the result in the original context.", "Interprets or justifies", [["because", "context", "units", "means", "therefore", "valid", "represents"]], { minWords: 8, minHits: 1 })
+    ];
+  }
+
+  function statisticsParts() {
+    return [
+      part("(a) Identify the parameter, statistic, design feature, or condition needed for the method.", "Identifies parameter, statistic, design, or condition", [["parameter", "statistic", "random", "condition", "independent", "sample", "population"]], { minWords: 6, minHits: 1 }),
+      part("(b) Set up and carry out the appropriate calculation, comparison, or probability statement.", "Sets up and carries out appropriate statistical work", [["calculate", "probability", "interval", "test", "mean", "proportion", "standard", "p-value", "z", "t"]], { minWords: 6, minHits: 1 }),
+      part("(c) Interpret the result in context without overstating causation or certainty.", "Interprets in context", [["context", "means", "evidence", "estimate", "confidence", "convincing", "population", "sample"]], { minWords: 8, minHits: 1 }),
+      part("(d) Justify the conclusion by connecting the method, conditions, and evidence.", "Justifies conclusion with conditions and evidence", [["because", "therefore", "condition", "random", "evidence", "supports", "not prove", "uncertainty"]], { minWords: 10, minHits: 1 })
     ];
   }
 
   function essayParts() {
     return [
-      part("(a) Write a defensible thesis.", "States a defensible thesis", [["claim", "thesis", "argue", "reveals", "shows", "position"]], { minWords: 8 }),
-      part("(b) Select specific textual or source evidence.", "Uses evidence", [["evidence", "quote", "detail", "source", "example", "document", "passage"]], { minWords: 8 }),
-      part("(c) Explain how the evidence supports the line of reasoning.", "Provides commentary", [["because", "therefore", "suggests", "emphasizes", "develops", "supports", "conveys"]], { minWords: 12 }),
-      part("(d) Address complexity, purpose, or context.", "Addresses complexity", [["although", "however", "complex", "purpose", "context", "tension", "audience", "period"]], { minWords: 12, minHits: 1 })
+      part("(a) Write a defensible thesis that establishes a line of reasoning.", "States a defensible thesis", [["claim", "thesis", "argue", "reveals", "shows", "position"]], { minWords: 8 }),
+      part("(b) Select specific textual, source, document, or course evidence.", "Uses specific evidence", [["evidence", "quote", "detail", "source", "example", "document", "passage"]], { minWords: 8 }),
+      part("(c) Explain how the evidence supports the line of reasoning.", "Provides commentary or historical reasoning", [["because", "therefore", "suggests", "emphasizes", "develops", "supports", "conveys"]], { minWords: 12 }),
+      part("(d) Address complexity, purpose, context, or a significant qualification.", "Addresses complexity", [["although", "however", "complex", "purpose", "context", "tension", "audience", "period"]], { minWords: 12, minHits: 1 })
     ];
   }
 
@@ -1975,10 +1984,10 @@
 
   function portfolioParts() {
     return [
-      part("(a) State the inquiry or artistic intent.", "States inquiry or intent", [["inquiry", "intent", "idea", "question", "investigation", "sustained"]], { minWords: 6 }),
-      part("(b) Describe specific visual evidence.", "Uses visual evidence", [["visual", "composition", "material", "process", "form", "evidence", "surface", "space"]], { minWords: 8 }),
-      part("(c) Explain revision or experimentation.", "Explains process", [["revise", "revision", "experiment", "process", "develop", "iteration", "choice"]], { minWords: 10, minHits: 1 }),
-      part("(d) Justify why the work belongs in the portfolio.", "Justifies selection", [["selected", "portfolio", "because", "demonstrates", "supports", "skill", "intent"]], { minWords: 8, minHits: 1 })
+      part("(a) State the inquiry or artistic intent behind the work.", "States inquiry or intent", [["inquiry", "intent", "idea", "question", "investigation", "sustained"]], { minWords: 6 }),
+      part("(b) Describe specific visual evidence from materials, process, form, or composition.", "Uses visual evidence", [["visual", "composition", "material", "process", "form", "evidence", "surface", "space"]], { minWords: 8 }),
+      part("(c) Explain how revision, experimentation, or decision-making developed the work.", "Explains process and revision", [["revise", "revision", "experiment", "process", "develop", "iteration", "choice"]], { minWords: 10, minHits: 1 }),
+      part("(d) Justify why the selected work demonstrates skill and supports the inquiry.", "Justifies selection", [["selected", "portfolio", "because", "demonstrates", "supports", "skill", "intent"]], { minWords: 8, minHits: 1 })
     ];
   }
 
@@ -2081,6 +2090,14 @@
       frq("Graph and Table Analysis", "Use a graph or table to justify features of a model.", mathParts()),
       frq("Transformation or Composition", "Analyze transformations, composition, or inverse relationships in context.", mathParts()),
       frq("Modeling Choice", "Compare models and justify which is most appropriate for the context.", mathParts())
+    ],
+    "AP Statistics": [
+      frq("Collecting Data", "Evaluate a sampling or experimental design connected to {unit}, including randomization, controls, and scope of inference.", statisticsParts()),
+      frq("Exploring Data", "Compare distributions or summarize an association using graphical and numerical evidence from {unit}.", statisticsParts()),
+      frq("Probability and Simulation", "Use probability rules, random variables, or simulation results to answer a question about {unit}.", statisticsParts()),
+      frq("Inference for Proportions", "Check conditions, perform inference, and interpret a conclusion for a population proportion in context.", statisticsParts()),
+      frq("Inference for Means or Regression", "Use an appropriate inference procedure or regression model and interpret the result in context.", statisticsParts()),
+      frq("Investigative Task", "Combine design, data analysis, probability, and inference to solve a multi-step problem related to {unit}.", statisticsParts())
     ],
     "AP English Language and Composition": [
       frq("Synthesis Essay", "Use multiple sources to develop a defensible argument about an issue connected to {unit}.", essayParts()),
@@ -2730,17 +2747,168 @@
     ]
   };
 
+  const OFFICIAL_ALIGNMENT_SOURCES = [
+    {
+      label: "AP Central released FRQs and scoring information",
+      url: "https://apcentral.collegeboard.org/courses/past-exam-questions"
+    },
+    {
+      label: "AP Central course and exam pages",
+      url: "https://apcentral.collegeboard.org/courses"
+    },
+    {
+      label: "AP Students course pages",
+      url: "https://apstudents.collegeboard.org/courses"
+    }
+  ];
+
+  const CB_ALIGNED_MCQ_TASKS = {
+    Statistics: [
+      makeTask("A random sample of {sampleSize} students is used to estimate a population proportion for a question about {unitLower}. The sample proportion is {percentOne}%, and the margin of error is reported.", "Which interpretation is most appropriate?", "The interval estimates the population proportion for students represented by the random sampling method, with uncertainty described by the margin of error.", ["The interval proves the exact proportion for every student in the population.", "The margin of error can be ignored because the statistic came from a sample.", "The result proves that the measured variable caused the response.", "The sample proportion applies only to the sampled students and can never support inference."], "The correct interpretation names the population, uses the sample design, and keeps the inference within the margin of error."),
+      makeTask("Two distributions for {unitLower} have similar shapes. Group A has median {valueOne} and IQR {percentOne}; Group B has median {valueTwo} and IQR {percentTwo}.", "Which comparison is justified?", "The group with the larger median has the greater typical value, while IQR compares variability in the middle half of each distribution.", ["The group with the larger IQR must also have the larger mean.", "The medians prove every value in one group exceeds every value in the other.", "The smaller IQR proves the total range is smaller.", "The distributions must be normal because medians and IQRs are given."], "AP Statistics comparisons must separate center, variability, shape, and context."),
+      makeTask("A significance test for a claim about {unitLower} gives a small p-value after the randomization and large-count conditions are checked.", "What conclusion follows?", "There is convincing evidence against the null claim in the direction of the alternative, stated in context.", ["The null claim is proven false for every future sample.", "The p-value is the probability that the alternative claim is true.", "The sample statistic must equal the population parameter.", "A small p-value removes the need to discuss context."], "A valid test conclusion uses evidence against the null and avoids proving the alternative.")
+    ],
+    Calculus: [
+      makeTask("A differentiable function models {unitLower}. A graph of f' is positive on an interval and decreases from {valueTwo} to {valueOne}.", "Which statement is supported?", "The original function is increasing on the interval, and its graph is concave down where f' is decreasing.", ["The original function has a local maximum wherever f' is positive.", "The original function is decreasing because f' is decreasing.", "The graph of f must be linear because f' is shown on a graph.", "The value of f equals the area under f' at every point."], "Derivative sign determines increasing or decreasing behavior; derivative change determines concavity."),
+      makeTask("A rate function r(t), measured in units per hour, describes change in a quantity related to {unitLower} from t = a to t = b.", "Which expression gives net change?", "The definite integral of r(t) from a to b, with units of the accumulated quantity.", ["The derivative r'(b), because it gives total accumulation.", "The endpoint difference r(b) - r(a), because rates are quantities.", "The average of r(a) and r(b), without multiplying by time.", "The reciprocal of r(t), because rates are inverted for totals."], "A definite integral of a rate over time gives net change in context."),
+      makeTask("A table for f gives values near {valueOne} and {valueTwo}, and the prompt asks for a justified approximation.", "Which method is most defensible?", "Use the relevant table values with the specified numerical method and explain what the approximation represents in context.", ["Use any two entries because all table intervals are interchangeable.", "Differentiate the table values without explaining units.", "Report a decimal answer without setup or interpretation.", "Assume the approximation is exact because the values are listed."], "AP Calculus scoring rewards setup, procedure, and contextual interpretation.")
+    ],
+    Precalculus: [
+      makeTask("A function model for {unitLower} is fitted only on a domain from 0 to {valueTwo}.", "Which prediction is most defensible?", "A prediction within the observed domain is more defensible than an extrapolation far outside the stated domain.", ["The model is accurate for all real inputs because it has a formula.", "The y-intercept is always the most important feature.", "A graphing calculator output removes the need for context.", "The model with the largest value is automatically best."], "Modeling questions require attention to domain, representation, and context."),
+      makeTask("A table, graph, and symbolic rule represent the same relationship for {unitLower}.", "Which comparison is valid?", "Features such as intercepts, extrema, and rates of change should agree across equivalent representations.", ["The representations must use the same visual scale to be equivalent.", "Only the symbolic rule can show function behavior.", "A table cannot show an input-output relationship.", "A transformation never changes a function's graph."], "Equivalent representations preserve the same mathematical features.")
+    ],
+    Biology: [
+      makeTask("Cells exposed to a treatment related to {unitLower} show a response increase from {valueOne} to {valueTwo}, while the control remains nearly unchanged.", "Which explanation best fits the evidence?", "The treatment is associated with the response, and the proposed biological mechanism should explain why the treated cells changed relative to the control.", ["The treatment must affect every organism in the same way.", "The control can be ignored because the treatment group changed.", "The data prove the exact molecular mechanism without additional evidence.", "The conclusion should describe only the graph and avoid biology."], "AP Biology questions connect data trends to biological mechanisms and controls."),
+      makeTask("A model of a pathway for {unitLower} shows that an early step affects a later measurable response.", "Which prediction follows?", "Disrupting the early step should change the later response if the pathway model is accurate.", ["Changing the later response must always change every earlier step.", "No prediction can be made from a model.", "All pathway steps must change by the same amount.", "A model is valid only if it includes every molecule in the system."], "A model supports predictions that can be tested with evidence.")
+    ],
+    Chemistry: [
+      makeTask("A reaction system involving {unitLower} is represented by a balanced equation, measured amounts, and a particulate diagram.", "Which response gives the best chemical reasoning?", "Use the balanced relationship for amounts and explain the observation with particles, attractions, energy, or equilibrium.", ["Use a coefficient as a measured mass without conversion.", "Report only a number and omit the particle-level explanation.", "Ignore the data because diagrams are always sufficient.", "Assume every reaction goes to completion under all conditions."], "AP Chemistry tasks often require quantitative and particle-level reasoning together."),
+      makeTask("A system at equilibrium involving {unitLower} is disturbed by a change in concentration, pressure, or temperature.", "Which prediction is defensible?", "The system responds in the direction that reduces the disturbance, and the explanation must match the reaction model.", ["The system always shifts toward products after any disturbance.", "The equilibrium constant changes after every concentration change.", "Only the color change matters, not particle interactions.", "The side with more substances is always favored."], "Equilibrium reasoning must match the balanced model and the stated conditions.")
+    ],
+    Science: [
+      makeTask("A controlled investigation of {unitLower} compares a treatment group with a control group and records a consistent trend.", "Which conclusion is strongest?", "The treatment is associated with the response, and a stronger causal claim depends on controlled variables and appropriate assignment.", ["The trend proves the mechanism even if variables were not controlled.", "The control group is unnecessary because the treatment group changed.", "The largest single measurement establishes the conclusion.", "The response variable should be changed midway through the investigation."], "Science items connect data, experimental design, and limits on conclusions."),
+      makeTask("A model predicts that changing one component of a system related to {unitLower} will alter a measurable output.", "Which evidence would best test the model?", "Data from a controlled comparison in which only the predicted component is changed and the output is measured.", ["A restatement of the model without new evidence.", "A trial in which several components change at once.", "A conclusion based only on the first observation.", "A claim that the model is correct because it is simple."], "A useful model test isolates a variable and compares evidence to the prediction.")
+    ],
+    Physics: [
+      makeTask("A physical system involving {unitLower} is represented by a diagram and a graph with labeled axes and units.", "Which interpretation is correct?", "Match the graph's slope, area, or intercept to the physical quantity, including sign and units.", ["The steepest-looking line always means the largest force.", "The area under every graph has the same meaning.", "A negative value is impossible in a physical model.", "Units can be omitted when the equation is correct."], "AP Physics questions emphasize representations, units, signs, and assumptions."),
+      makeTask("A lab group tests a model for {unitLower} and notices variation across repeated trials.", "Which revision would best reduce uncertainty?", "Measure relevant quantities more precisely, repeat trials, and control variables that affect the model.", ["Change several variables so the trend is easier to see.", "Remove trials that do not match the prediction without justification.", "Use only a verbal explanation instead of measurements.", "Choose the conclusion before collecting data."], "Experimental physics rewards controls, repeated measurement, and uncertainty reasoning.")
+    ],
+    History: [
+      makeTask("A {sourceType} about {unitLower} was created for a specific audience during a period of political, social, or economic change.", "Which use of the source is strongest?", "It connects the author's perspective and historical context to a defensible claim about a broader development.", ["It restates the source without explaining why the evidence matters.", "It treats the source as neutral because all historical sources are factual.", "It makes a claim about a different period with no connection to the source.", "It lists events without establishing a line of reasoning."], "AP history items require sourcing, context, chronology, and evidence."),
+      makeTask("Several developments related to {unitLower} can be explained through causation, comparison, or continuity and change.", "Which claim is strongest?", "A specific claim that identifies the development and explains its relationship to evidence from the period.", ["A broad claim that could apply to any century.", "A claim based only on present-day values.", "A claim that repeats the prompt without analysis.", "A claim that ignores chronology."], "Historical claims need specificity and a reasoning process.")
+    ],
+    Government: [
+      makeTask("A scenario involving {unitLower} describes an institution, a constitutional principle, and a policy conflict.", "Which application is most accurate?", "The answer applies the correct constitutional principle, required document, or required case to the facts of the scenario.", ["The answer defines the principle but never applies it.", "The answer chooses a required case only because it is famous.", "The answer relies on personal opinion instead of course evidence.", "The answer ignores which institution has authority."], "AP Government questions reward application of concepts, cases, documents, and data."),
+      makeTask("A chart related to {unitLower} shows values near {percentOne}% and {percentTwo}% for different groups.", "Which conclusion is best supported?", "The data support a limited claim about the observed trend, but a causal explanation would require more evidence.", ["The chart proves the cause of the trend by itself.", "The highest value always identifies the most political power.", "The trend is invalid unless every voter was surveyed.", "The data should be ignored if they challenge expectations."], "Quantitative political analysis reads trends without overstating causation.")
+    ],
+    Economics: [
+      makeTask("A market or macroeconomic model involving {unitLower} begins in equilibrium before a policy change or shock occurs.", "Which effect follows from the model?", "The relevant curve, schedule, or account changes, leading to a predictable change in price, quantity, output, inflation, unemployment, or welfare.", ["Both curves must shift whenever conditions change.", "Labels are unnecessary if the direction seems obvious.", "A policy always improves every economic outcome.", "A shortage and a surplus mean the same thing."], "AP Economics items depend on model labels, incentives, and graph shifts."),
+      makeTask("A table related to {unitLower} includes nominal values, real values, marginal benefits, or marginal costs.", "Which interpretation is best?", "The conclusion should distinguish nominal from real measures and compare the relevant marginal benefit and marginal cost.", ["The option with the largest dollar amount is always best.", "Opportunity cost is zero when no money is paid.", "Nominal and real values are interchangeable.", "Averages always answer marginal decision questions."], "Economic reasoning often hinges on real versus nominal values and marginal analysis.")
+    ],
+    Psychology: [
+      makeTask("A study about {unitLower} compares behavior across groups and reports a correlation between two measured variables.", "Which conclusion is appropriate?", "The variables are associated, but a causal claim requires an experimental design with appropriate controls.", ["The correlation proves one variable caused the other.", "The operational definition does not matter if the sample is large.", "A single case study proves the general pattern.", "The study is invalid because psychology cannot use data."], "AP Psychology questions emphasize concept application and research-method limits."),
+      makeTask("A person in a scenario shows behavior related to {unitLower}.", "Which answer best applies the concept?", "It identifies the psychological concept and explains how the specific behavior illustrates it.", ["It defines the term without connecting it to the scenario.", "It gives a popular explanation without course vocabulary.", "It applies a different perspective without evidence.", "It assumes the behavior has only one possible explanation."], "Application requires matching the concept to specific evidence.")
+    ],
+    Geography: [
+      makeTask("A map and table related to {unitLower} show a spatial pattern at local, regional, and global scales.", "Which explanation is strongest?", "It identifies the pattern, names the relevant scale, and explains the geographic process that produced it.", ["It describes locations but gives no process.", "It uses a global conclusion for a local pattern without support.", "It ignores regional variation in the data.", "It assumes every place follows the same pattern."], "AP Human Geography questions require spatial reasoning, scale, and process."),
+      makeTask("A geographic model is applied to a real situation involving {unitLower}.", "Which use of the model is most defensible?", "The model can explain part of the pattern, but local context and exceptions must be considered.", ["The model predicts every place perfectly.", "The model is invalid whenever one exception exists.", "Only physical geography matters in human geography.", "Scale is irrelevant if the model is named correctly."], "Models are useful when applied with attention to place and scale.")
+    ],
+    EnglishLanguage: [
+      makeTask("A nonfiction passage about {unitLower} addresses a specific audience and develops a claim through evidence, organization, diction, and syntax.", "Which analysis is strongest?", "It identifies a rhetorical choice and explains how it helps the writer achieve a purpose for that audience.", ["It summarizes the passage without analyzing how it works.", "It names a device but gives only a generic effect.", "It judges whether the writer is right instead of analyzing rhetoric.", "It quotes a detail that does not support the claim."], "Rhetorical analysis connects choice, purpose, and audience."),
+      makeTask("A draft argument about {unitLower} contains a claim, evidence, and commentary.", "Which revision would most improve the line of reasoning?", "Add commentary that explains how the evidence supports the claim and why it matters for the audience.", ["Add unrelated facts to make the paragraph longer.", "Remove the claim so the reader can decide the position.", "Replace evidence with a personal preference.", "Use a more complex word without changing the reasoning."], "AP English Language revision items focus on reasoning, evidence, and purpose.")
+    ],
+    EnglishLiterature: [
+      makeTask("A literary passage involving {unitLower} uses imagery, structure, narration, or figurative language to develop meaning.", "Which interpretation is best supported?", "The interpretation connects a specific textual detail to a larger meaning or tension in the passage.", ["The interpretation retells the plot without analysis.", "The interpretation names a device but gives no effect.", "The interpretation relies only on the reader's personal reaction.", "The interpretation ignores the passage's language."], "Literary analysis links evidence to meaning, not just plot."),
+      makeTask("A passage shifts in tone or focus while developing {unitLower}.", "What is the effect of the shift?", "It changes the reader's understanding of character, conflict, or theme through specific details in the text.", ["It proves the author changed topics accidentally.", "It matters only if the passage is poetry.", "It eliminates the need for evidence.", "It means the earlier section should be ignored."], "AP Literature questions ask how choices develop meaning.")
+    ],
+    WorldLanguage: [
+      makeTask("An authentic-style message about {unitLower} has a purpose, audience, register, and cultural context.", "Which response best fits the task?", "It answers the prompt with appropriate register, uses details from the source, and respects cultural context.", ["It translates isolated words without addressing the task.", "It uses slang in a formal message without purpose.", "It ignores the source details and gives a memorized fact.", "It avoids a response because cultural context is present."], "World language practice combines interpretation, register, and cultural context."),
+      makeTask("A cultural comparison prompt asks about a product, practice, or perspective related to {unitLower}.", "Which comparison is strongest?", "It compares a specific cultural example with a clear explanation of the perspective behind it.", ["It lists stereotypes without evidence.", "It mentions a country but no cultural practice.", "It describes only one place and avoids comparison.", "It gives a memorized fact unrelated to the prompt."], "Cultural comparison requires specific examples and perspective.")
+    ],
+    Latin: [
+      makeTask("A Latin passage connected to {unitLower} contains a key verb form, case usage, word order clue, and context.", "Which translation choice is best?", "The translation preserves grammar, tense, and relationships among the words in context.", ["The translation sounds natural but ignores the case ending.", "The translation changes tense to match a guess.", "The translation omits a word that affects meaning.", "The translation relies only on English cognates."], "AP Latin questions require grammar and context, not loose paraphrase."),
+      makeTask("A short excerpt uses syntax or word order to emphasize an idea related to {unitLower}.", "Which analysis is strongest?", "It identifies the grammatical feature and explains how it shapes meaning in the passage.", ["It names a grammar term that is not present.", "It gives historical context but no Latin evidence.", "It translates the line without analysis.", "It treats word order as meaningless."], "Latin analysis links grammar, vocabulary, and effect.")
+    ],
+    SpanishLiterature: [
+      makeTask("An excerpt related to {unitLower} uses imagery, tone, genre, or historical context to develop a theme.", "Which interpretation is best supported?", "It connects a specific literary device to theme and period with textual evidence.", ["It summarizes the plot without literary analysis.", "It names a movement but gives no evidence.", "It treats every symbol as having the same meaning.", "It compares works only by title or author."], "AP Spanish Literature questions require textual support, genre, context, and comparison."),
+      makeTask("A comparison prompt pairs a literary text with another text or artwork connected to {unitLower}.", "Which comparison is strongest?", "It explains a meaningful similarity or difference using evidence from both works.", ["It discusses only one work.", "It makes a general claim about culture without textual support.", "It identifies a device in one work but not the other.", "It chooses the older work as automatically more important."], "Comparative analysis must use both works as evidence.")
+    ],
+    ComputerScienceA: [
+      makeTask("A Java method involving {unitLower} uses a loop, a conditional statement, and an array or object state.", "Which result is most likely after execution?", "Trace each iteration, update variables in order, and check boundary conditions before choosing the output.", ["Assume the loop runs one more time than its condition allows.", "Ignore zero-based indexing.", "Describe what the method was intended to do instead of what it does.", "Assume object fields reset automatically between method calls."], "AP CSA questions require precise tracing and boundary awareness."),
+      makeTask("A class design problem related to {unitLower} asks which replacement code preserves behavior.", "Which replacement is best?", "The replacement maintains encapsulation, uses the correct types, and handles all specified cases.", ["The replacement works only for the example input.", "The replacement exposes private state unnecessarily.", "The replacement changes the required method signature.", "The replacement compiles only if an unrelated variable exists."], "CSA distractors often fail on type, scope, boundary, or specification details.")
+    ],
+    ComputerSciencePrinciples: [
+      makeTask("A pseudocode algorithm related to {unitLower} processes a list using selection, iteration, and abstraction.", "Which statement best describes the algorithm?", "It describes the actual output after tracing the algorithm and explains how abstraction manages complexity.", ["It states the program's goal but not its behavior.", "It assumes the list is sorted when the prompt does not say so.", "It ignores a condition inside the loop.", "It treats every algorithm as equally efficient."], "AP CSP questions test algorithms, abstraction, data, and impacts."),
+      makeTask("A computing-impact scenario involving {unitLower} describes data collection, security, or network behavior.", "Which concern is most relevant?", "The answer identifies the data, privacy, security, or access tradeoff that follows from the scenario.", ["The answer says technology has no social impact.", "The answer confuses authentication with authorization.", "The answer assumes all data are unbiased.", "The answer ignores who can access the data."], "CSP impact questions connect technical choices to consequences.")
+    ],
+    Cybersecurity: [
+      makeTask("A security log related to {unitLower} shows repeated failed sign-ins followed by one successful sign-in from a new location.", "Which response is best?", "Preserve evidence, contain the account, verify identity, and reset credentials according to policy.", ["Delete the logs to protect privacy.", "Ignore the event because one sign-in succeeded.", "Disable all network access permanently before investigating.", "Send the password by email to confirm the user."], "Cybersecurity questions prioritize evidence, containment, identity, and risk."),
+      makeTask("An organization chooses a control for a risk involving {unitLower}.", "Which control is best matched to the risk?", "Use the control that directly reduces the stated threat while balancing usability and policy requirements.", ["Choose the newest tool regardless of the threat.", "Use only training for every technical vulnerability.", "Remove authentication to improve usability.", "Treat confidentiality, integrity, and availability as the same goal."], "Controls must match threats and protect CIA goals.")
+    ],
+    Business: [
+      makeTask("A business scenario involving {unitLower} compares two choices using costs, expected revenue, risk, and customer value.", "Which decision is best supported?", "Choose the option with the stronger net benefit after considering cost, risk, cash flow, and customer demand.", ["Choose the option with the highest revenue even if costs are higher.", "Ignore risk because expected revenue is positive.", "Choose based only on personal preference.", "Treat cash flow and profit as identical in every case."], "Business decisions require data, tradeoffs, and financial reasoning."),
+      makeTask("A personal-finance case related to {unitLower} asks whether to borrow, save, invest, or insure.", "Which reasoning is strongest?", "Compare interest, opportunity cost, risk tolerance, time horizon, and consequences before deciding.", ["Choose the lowest monthly payment without considering total cost.", "Invest all money in the riskiest option for the highest possible return.", "Ignore credit terms because the purchase is needed.", "Assume insurance is unnecessary when losses are rare."], "Finance questions reward tradeoff analysis and risk awareness.")
+    ],
+    ArtPortfolio: [
+      makeTask("A portfolio statement about {unitLower} describes an inquiry, materials, process images, and revisions.", "Which critique would be most useful?", "It connects visual evidence, materials, composition, and revision choices to the stated inquiry.", ["It praises the work generally without naming visual evidence.", "It focuses only on whether the subject is attractive.", "It recommends decoration unrelated to the inquiry.", "It ignores process because only the final image matters."], "Art portfolio practice should connect process, visual evidence, and intent."),
+      makeTask("A student chooses selected works related to {unitLower} for review.", "Which rationale is strongest?", "The selected works show skill, purposeful decision-making, and clear relationship to the portfolio investigation.", ["The works are selected only because they are the largest.", "The rationale repeats the title of each work.", "The works are unrelated but use similar colors.", "The rationale avoids discussing materials or composition."], "Selected works should demonstrate skill and intentional choices.")
+    ],
+    ArtHistory: [
+      makeTask("An artwork connected to {unitLower} is identified by medium, function, and cultural setting.", "Which analysis is best supported?", "It uses specific visual evidence and context to explain function, content, or meaning.", ["It names the culture but gives no visual evidence.", "It assumes all works with the same material have the same function.", "It describes appearance without explaining meaning.", "It applies a context from a different region or period."], "AP Art History items require visual and contextual evidence."),
+      makeTask("Two works related to {unitLower} are compared by form, function, and patronage.", "Which comparison is strongest?", "It explains how a similarity or difference in form relates to function or cultural context.", ["It compares only size.", "It says both works are art without analysis.", "It ignores patronage and function.", "It relies only on modern taste."], "Comparison must connect visual features to meaning and context.")
+    ],
+    MusicTheory: [
+      makeTask("A notated or listening-style excerpt involving {unitLower} gives key, meter, melody, bass motion, and cadence evidence.", "Which analysis is most accurate?", "Identify the chord, cadence, rhythm, or voice-leading feature from the notated evidence.", ["Choose a chord that conflicts with the bass.", "Ignore meter when interpreting rhythm.", "Create parallel perfect intervals in part writing.", "Analyze the cadence without the final bass note."], "AP Music Theory questions require evidence from notation and aural-style context."),
+      makeTask("A melody related to {unitLower} contains a leap followed by stepwise motion and a cadence.", "Which revision follows common-practice style?", "Resolve tendency tones, preserve the meter, and avoid forbidden parallels.", ["Double the leading tone in a final cadence.", "Leave tendency tones unresolved.", "Change the meter to make rhythm easier.", "Use parallel fifths to strengthen the line."], "Voice-leading rules and cadence evidence guide the answer.")
+    ],
+    Capstone: [
+      makeTask("A research project about {unitLower} includes a broad question, several sources, and a limitation.", "Which revision best improves the inquiry?", "Narrow the question, evaluate source credibility, and explain how the evidence supports a focused claim.", ["Keep the question broad so it can include every source.", "Use sources only because they agree with the claim.", "Summarize each source separately without synthesis.", "Hide limitations to make the argument seem stronger."], "AP Capstone work values focused inquiry, credible evidence, synthesis, and limitations."),
+      makeTask("A presentation defense asks why a method or source was chosen for {unitLower}.", "Which answer is strongest?", "It justifies the choice by connecting credibility, relevance, limitations, and the research purpose.", ["It says the source was chosen because it was easy to find.", "It avoids discussing limitations.", "It repeats the title of the project.", "It claims one source proves the entire argument."], "Defense questions ask for choices that are justified and limited.")
+    ],
+    Social: [
+      makeTask("A course scenario about {unitLower} includes a claim, data, and a competing explanation.", "Which answer is best supported?", "It applies the relevant course concept to the evidence and avoids a conclusion broader than the data allow.", ["It defines the concept without using the scenario.", "It uses personal opinion instead of evidence.", "It assumes the first explanation is automatically correct.", "It ignores the competing explanation."], "Strong AP responses apply concepts to evidence and avoid overclaiming."),
+      makeTask("A source or data display related to {unitLower} supports more than one possible interpretation.", "Which response would earn the strongest score?", "It states a defensible interpretation, uses specific evidence, and explains why the evidence supports the interpretation.", ["It gives a one-word answer without support.", "It repeats the prompt without adding evidence.", "It chooses an interpretation based only on preference.", "It ignores the evidence that complicates the claim."], "CB-style scoring generally rewards claim, evidence, and reasoning.")
+    ]
+  };
+
+  function alignedMcqTasksFor(subject) {
+    const key = profileKeyFor(subject);
+    return CB_ALIGNED_MCQ_TASKS[key] || CB_ALIGNED_MCQ_TASKS[subject.group] || CB_ALIGNED_MCQ_TASKS.Social;
+  }
+
   function mcqTasksFor(subject) {
     const key = profileKeyFor(subject);
-    return MCQ_STYLE_TASKS[key] || MCQ_STYLE_TASKS[subject.group] || MCQ_STYLE_TASKS.Social;
+    return alignedMcqTasksFor(subject) || MCQ_STYLE_TASKS[key] || MCQ_STYLE_TASKS[subject.group] || MCQ_STYLE_TASKS.Social;
+  }
+
+  function uniqueChoices(choices, minimumCount) {
+    const cleaned = [];
+    choices.forEach((choice) => {
+      const normalized = oneLine(choice);
+      if (normalized && !cleaned.some((item) => item.toLowerCase() === normalized.toLowerCase())) {
+        cleaned.push(normalized);
+      }
+    });
+    const fallbacks = [
+      "The response overstates what the evidence can support.",
+      "The response uses course vocabulary but does not apply it to the scenario.",
+      "The response ignores a required condition, variable, or piece of evidence.",
+      "The response makes a correct-sounding claim about a different task."
+    ];
+    fallbacks.forEach((choice) => {
+      if (cleaned.length < minimumCount && !cleaned.includes(choice)) cleaned.push(choice);
+    });
+    return cleaned.slice(0, minimumCount);
   }
 
   function buildMcqTask(subject, index, values) {
+    const alignedTasks = alignedMcqTasksFor(subject);
     const tasks = mcqTasksFor(subject);
     const rawTask = tasks[index % tasks.length];
     const scenario = mcqScenarioFor(subject, index, values);
+    const stimulus = alignedTasks ? rawTask.stimulus : scenario + " " + rawTask.stimulus;
     return {
-      stimulus: oneLine(scenario + " " + fillTemplate(rawTask.stimulus, values)),
+      stimulus: oneLine(fillTemplate(stimulus, values)),
       question: fillTemplate(rawTask.question, values),
       correct: fillTemplate(rawTask.correct, values),
       distractors: rawTask.distractors.map((choice) => fillTemplate(choice, values)),
@@ -2749,6 +2917,7 @@
   }
 
   const FRQ_STYLE_PROMPTS = {
+    Statistics: "A statistical scenario involving {unitLower} includes a study design, data display, probability model, or inference result with a student conclusion.",
     Calculus: "A table and graph for a differentiable function model a situation involving {unitLower}; selected values and rates are given over a closed interval.",
     Precalculus: "A real-world model involving {unitLower} is represented by a table, graph, and symbolic rule, with a stated domain and units.",
     Science: "A controlled investigation of {unitLower} includes a treatment group, a control group, repeated trials, and a graph of the response variable.",
@@ -2776,6 +2945,40 @@
     Social: "A source or scenario about {unitLower} includes evidence, a claim, and a competing interpretation."
   };
 
+  const FRQ_RUBRIC_FOCUS = {
+    Statistics: "Score for correct method selection, condition checks, calculation or comparison, and contextual interpretation.",
+    Calculus: "Score for setup, mathematical procedure, notation, and contextual interpretation with units.",
+    Precalculus: "Score for representation use, model choice, domain reasoning, and interpretation.",
+    Science: "Score for claim or prediction, experimental design, data/model evidence, and mechanism or uncertainty.",
+    Biology: "Score for biological claim, model/data evidence, mechanism, and experimental or evolutionary reasoning.",
+    Chemistry: "Score for quantitative setup, particle-level or energy reasoning, and consistency with the chemical model.",
+    Physics: "Score for representation translation, equations or derivations, units, assumptions, and experimental uncertainty.",
+    History: "Score for thesis or claim, contextual evidence, sourcing, and historical reasoning.",
+    Government: "Score for concept application, data or document evidence, required case/document use, and argumentation.",
+    Economics: "Score for model setup, graph or curve shift, economic vocabulary, and outcome explanation.",
+    Psychology: "Score for concept application, research-method accuracy, evidence, and limits on causation/generalization.",
+    Geography: "Score for geographic concept use, spatial pattern evidence, scale, and process explanation.",
+    EnglishLanguage: "Score for defensible claim, evidence, commentary, rhetorical purpose, and line of reasoning.",
+    EnglishLiterature: "Score for interpretation, textual evidence, commentary, and complexity of literary analysis.",
+    WorldLanguage: "Score for task completion, source use, register, cultural comparison, and comprehensibility.",
+    Latin: "Score for translation accuracy, grammar/syntax evidence, and contextual interpretation.",
+    SpanishLiterature: "Score for textual evidence, literary terminology, period/context, and comparative reasoning.",
+    ComputerScienceA: "Score for specification, algorithmic correctness, data structure use, and boundary-case reasoning.",
+    ComputerSciencePrinciples: "Score for program purpose, algorithms, abstraction, data, testing, and computing impacts.",
+    Cybersecurity: "Score for asset/risk identification, control selection, incident response, and justification.",
+    Business: "Score for financial evidence, tradeoff analysis, risk, stakeholder impact, and recommendation.",
+    ArtPortfolio: "Score for inquiry, visual evidence, process/revision, and rationale for selected work.",
+    ArtHistory: "Score for visual evidence, context, function/content, attribution, and comparison.",
+    MusicTheory: "Score for notation evidence, harmonic/rhythmic accuracy, cadence, and voice-leading rules.",
+    Capstone: "Score for inquiry, source credibility, synthesis, method, limitation, and defense.",
+    Social: "Score for defensible claim, specific evidence, course reasoning, and qualification."
+  };
+
+  function frqRubricFocusFor(subject) {
+    const key = profileKeyFor(subject);
+    return FRQ_RUBRIC_FOCUS[key] || FRQ_RUBRIC_FOCUS[subject.group] || FRQ_RUBRIC_FOCUS.Social;
+  }
+
   function frqPromptFor(subject, values, frqType) {
     const key = profileKeyFor(subject);
     const base = FRQ_STYLE_PROMPTS[key] || FRQ_STYLE_PROMPTS[subject.group] || FRQ_STYLE_PROMPTS.Social;
@@ -2792,7 +2995,9 @@
       const unit = subject.units[index % subject.units.length];
       const values = buildItemValues(subject, unit, index);
       const task = buildMcqTask(subject, index, values);
-      const choices = rotateChoices([task.correct, ...task.distractors.slice(0, choiceCount - 1)], index + subject.slug.length);
+      const correctText = oneLine(task.correct);
+      const rawChoices = uniqueChoices([correctText, ...task.distractors], choiceCount);
+      const choices = rotateChoices(rawChoices, index + subject.slug.length);
       const setStart = Math.floor(index / setLength) * setLength + 1;
       const setEnd = Math.min(setStart + setLength - 1, subject.format.mcqCount);
       const prompt = oneLine(task.stimulus + " " + task.question);
@@ -2805,10 +3010,10 @@
         stimulus: "",
         prompt,
         choices,
-        correct: choices.indexOf(task.correct),
+        correct: choices.indexOf(correctText),
         explanation: task.explanation || fillTemplate(profile.explanation, values),
         choiceExplanations: choices.map((choice, choiceIndex) => choiceExplanation({
-          correct: choices.indexOf(task.correct),
+          correct: choices.indexOf(correctText),
           explanation: task.explanation || fillTemplate(profile.explanation, values)
         }, choice, choiceIndex))
       };
@@ -2830,6 +3035,8 @@
         unit: "Unit " + (unitIndex + 1) + ": " + unit,
         title: fillTemplate(frqType.title, values),
         maxPoints: frqType.parts.length,
+        rubricFocus: frqRubricFocusFor(subject),
+        sourcePattern: "Original practice item modeled on AP Central released-question task types and scoring categories.",
         stimulus: frqPromptFor(subject, values, frqType),
         parts: frqType.parts.map((item) => ({
           label: fillTemplate(item.label, values),
@@ -2858,6 +3065,7 @@
     latestScoreForSubject,
     officialLinksForSubject,
     buildMcqQuestions,
-    buildFrqItems
+    buildFrqItems,
+    alignmentSources: OFFICIAL_ALIGNMENT_SOURCES
   };
 }());
