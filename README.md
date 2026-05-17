@@ -20,6 +20,7 @@ AP Exam Practice is an independent study tool made by Alan. It lets students cho
 - Write FRQ responses and get estimated rubric feedback after submission
 - Print a practice summary for MCQ or FRQ review
 - Check official AP exam schedule, visual timeline, location guidance, and registration links
+- See an automatic College Board schedule status card for completed windows and the next testing dates
 - Adjust the timeline timezone and expand each test day for schedule details
 - Use an auto-adjusting light/dark theme that follows the visitor's device setting
 - Read the independent-use disclaimer and official source links

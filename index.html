@@ -14,7 +14,7 @@
     <meta name="twitter:image" content="https://alanlu439.github.io/ap/assets/social-preview.png">
     <link rel="icon" type="image/svg+xml" href="assets/ap-icon.svg">
     <script>try{const m=localStorage.getItem("ap-practice-theme-mode-v1");const s=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=m==="dark"||m==="light"?m:s;document.documentElement.dataset.themeMode=m==="dark"||m==="light"?m:"auto"}catch{document.documentElement.dataset.theme="light";document.documentElement.dataset.themeMode="auto"}</script>
-    <link rel="stylesheet" href="styles.css?v=focus-20260516e">
+    <link rel="stylesheet" href="styles.css?v=focus-20260517a">
   </head>
   <body>
     <section class="start-screen home-page" id="startScreen">
@@ -99,6 +99,31 @@
             <strong id="timelineNextTitle">Finding the next AP exam...</strong>
             <em id="timelineCountdown">Using your device time.</em>
             <div class="timeline-progress" aria-hidden="true"><span id="timelineProgressFill"></span></div>
+          </div>
+          <div class="official-status-card" id="officialScheduleStatus" aria-live="polite">
+            <div class="official-status-copy">
+              <span id="officialStatusLabel">College Board status</span>
+              <strong id="officialStatusTitle">Checking official AP dates...</strong>
+              <em id="officialStatusMeta">The site checks the College Board schedule and falls back to a verified snapshot when browser fetching is blocked.</em>
+            </div>
+            <dl class="official-status-grid">
+              <div>
+                <dt>Next date</dt>
+                <dd id="officialStatusNext">Checking...</dd>
+              </div>
+              <div>
+                <dt>Window</dt>
+                <dd id="officialStatusWindow">2026 AP dates</dd>
+              </div>
+              <div>
+                <dt>Source</dt>
+                <dd id="officialStatusSource">Connecting...</dd>
+              </div>
+            </dl>
+            <nav class="official-status-links" aria-label="Official College Board schedule links">
+              <a href="https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates" target="_blank" rel="noreferrer">Regular dates</a>
+              <a href="https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/late-testing-dates" target="_blank" rel="noreferrer">Late testing</a>
+            </nav>
           </div>
           <div class="deadline-row" aria-label="AP Digital Portfolio deadlines">
             <div class="deadline-card">
@@ -206,8 +231,8 @@
       </div>
     </div>
 
-    <script src="practice-data.js?v=focus-20260516e"></script>
-    <script src="start.js?v=focus-20260516e"></script>
-    <script src="chrome.js?v=focus-20260516e"></script>
+    <script src="practice-data.js?v=focus-20260517a"></script>
+    <script src="start.js?v=focus-20260517a"></script>
+    <script src="chrome.js?v=focus-20260517a"></script>
   </body>
 </html>

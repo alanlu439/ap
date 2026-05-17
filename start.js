@@ -4,6 +4,34 @@ const SUBJECT_SORT_KEY = "ap-practice-subject-sort-v1";
 const TIMELINE_TIMEZONE_KEY = "ap-practice-timeline-timezone-v1";
 const STUDENT_NAME_KEY = "ap-practice-student-name-v1";
 const SUBJECT_SORTS = new Set(["az", "za", "group", "duration-asc", "duration-desc"]);
+const OFFICIAL_SCHEDULE_SOURCES = {
+  regular: "https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates",
+  late: "https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/late-testing-dates"
+};
+const OFFICIAL_SCHEDULE_SNAPSHOT = {
+  checkedAt: "May 17, 2026",
+  regularWindow: "May 4-15, 2026",
+  lateWindow: "May 18-22, 2026",
+  regularStart: "2026-05-04",
+  regularEnd: "2026-05-15",
+  lateSessions: [
+    { date: "2026-05-18", hour: 8, title: "Comparative Government · European History" },
+    { date: "2026-05-18", hour: 12, title: "World History · English Literature · Human Geography · Latin" },
+    { date: "2026-05-19", hour: 8, title: "Japanese Language · U.S. Government" },
+    { date: "2026-05-19", hour: 12, title: "African American Studies · U.S. History" },
+    { date: "2026-05-20", hour: 8, title: "Microeconomics · Seminar · Statistics" },
+    { date: "2026-05-20", hour: 12, title: "Biology · Chemistry · French Language · Macroeconomics" },
+    { date: "2026-05-21", hour: 8, title: "Chinese Language · CSP · English Language" },
+    { date: "2026-05-21", hour: 12, title: "Music Theory · Precalculus · Art History · Calculus AB/BC · Italian Language · Physics C: Mechanics · Physics 2" },
+    { date: "2026-05-22", hour: 8, title: "Environmental Science · Physics 1 · Spanish Language · Spanish Literature" },
+    { date: "2026-05-22", hour: 12, title: "Computer Science A · German Language · Physics C: E&M · Psychology" }
+  ]
+};
+const officialScheduleFetchState = {
+  checked: false,
+  live: false,
+  message: `Verified snapshot · checked ${OFFICIAL_SCHEDULE_SNAPSHOT.checkedAt}`
+};
 const fallbackSubject = {
   title: "AP Statistics",
   short: "AP Statistics",
@@ -150,6 +178,11 @@ function parseTimelineLocalDate(dateString, hour) {
   return new Date(year, month - 1, day, Number(hour) || 0, 0, 0, 0);
 }
 
+function parseTimelineLocalDateTime(dateString, hour = 0, minute = 0) {
+  const [year, month, day] = String(dateString || "").split("-").map(Number);
+  return new Date(year, month - 1, day, Number(hour) || 0, Number(minute) || 0, 0, 0);
+}
+
 function sameTimelineDay(first, second) {
   return first.getFullYear() === second.getFullYear()
     && first.getMonth() === second.getMonth()
@@ -167,6 +200,141 @@ function formatTimelineCountdown(milliseconds) {
   if (hours) return `${hours}h ${minutes}m`;
   if (minutes) return `${minutes}m ${seconds}s`;
   return `${seconds}s`;
+}
+
+function formatOfficialScheduleDate(date) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric"
+  }).format(date);
+}
+
+function formatOfficialScheduleTime(hour) {
+  return hour >= 12 ? `${hour === 12 ? 12 : hour - 12} PM local` : `${hour} AM local`;
+}
+
+function officialLateSessionItems() {
+  return OFFICIAL_SCHEDULE_SNAPSHOT.lateSessions.map((session) => ({
+    ...session,
+    start: parseTimelineLocalDateTime(session.date, session.hour)
+  }));
+}
+
+function officialScheduleStatus(now) {
+  const regularStart = parseTimelineLocalDateTime(OFFICIAL_SCHEDULE_SNAPSHOT.regularStart, 8);
+  const regularEnd = parseTimelineLocalDateTime(OFFICIAL_SCHEDULE_SNAPSHOT.regularEnd, 23, 59);
+  const lateSessions = officialLateSessionItems();
+  const lateStart = lateSessions[0]?.start || parseTimelineLocalDateTime("2026-05-18", 8);
+  const lateEnd = parseTimelineLocalDateTime("2026-05-22", 23, 59);
+  const nextLate = lateSessions.find((session) => session.start > now) || null;
+
+  if (now < regularStart) {
+    return {
+      label: "Before regular testing",
+      title: `Regular AP exams start ${OFFICIAL_SCHEDULE_SNAPSHOT.regularWindow}.`,
+      meta: "Official exam times are based on the school's testing-location local time.",
+      next: `${formatOfficialScheduleDate(regularStart)} · 8 AM local`,
+      window: `Regular: ${OFFICIAL_SCHEDULE_SNAPSHOT.regularWindow}`
+    };
+  }
+
+  if (now <= regularEnd) {
+    return {
+      label: "Regular testing",
+      title: "Regular AP testing is in progress.",
+      meta: "Use the timeline above for today's regular AP exam sessions.",
+      next: "See the next live regular session above",
+      window: `Regular: ${OFFICIAL_SCHEDULE_SNAPSHOT.regularWindow}`
+    };
+  }
+
+  if (now < lateStart) {
+    return {
+      label: "Regular testing complete",
+      title: "Regular AP exams are done.",
+      meta: `The next official College Board window is late testing, ${OFFICIAL_SCHEDULE_SNAPSHOT.lateWindow}.`,
+      next: `Late testing: ${formatOfficialScheduleDate(lateStart)} · 8 AM local`,
+      window: `Late testing: ${OFFICIAL_SCHEDULE_SNAPSHOT.lateWindow}`
+    };
+  }
+
+  if (now <= lateEnd) {
+    return {
+      label: "Late testing",
+      title: nextLate ? "Late testing is in progress." : "Late testing is wrapping up today.",
+      meta: nextLate
+        ? `Next listed late-testing block: ${nextLate.title}.`
+        : "No later late-testing block remains in the bundled schedule snapshot.",
+      next: nextLate
+        ? `${formatOfficialScheduleDate(nextLate.start)} · ${formatOfficialScheduleTime(nextLate.hour)}`
+        : "No later late-testing block today",
+      window: `Late testing: ${OFFICIAL_SCHEDULE_SNAPSHOT.lateWindow}`
+    };
+  }
+
+  return {
+    label: "2026 testing complete",
+    title: "The 2026 AP testing windows are complete.",
+    meta: "Check College Board for the next published AP exam date cycle.",
+    next: "Next cycle pending College Board publication",
+    window: "Watch official AP schedule updates"
+  };
+}
+
+function updateOfficialScheduleCard(now, timeZone) {
+  const card = document.getElementById("officialScheduleStatus");
+  if (!card) return;
+
+  const status = officialScheduleStatus(now);
+  const label = document.getElementById("officialStatusLabel");
+  const title = document.getElementById("officialStatusTitle");
+  const meta = document.getElementById("officialStatusMeta");
+  const next = document.getElementById("officialStatusNext");
+  const windowEl = document.getElementById("officialStatusWindow");
+  const source = document.getElementById("officialStatusSource");
+
+  card.dataset.officialStatus = normalizeSearch(status.label).replaceAll(" ", "-");
+  if (label) label.textContent = status.label;
+  if (title) title.textContent = status.title;
+  if (meta) meta.textContent = `${status.meta} Display timezone: ${formatTimeZoneName(timeZone)}.`;
+  if (next) next.textContent = status.next;
+  if (windowEl) windowEl.textContent = status.window;
+  if (source) source.textContent = officialScheduleFetchState.message;
+}
+
+async function fetchOfficialScheduleSource() {
+  if (officialScheduleFetchState.checked) return officialScheduleFetchState;
+
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const [regularResponse, lateResponse] = await Promise.all([
+      fetch(OFFICIAL_SCHEDULE_SOURCES.regular, { cache: "no-store", signal: controller.signal }),
+      fetch(OFFICIAL_SCHEDULE_SOURCES.late, { cache: "no-store", signal: controller.signal })
+    ]);
+    const [regularText, lateText] = await Promise.all([
+      regularResponse.text(),
+      lateResponse.text()
+    ]);
+    const hasRegularWindow = /May\s+4[\s\S]*May\s+15|May\s+4-15/i.test(regularText);
+    const hasLateWindow = /May\s+18[\s\S]*May\s+22|May\s+18-22/i.test(lateText);
+
+    officialScheduleFetchState.checked = true;
+    officialScheduleFetchState.live = regularResponse.ok && lateResponse.ok && hasRegularWindow && hasLateWindow;
+    officialScheduleFetchState.message = officialScheduleFetchState.live
+      ? `College Board live check · ${formatTimelineDeadline(new Date().toISOString(), getTimelineTimeZone())}`
+      : `College Board checked; using verified snapshot from ${OFFICIAL_SCHEDULE_SNAPSHOT.checkedAt}`;
+  } catch {
+    officialScheduleFetchState.checked = true;
+    officialScheduleFetchState.live = false;
+    officialScheduleFetchState.message = `Live fetch blocked by browser; using verified College Board snapshot from ${OFFICIAL_SCHEDULE_SNAPSHOT.checkedAt}`;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+
+  return officialScheduleFetchState;
 }
 
 function collectTimelineSessions(timeline) {
@@ -542,6 +710,7 @@ function initTimelineTimezone() {
     applyTimelineFilter(sessions, deadlines, activeFilter, timelineNow, actualNow, timeZone);
     syncTimelineDayCollapse(sessions, activeFilter, selectedSession, timelineNow, manuallyToggledDays);
     updateTimelineLiveCard(sessions, selectedSession, timelineNow);
+    updateOfficialScheduleCard(timelineNow, timeZone);
   };
 
   filters.forEach((button) => {
@@ -578,6 +747,7 @@ function initTimelineTimezone() {
 
   updateTimezoneCopy();
   refreshTimeline();
+  fetchOfficialScheduleSource().then(refreshTimeline);
   window.setInterval(refreshTimeline, 1000);
 }
 
